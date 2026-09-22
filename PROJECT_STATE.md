@@ -554,7 +554,17 @@ screenshot-source.svg
 
 当前 workspace：
 
-NO GIT REPOSITORY
+Git repository:
+https://github.com/wwintj/lumen
+
+Default branch:
+main
+
+Baseline tag:
+v0.2.0-rc1
+
+Visibility:
+Private
 
 之前明确没有执行：
 

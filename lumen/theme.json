@@ -1,0 +1,81 @@
+{
+	"version": 2,
+	"settings": {
+		"color": {
+			"palette": [
+				{ "name": "Background", "slug": "lumen-bg", "value": "#fdfdfd" },
+				{ "name": "Background soft", "slug": "lumen-bg-soft", "value": "#f4f4f4" },
+				{ "name": "Text", "slug": "lumen-fg", "value": "#1b1b1b" },
+				{ "name": "Text soft", "slug": "lumen-fg-soft", "value": "#4b4b4b" },
+				{ "name": "Muted", "slug": "lumen-muted", "value": "#6e6e6e" },
+				{ "name": "Border", "slug": "lumen-border", "value": "#e6e6e6" },
+				{ "name": "Accent", "slug": "lumen-accent", "value": "#1b1b1b" }
+			],
+			"gradients": []
+		},
+		"typography": {
+			"fontFamilies": [
+				{
+					"slug": "lumen-sans",
+					"name": "Sans (system)",
+					"fontFamily": "var(--lumen-sans)",
+					"fontSize": "1.0625rem",
+					"weight": "400",
+					"height": "1.6"
+				}
+			]
+		},
+		"spacing": {
+			"slate": true
+		},
+		"layout": {
+			"contentSize": "68rem",
+			"wideSize": "72rem"
+		},
+		"customColors": [],
+		"customFontSizes": []
+	},
+	"style": {
+		"spacing": {
+			"blockSpacing": "1.5rem"
+		},
+		"color": {
+			"text": { "color": "var(--lumen-fg)" },
+			"background": { "color": "var(--lumen-bg)" }
+		}
+	},
+	"typography": {
+		"bodyFont": {
+			"family": "var(--lumen-sans)",
+			"fontSize": "1.0625rem",
+			"weight": 400,
+			"lineHeight": "1.6"
+		},
+		"h1": {
+			"size": "clamp(2.25rem, 4vw, 3.25rem)"
+		},
+		"h2": {
+			"size": "clamp(1.75rem, 3vw, 2.25rem)"
+		}
+	},
+	"blocks": {
+		"wp-block-post-image": {
+			"style": {
+				"borderRadius": "var(--lumen-radius)",
+				"margin": {
+					"bottom": "1.5rem"
+				}
+			}
+		},
+		"wp-block-quote": {
+			"style": {
+				"color": "var(--lumen-fg-soft)"
+			}
+		},
+		"wp-block-image": {
+			"style": {
+				"borderRadius": "var(--lumen-radius)"
+			}
+		}
+	}
+}

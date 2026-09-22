@@ -1,0 +1,244 @@
+/*
+Theme Name: Lumen
+Theme URI: https://lumen.example/
+Author: Lumen Team
+Author URI: https://lumen.example/
+Description: Lumen is a minimalist, SEO-friendly content blog theme for a bilingual (EN/CN) site. Semantic structure, fast loading, mobile-first, and designed to pair with a thin companion plugin.
+Version: 0.2.0
+Requires at least: 6.3
+Requires PHP: 8.2
+Text Domain: lumen
+Tags: blog, content, minimalist, responsive-layout, custom-menu, translation-ready, rss-icons
+*/
+
+/* ============================================================
+   Design tokens + base reset + typography
+   (Component / layout styles live in assets/css/main.css)
+   ============================================================ */
+
+:root {
+	/* Color (minimalist, near-monochrome) */
+	--lumen-bg: #fdfdfd;
+	--lumen-bg-soft: #f4f4f4;
+	--lumen-fg: #1b1b1b;
+	--lumen-fg-soft: #4b4b4b;
+	--lumen-muted: #6e6e6e;
+	--lumen-border: #e6e6e6;
+	--lumen-accent: #1b1b1b;
+	--lumen-accent-hover: #555555;
+	--lumen-link: #1b1b1b;
+
+	/* Type */
+	--lumen-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+	--lumen-serif: Georgia, "Times New Roman", serif;
+	--lumen-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+	--lumen-fs: 17px;
+
+	/* Layout */
+	--lumen-content-max: 68ch;
+	--lumen-container-max: 72rem;
+	--lumen-gap: 1.5rem;
+	--lumen-gap-sm: 0.75rem;
+	--lumen-radius: 6px;
+
+	/* Shadow */
+	--lumen-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+
+	/* Spacing scale (via theme.json) */
+	--lumen-space-1: 0.5rem;
+	--lumen-space-2: 1rem;
+	--lumen-space-3: 1.5rem;
+	--lumen-space-4: 2.5rem;
+	--lumen-space-5: 4rem;
+
+	/* Motion (restrained) */
+	--lumen-duration: 160ms;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html {
+	-webkit-text-size-adjust: 100%;
+	/* Room for the sticky header when jumping to anchors. */
+	scroll-padding-top: 3.5rem;
+}
+
+body {
+	margin: 0;
+	font-family: var(--lumen-sans);
+	font-size: var(--lumen-fs);
+	line-height: 1.6;
+	color: var(--lumen-fg);
+	background: var(--lumen-bg);
+	-webkit-font-smoothing: antialiased;
+	text-rendering: optimizeLegibility;
+}
+
+/* Semantic structure */
+img {
+	max-width: 100%;
+	height: auto;
+	display: block;
+}
+
+a {
+	color: var(--lumen-link);
+	text-decoration: none;
+	overflow-wrap: anywhere;
+}
+a:hover {
+	text-decoration: underline;
+	color: var(--lumen-accent-hover);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	margin: 0 0 0.6em;
+	line-height: 1.25;
+	font-weight: 500;
+	letter-spacing: -0.01em;
+}
+
+h1 {
+	font-size: clamp(2.25rem, 4vw, 3.25rem);
+}
+h2 {
+	font-size: clamp(1.75rem, 3vw, 2.25rem);
+}
+h3 {
+	font-size: clamp(1.5rem, 2.5vw, 1.75rem);
+}
+
+p {
+	margin: 0 0 1em;
+}
+
+blockquote {
+	margin: 1.5em 0;
+	padding-left: 1.5em;
+	border-left: 2px solid var(--lumen-fg-soft);
+	color: var(--lumen-fg-soft);
+}
+
+ol,
+ul {
+	margin: 0 0 1em;
+	padding-left: 1.5em;
+}
+li {
+	margin-bottom: 0.35em;
+}
+
+hr {
+	border: 0;
+	border-top: 1px solid var(--lumen-border);
+	margin: 2em 0;
+}
+
+table {
+	border-collapse: collapse;
+	width: 100%;
+	margin-bottom: 1em;
+}
+th,
+td {
+	border: 1px solid var(--lumen-border);
+	padding: 0.6em 0.75em;
+	text-align: left;
+}
+
+code {
+	font-family: var(--lumen-mono);
+	background: var(--lumen-bg-soft);
+	padding: 0.1em 0.35em;
+	border-radius: var(--lumen-radius);
+	font-size: 0.9em;
+}
+pre {
+	background: var(--lumen-bg-soft);
+	padding: 1em 1.25em;
+	border-radius: var(--lumen-radius);
+	overflow: auto;
+	overflow-wrap: anywhere;
+	white-space: pre-wrap;
+}
+pre code {
+	background: 0;
+	padding: 0;
+}
+
+form {
+	margin: 0 0 1.5em;
+}
+input[type="text"],
+input[type="email"],
+input[type="url"],
+input[type="search"],
+input[type="number"],
+textarea,
+select {
+	width: 100%;
+	font: inherit;
+	color: var(--lumen-fg);
+	background: #fff;
+	border: 1px solid var(--lumen-border);
+	border-radius: var(--lumen-radius);
+	padding: 0.5em 0.75em;
+}
+textarea {
+	min-height: 8em;
+	resize: vertical;
+}
+
+button,
+.wp-block-button__link {
+	font: inherit;
+	padding: 0.5em 1em;
+	border: 1px solid var(--lumen-fg);
+	border-radius: var(--lumen-radius);
+	background: var(--lumen-fg);
+	color: #fff;
+	cursor: pointer;
+}
+button:hover,
+.wp-block-button__link:hover {
+	opacity: 0.9;
+}
+
+/* Accessibility */
+.visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	white-space: nowrap;
+	border: 0;
+}
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+	outline: 2px solid var(--lumen-accent);
+	outline-offset: 2px;
+}
+
+/* Print (minimal) */
+@media print {
+	.lumen-site-header,
+	.lumen-site-footer,
+	.lumen-skip-link {
+		display: none;
+	}
+}

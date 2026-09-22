@@ -1,0 +1,635 @@
+/* ============================================================
+   Lumen — component / layout styles
+   (base reset + typography + design tokens live in style.css)
+   Mobile-first. No JS; navigation is an always-accessible list.
+   ============================================================ */
+
+/* ============================================================
+   Skip link
+   ============================================================ */
+
+.lumen-skip-link {
+	position: absolute;
+	top: -100px;
+	left: 1rem;
+	z-index: 200;
+	background: var(--lumen-fg);
+	color: #fff;
+	padding: 0.75rem 1.25rem;
+	border-radius: 0 0 var(--lumen-radius) var(--lumen-radius);
+	transition: top 120ms ease;
+}
+.lumen-skip-link:focus {
+	top: 0;
+}
+
+/* ============================================================
+   Layout
+   ============================================================ */
+
+.lumen-container {
+	width: min(100% - 1.5rem, var(--lumen-container-max));
+	margin-inline: auto;
+}
+
+.lumen-site-main {
+	padding-block: var(--lumen-space-3) var(--lumen-space-5);
+}
+
+/* ============================================================
+   Header
+   ============================================================ */
+
+.lumen-site-header {
+	position: sticky;
+	top: 0;
+	z-index: 50;
+	background: var(--lumen-bg);
+	border-bottom: 1px solid var(--lumen-border);
+}
+
+/* When the WordPress Admin Bar is visible, offset the sticky header
+   (progressive, pure CSS — no JS). The .admin-bar class is added to <body>
+   by WordPress when the logged-in admin bar is shown. */
+body.admin-bar .lumen-site-header {
+	top: 32px;
+}
+
+.lumen-header-inner {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.5rem;
+	padding-block: 0.5rem;
+}
+
+.lumen-site-title {
+	font-size: 1.25rem;
+	font-weight: 700;
+	letter-spacing: -0.02em;
+}
+
+.lumen-site-logo {
+	display: inline-block;
+}
+.lumen-site-logo img {
+	max-height: 32px;
+}
+
+/* --- Navigation (always accessible, no JS) --- */
+
+.lumen-site-nav ul {
+	list-style: none;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.15rem;
+	margin: 0;
+	padding: 0;
+}
+
+.lumen-site-nav a {
+	font-size: 0.9rem;
+	padding: 0.25rem 0.5rem;
+	border-radius: var(--lumen-radius);
+}
+.lumen-site-nav a:hover {
+	background: var(--lumen-bg-soft);
+}
+
+/* Desktop: title left, nav right */
+@media (min-width: 768px) {
+	.lumen-header-inner {
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		padding-block: 0.75rem;
+	}
+
+	.lumen-site-nav ul {
+		flex-direction: row;
+		align-items: center;
+		gap: 0.25rem;
+	}
+
+	.lumen-site-nav a {
+		font-size: 1rem;
+		padding: 0.35rem 0.5rem;
+	}
+}
+
+/* ============================================================
+   Footer
+   ============================================================ */
+
+.lumen-site-footer {
+	border-top: 1px solid var(--lumen-border);
+	padding-block: 1.5rem;
+	background: var(--lumen-bg-soft);
+	margin-top: var(--lumen-space-4);
+}
+
+.lumen-footer-inner {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+.lumen-site-footer-nav ul {
+	list-style: none;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1.25rem;
+	margin: 0;
+	padding: 0;
+}
+
+.lumen-site-footer-nav a {
+	font-size: 0.95rem;
+}
+
+.lumen-footer-meta {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	gap: 0.75rem;
+	align-items: center;
+	color: var(--lumen-muted);
+	font-size: 0.9rem;
+}
+
+.lumen-footer-copyright {
+	margin: 0;
+}
+
+.lumen-footer-feed a {
+	color: var(--lumen-fg);
+}
+.lumen-footer-feed span[aria-hidden="true"] {
+	font-size: 1.2em;
+}
+
+@media (min-width: 768px) {
+	.lumen-footer-inner {
+		flex-direction: row;
+		align-items: center;
+	}
+
+	.lumen-site-footer-nav {
+		order: 1;
+	}
+
+	.lumen-footer-meta {
+		order: 2;
+		flex: 1;
+	}
+}
+
+/* ============================================================
+   Archive / Blog list
+   ============================================================ */
+
+.lumen-archive-wrap {
+	padding-block: var(--lumen-space-4) var(--lumen-space-5);
+}
+
+.lumen-archive-header {
+	max-width: var(--lumen-content-max);
+	margin: 0 auto var(--lumen-space-4);
+}
+
+.lumen-archive-title {
+	font-size: clamp(1.5rem, 1.25rem + 1vw, 2rem);
+	font-weight: 500;
+	letter-spacing: -0.025em;
+	margin-bottom: var(--lumen-space-4);
+}
+
+.lumen-archive-header .lumen-search-form {
+	margin-top: 1rem;
+}
+
+.lumen-post-list {
+	list-style: none;
+	margin: 0 auto;
+	padding: 0;
+	max-width: var(--lumen-content-max);
+	display: grid;
+	gap: 2.5rem;
+	grid-template-columns: 1fr;
+}
+
+.lumen-post-item {
+	margin: 0;
+	min-width: 0;
+}
+
+.lumen-post-card {
+	border-bottom: 1px solid var(--lumen-border);
+	padding-bottom: 2rem;
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+
+.lumen-post-list > :last-child {
+	border-bottom: 0;
+	padding-bottom: 0;
+}
+
+.lumen-post-thumb {
+	margin-bottom: 1rem;
+}
+.lumen-post-thumb a {
+	display: block;
+}
+.lumen-post-thumb img {
+	width: 100%;
+	height: auto;
+	display: block;
+	aspect-ratio: 16 / 9;
+	object-fit: cover;
+}
+
+.lumen-post-card .lumen-post-title {
+	font-size: 1.5rem;
+	line-height: 1.3;
+	margin-bottom: 0.5rem;
+}
+
+.lumen-post-card .lumen-post-title a {
+	font-weight: 500;
+}
+
+.lumen-post-meta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	align-items: center;
+	margin: 0 0 0.75rem;
+}
+
+.lumen-post-meta * {
+	font-size: 0.85rem;
+	color: var(--lumen-muted);
+}
+
+.lumen-post-meta a {
+	color: var(--lumen-muted);
+}
+.lumen-post-meta a:hover {
+	color: var(--lumen-fg);
+}
+
+.lumen-post-date {
+	font-variant-numeric: tabular-nums;
+}
+
+.lumen-post-cats {
+	display: inline-flex;
+	gap: 0.5rem;
+}
+
+.lumen-post-cat {
+	font-size: 0.8rem;
+	color: var(--lumen-muted);
+}
+
+@media (min-width: 768px) {
+	.lumen-post-list {
+		gap: 3rem;
+	}
+}
+
+/* ============================================================
+   Single post
+   ============================================================ */
+
+.lumen-post-header {
+	max-width: var(--lumen-content-max);
+	margin-inline: auto;
+	padding-block: 2rem;
+}
+
+.lumen-post-featured img {
+	width: 100%;
+	height: auto;
+	display: block;
+	aspect-ratio: 16 / 9;
+	object-fit: cover;
+}
+
+.lumen-post-title {
+	font-size: clamp(2rem, 4.5vw, 3rem);
+	margin-bottom: 0.5rem;
+}
+
+.lumen-post-body {
+	max-width: var(--lumen-content-max);
+	margin-inline: auto;
+}
+
+.lumen-post-body img {
+	max-width: 100%;
+	height: auto;
+	margin-block: 1rem 1.5rem;
+	border-radius: var(--lumen-radius);
+}
+.lumen-post-body img:first-child {
+	margin-top: 0;
+}
+.lumen-post-body img:last-child {
+	margin-bottom: 0;
+}
+
+.lumen-post-body p {
+	margin-bottom: 1.5rem;
+}
+
+/* Wide tables on narrow screens scroll horizontally. */
+@media (max-width: 767px) {
+	.lumen-post-body table {
+		display: block;
+		width: 100%;
+		overflow-x: auto;
+	}
+}
+
+.lumen-post-nav {
+	max-width: var(--lumen-content-max);
+	margin-inline: auto;
+	margin-top: var(--lumen-space-4);
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	align-items: center;
+}
+/* Core the_post_navigation() emits:
+     <nav class="navigation post-navigation">
+       <div class="nav-links">
+         <div class="nav-previous">…</div>
+         <div class="nav-next">…</div>
+       </div>
+     </nav>
+   Style those exact Core classes; no nth-child fallback. */
+.lumen-post-nav .post-navigation {
+	flex: 1 1 100%;
+}
+.lumen-post-nav .post-navigation .nav-links {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	align-items: center;
+}
+.lumen-post-nav .post-navigation .nav-previous,
+.lumen-post-nav .post-navigation .nav-next {
+	margin: 0;
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+.lumen-post-nav .post-navigation .nav-previous {
+	margin-right: auto;
+}
+.lumen-post-nav .post-navigation .nav-next {
+	margin-left: auto;
+}
+.lumen-post-nav a {
+	font-size: 0.95rem;
+	color: var(--lumen-fg-soft);
+	overflow-wrap: anywhere;
+}
+.lumen-post-nav a:hover {
+	color: var(--lumen-fg);
+}
+
+/* ============================================================
+   Page
+   ============================================================ */
+
+.lumen-page-wrap {
+	max-width: var(--lumen-content-max);
+	margin-inline: auto;
+}
+
+.lumen-page-body {
+	margin-top: 1.5rem;
+}
+
+/* ============================================================
+   Search / 404
+   ============================================================ */
+
+.lumen-not-found-wrap {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: calc(100vh - 2rem);
+}
+
+.lumen-not-found {
+	text-align: center;
+	padding-block: var(--lumen-space-5);
+}
+
+.lumen-not-found-code {
+	font-size: 5rem;
+	font-weight: 700;
+	margin: 0;
+}
+
+.lumen-not-found-message {
+	font-size: 1.25rem;
+}
+
+.lumen-not-found-sub {
+	color: var(--lumen-muted);
+}
+
+/* ============================================================
+   Comments
+   ============================================================ */
+
+.lumen-comments {
+	margin-top: var(--lumen-space-5);
+	max-width: var(--lumen-content-max);
+	margin-inline: auto;
+}
+
+.lumen-comments-title {
+	font-size: 1.5rem;
+	margin-bottom: 1.5rem;
+}
+
+.lumen-comment-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.lumen-comment-list li {
+	margin: 0;
+	padding: 1.5rem 0;
+	border-top: 1px solid var(--lumen-border);
+}
+
+.lumen-comment-list li:first-child {
+	padding-top: 0;
+}
+
+.lumen-comment-author {
+	font-weight: 600;
+	margin: 0 0 0.25rem;
+}
+
+.lumen-comment-date {
+	font-size: 0.85rem;
+	color: var(--lumen-muted);
+}
+
+.lumen-comment-form-wrap {
+	margin-top: 2rem;
+}
+
+/* Core comment form rows are <p class="comment-form-*"> (no .wp-row divs).
+   The cols="45" #comment textarea has a wide min-content, so constrain the
+   form controls so nothing overflows on narrow viewports. */
+.lumen-comments #commentform textarea {
+	width: 100%;
+	box-sizing: border-box;
+}
+.lumen-comments #commentform input[type="text"],
+.lumen-comments #commentform input[type="email"],
+.lumen-comments #commentform input[type="url"] {
+	width: 100%;
+	box-sizing: border-box;
+}
+
+/* ============================================================
+   Search form
+   ============================================================ */
+
+.lumen-search-form {
+	display: flex;
+	gap: 0.5rem;
+	max-width: 30rem;
+	flex-wrap: wrap;
+}
+
+.lumen-search-input {
+	flex: 1;
+	width: min(100%, 20rem);
+	min-width: 0;
+	padding: 0.6rem 0.9rem;
+}
+
+.lumen-search-button {
+	padding: 0.6rem 1rem;
+}
+
+/* ============================================================
+   Pagination
+   ============================================================ */
+
+.lumen-pagination {
+	margin-top: 2.5rem;
+	text-align: center;
+}
+
+.lumen-pagination .prev,
+.lumen-pagination .next {
+	font-weight: 500;
+}
+
+/* ============================================================
+   Gutenberg / block styles
+   ============================================================ */
+
+/* Full-bleed alignment (progressive; modern browsers). */
+/* WP generates .alignfull / .alignwide (not .align-wp-block-align-full);
+   match the real class names so the rule actually applies. */
+.align-wp-block-align-full,
+.alignfull {
+	margin-left: calc(50% - 50vw);
+	margin-right: calc(50% - 50vw);
+}
+
+.wp-block-quote {
+	margin: 1.5rem 0;
+	padding-left: 1.5rem;
+	border-left: 2px solid var(--lumen-fg-soft);
+	color: var(--lumen-fg-soft);
+}
+
+.wp-block-image img {
+	max-width: 100%;
+	border-radius: var(--lumen-radius);
+}
+
+.wp-block-image.is-alignment-center {
+	margin-inline: auto;
+}
+
+/* Image captions (WP core .wp-caption / figcaption). */
+figcaption,
+.wp-caption-text {
+	font-size: 0.9em;
+	color: var(--lumen-muted);
+	margin-top: 0.5rem;
+	text-align: left;
+}
+
+/* Responsive galleries. */
+.gallery,
+.wp-block-gallery {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+	gap: 1rem;
+	list-style: none;
+	padding: 0;
+	margin: 0 0 1.5rem;
+}
+.gallery-item,
+.wp-block-gallery figure {
+	margin: 0;
+}
+.gallery-item img,
+.wp-block-gallery img {
+	width: 100%;
+	aspect-ratio: 1 / 1;
+	object-fit: cover;
+	border-radius: var(--lumen-radius);
+}
+
+/* ============================================================
+   Utilities
+   ============================================================ */
+
+.lumen-btn {
+	display: inline-block;
+}
+
+.lumen-not-found-home {
+	margin-top: 1.5rem;
+	display: inline-block;
+	padding: 0.6rem 1.25rem;
+	font-weight: 500;
+	text-decoration: none;
+	border: 1px solid var(--lumen-fg);
+	border-radius: var(--lumen-radius);
+}
+.lumen-not-found-home:hover {
+	background: var(--lumen-fg);
+	color: var(--lumen-bg);
+}
+
+.lumen-archive-empty {
+	text-align: center;
+	color: var(--lumen-muted);
+	padding-block: var(--lumen-space-4);
+}
+
+/* Respect prefers-reduced-motion: the skip link needs no animation. */
+@media (prefers-reduced-motion: reduce) {
+	.lumen-skip-link {
+		transition: none;
+	}
+}

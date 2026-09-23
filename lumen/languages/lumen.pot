@@ -33,10 +33,6 @@
 "Back to home";
 "";
 
-#: comments.php:34
-"Leave a comment";
-"";
-
 #: comments.php:35
 "Comments";
 "";
@@ -55,7 +51,7 @@
 "";
 
 #: footer.php:23
-"© %1$s %2s.";
+"© %1$s %2$s";
 "";
 
 #: footer.php:29

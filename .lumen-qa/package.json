@@ -1,0 +1,11 @@
+{
+  "name": "lumen-qa",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "start": "node qa.js"
+  },
+  "dependencies": {
+    "playwright": "^1.63.0"
+  }
+}

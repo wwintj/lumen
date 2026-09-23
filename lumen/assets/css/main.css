@@ -33,7 +33,7 @@
 }
 
 .lumen-site-main {
-	padding-block: var(--lumen-space-3) var(--lumen-space-5);
+	padding-block: 2.5rem 4rem;
 }
 
 /* ============================================================
@@ -59,12 +59,12 @@ body.admin-bar .lumen-site-header {
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
-	gap: 0.5rem;
-	padding-block: 0.5rem;
+	gap: 0.75rem;
+	padding-block: 0.75rem;
 }
 
 .lumen-site-title {
-	font-size: 1.25rem;
+	font-size: 1.5rem;
 	font-weight: 700;
 	letter-spacing: -0.02em;
 }
@@ -82,13 +82,13 @@ body.admin-bar .lumen-site-header {
 	list-style: none;
 	display: flex;
 	flex-wrap: wrap;
-	gap: 0.15rem;
+	gap: 0.75rem;
 	margin: 0;
 	padding: 0;
 }
 
 .lumen-site-nav a {
-	font-size: 0.9rem;
+	font-size: 1rem;
 	padding: 0.25rem 0.5rem;
 	border-radius: var(--lumen-radius);
 }
@@ -103,13 +103,14 @@ body.admin-bar .lumen-site-header {
 		align-items: center;
 		justify-content: space-between;
 		gap: 1rem;
-		padding-block: 0.75rem;
+		min-height: 4.75rem;
+		padding-block: 0;
 	}
 
 	.lumen-site-nav ul {
 		flex-direction: row;
 		align-items: center;
-		gap: 0.25rem;
+		gap: 1.5rem;
 	}
 
 	.lumen-site-nav a {
@@ -125,14 +126,18 @@ body.admin-bar .lumen-site-header {
 .lumen-site-footer {
 	border-top: 1px solid var(--lumen-border);
 	padding-block: 1.5rem;
-	background: var(--lumen-bg-soft);
-	margin-top: var(--lumen-space-4);
 }
 
 .lumen-footer-inner {
 	display: flex;
 	flex-direction: column;
 	gap: 0.75rem;
+}
+
+.lumen-footer-left {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
 }
 
 .lumen-site-footer-nav ul {
@@ -148,40 +153,30 @@ body.admin-bar .lumen-site-header {
 	font-size: 0.95rem;
 }
 
-.lumen-footer-meta {
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: space-between;
-	gap: 0.75rem;
-	align-items: center;
+.lumen-footer-copyright {
+	margin: 0;
 	color: var(--lumen-muted);
 	font-size: 0.9rem;
 }
 
-.lumen-footer-copyright {
-	margin: 0;
+.lumen-footer-feed {
+	font-size: 0.9rem;
+	color: var(--lumen-muted);
 }
-
-.lumen-footer-feed a {
+.lumen-footer-feed:hover {
 	color: var(--lumen-fg);
-}
-.lumen-footer-feed span[aria-hidden="true"] {
-	font-size: 1.2em;
 }
 
 @media (min-width: 768px) {
 	.lumen-footer-inner {
 		flex-direction: row;
-		align-items: center;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 2rem;
 	}
 
-	.lumen-site-footer-nav {
-		order: 1;
-	}
-
-	.lumen-footer-meta {
-		order: 2;
-		flex: 1;
+	.lumen-footer-feed {
+		align-self: center;
 	}
 }
 
@@ -190,19 +185,19 @@ body.admin-bar .lumen-site-header {
    ============================================================ */
 
 .lumen-archive-wrap {
-	padding-block: var(--lumen-space-4) var(--lumen-space-5);
+	max-width: var(--lumen-content-max);
+	margin-inline: auto;
 }
 
 .lumen-archive-header {
-	max-width: var(--lumen-content-max);
-	margin: 0 auto var(--lumen-space-4);
+	margin-bottom: var(--lumen-space-3);
 }
 
 .lumen-archive-title {
-	font-size: clamp(1.5rem, 1.25rem + 1vw, 2rem);
+	font-size: clamp(2.25rem, 2rem + 1.2vw, 2.625rem);
 	font-weight: 500;
 	letter-spacing: -0.025em;
-	margin-bottom: var(--lumen-space-4);
+	margin-bottom: var(--lumen-space-3);
 }
 
 .lumen-archive-header .lumen-search-form {
@@ -211,9 +206,8 @@ body.admin-bar .lumen-site-header {
 
 .lumen-post-list {
 	list-style: none;
-	margin: 0 auto;
+	margin: 0;
 	padding: 0;
-	max-width: var(--lumen-content-max);
 	display: grid;
 	gap: 2.5rem;
 	grid-template-columns: 1fr;
@@ -226,14 +220,12 @@ body.admin-bar .lumen-site-header {
 
 .lumen-post-card {
 	border-bottom: 1px solid var(--lumen-border);
-	padding-bottom: 2rem;
 	min-width: 0;
 	overflow-wrap: anywhere;
 }
 
 .lumen-post-list > :last-child {
 	border-bottom: 0;
-	padding-bottom: 0;
 }
 
 .lumen-post-thumb {
@@ -294,11 +286,7 @@ body.admin-bar .lumen-site-header {
 	color: var(--lumen-muted);
 }
 
-@media (min-width: 768px) {
-	.lumen-post-list {
-		gap: 3rem;
-	}
-}
+/* Post-list gap is a constant 2.5rem at all widths. */
 
 /* ============================================================
    Single post
@@ -307,7 +295,7 @@ body.admin-bar .lumen-site-header {
 .lumen-post-header {
 	max-width: var(--lumen-content-max);
 	margin-inline: auto;
-	padding-block: 2rem;
+	padding-bottom: 2rem;
 }
 
 .lumen-post-featured img {
@@ -316,6 +304,7 @@ body.admin-bar .lumen-site-header {
 	display: block;
 	aspect-ratio: 16 / 9;
 	object-fit: cover;
+	border-radius: var(--lumen-radius);
 }
 
 .lumen-post-title {
@@ -411,7 +400,7 @@ body.admin-bar .lumen-site-header {
 }
 
 .lumen-page-body {
-	margin-top: 1.5rem;
+	margin-top: 1rem;
 }
 
 /* ============================================================
@@ -510,7 +499,7 @@ body.admin-bar .lumen-site-header {
 .lumen-search-form {
 	display: flex;
 	gap: 0.5rem;
-	max-width: 30rem;
+	max-width: 32rem;
 	flex-wrap: wrap;
 }
 

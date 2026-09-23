@@ -20,6 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<p class="lumen-not-found-sub">
 			<?php echo esc_html__( 'You may have mistyped the URL or the page may have been moved.', 'lumen' ); ?>
 		</p>
+		<?php lumen_search_form(); ?>
 		<a class="lumen-btn lumen-not-found-home" href="<?php echo esc_url( home_url( '/' ) ); ?>">
 			<?php echo esc_html__( 'Back to home', 'lumen' ); ?>
 		</a>

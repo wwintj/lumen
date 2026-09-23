@@ -4,7 +4,7 @@ Contributor URI: https://lumen.example/
 Author: Lumen Team
 Author URI: https://lumen.example/
 Homepage URL: https://lumen.example/
-Version: 0.2.0
+Version: 1.0.0
 Requires at least: 6.3
 Tested up to: 6.7
 Requires PHP: 8.2
@@ -14,7 +14,7 @@ Text Domain: lumen
 Domain Path: /
 Tags: blog, content, minimalist, responsive-layout, custom-menu, translation-ready, rss-icons
 
-A minimalist, SEO-friendly content blog theme built for a bilingual (English + Chinese) site. Visual-polish release candidate (Phase 2 — 0.2.0).
+A minimalist, SEO-friendly content blog theme built for a bilingual (English + Chinese) site. Initial stable release (1.0.0).
 
 == Features ==
 * Semantic HTML5 structure (header, nav, main, article, section, footer).
@@ -51,6 +51,8 @@ A minimalist, SEO-friendly content blog theme built for a bilingual (English + C
 At 0.1.0 the plugin is a thin bootstrap: plugin header, LBN_VERSION constant, and a text-domain load (lumen-blog) so future extensions are i18n-ready. It ships no features, no UI, no REST endpoints, and no hooks beyond the text-domain load. Concrete features (CPTs, forms, REST API) are added in later phases only when a concrete need exists (YAGNI).
 
 == Changelog ==
+* 1.0.0 (Initial stable release)
+  * Release freeze: all Phase 1.2 / 1.3 browser validations pass; no new features or redesign.
 * 0.2.0 (Phase 2 — visual polish; release candidate)
   * Constrained the home/archive column to ~68ch, centered (flat editorial post list; no full-width).
   * Fixed post-card titles to 1.5rem (were 48px, same size as the single-post title).

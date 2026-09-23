@@ -4,7 +4,7 @@ Theme URI: https://lumen.example/
 Author: Lumen Team
 Author URI: https://lumen.example/
 Description: Lumen is a minimalist, SEO-friendly content blog theme for a bilingual (EN/CN) site. Semantic structure, fast loading, mobile-first, and designed to pair with a thin companion plugin.
-Version: 0.2.0
+Version: 1.0.0
 Requires at least: 6.3
 Requires PHP: 8.2
 Text Domain: lumen
@@ -35,11 +35,11 @@ Tags: blog, content, minimalist, responsive-layout, custom-menu, translation-rea
 	--lumen-fs: 17px;
 
 	/* Layout */
-	--lumen-content-max: 68ch;
-	--lumen-container-max: 72rem;
+	--lumen-content-max: 720px;
+	--lumen-container-max: 1180px;
 	--lumen-gap: 1.5rem;
 	--lumen-gap-sm: 0.75rem;
-	--lumen-radius: 6px;
+	--lumen-radius: 4px;
 
 	/* Shadow */
 	--lumen-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
@@ -71,7 +71,7 @@ body {
 	margin: 0;
 	font-family: var(--lumen-sans);
 	font-size: var(--lumen-fs);
-	line-height: 1.6;
+	line-height: 1.7;
 	color: var(--lumen-fg);
 	background: var(--lumen-bg);
 	-webkit-font-smoothing: antialiased;

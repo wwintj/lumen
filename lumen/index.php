@@ -39,12 +39,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 				$archive_title  = __( 'Latest posts', 'lumen' );
 			endif;
 
-			echo esc_html( $archive_title );
+			// get_the_archive_title() returns markup (e.g. <span>); emit it
+			// verbatim so the term name renders as intended.
+			echo ( string ) $archive_title;
 			?>
 		</h1>
-		<?php if ( is_archive( 'posts' ) ) : ?>
-			<?php lumen_search_form(); ?>
-		<?php endif; ?>
 	</header>
 
 	<?php get_template_part( 'template-parts/post-list' ); ?>

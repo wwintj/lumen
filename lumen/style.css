@@ -31,6 +31,7 @@ Tags: blog, content, minimalist, responsive-layout, custom-menu, translation-rea
 	/* Type */
 	--lumen-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 	--lumen-serif: Georgia, "Times New Roman", serif;
+	--lumen-serif-cn: "Songti SC", "STSong", "FangSong", "STFangsong", "SimSun", serif;
 	--lumen-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 	--lumen-fs: 17px;
 

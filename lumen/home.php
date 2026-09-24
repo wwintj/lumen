@@ -16,12 +16,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 <?php get_header(); ?>
 
 <section class="lumen-home-wrap">
-	<header class="lumen-home-header">
-		<h1 class="lumen-home-heading">
-			<?php echo esc_html__( 'Latest', 'lumen' ); ?>
-		</h1>
-	</header>
-
 	<?php if ( have_posts() ) : ?>
 
 		<div class="lumen-home-list">

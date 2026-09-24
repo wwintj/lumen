@@ -114,3 +114,37 @@ if ( ! function_exists( 'lumen_post_categories' ) ) {
 		echo '</span>';
 	}
 }
+
+if ( ! function_exists( 'lumen_home_excerpt' ) ) {
+	/**
+	 * Returns a trimmed excerpt for the Blog Home only.
+	 *
+	 * CJK (Chinese) text → up to 80 characters.
+	 * Latin text          → up to 24 words.
+	 *
+	 * Only used by template-parts/home-post-item.php, so Single/Archive/
+	 * Search excerpts are untouched.
+	 *
+	 * @return string
+	 */
+	function lumen_home_excerpt() {
+		$raw  = (string) get_the_excerpt();
+		$text = trim( wp_strip_all_tags( $raw ) );
+		if ( '' === $text ) {
+			return '';
+		}
+		if ( preg_match( '/[\p{Han}]/u', $text ) ) {
+			// Chinese: cut to ~80 characters.
+			$max   = 80;
+			$chars = preg_split( '//u', $text, -1, PREG_SPLIT_NO_EMPTY );
+			$kept  = array_slice( $chars, 0, $max );
+			$out   = implode( '', $kept );
+			if ( count( $chars ) > $max ) {
+				$out .= '…';
+			}
+			return $out;
+		}
+		// Latin: cut to ~24 words.
+		return wp_trim_words( $text, 24, '…' );
+	}
+}

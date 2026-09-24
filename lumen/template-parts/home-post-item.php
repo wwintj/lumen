@@ -20,9 +20,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// ~30 words of summary, controlled only on the homepage output.
-$excerpt = wp_trim_words( get_the_excerpt(), 30, '…' );
-$excerpt = trim( $excerpt );
+// Homepage-only excerpt: CJK ~80 chars / Latin ~24 words, trimmed in
+// template-tags.php (lumen_home_excerpt()) so Single/Archive/Search excerpts are untouched.
+$excerpt = lumen_home_excerpt();
 ?>
 <article class="lumen-home-post">
 	<p class="lumen-home-meta">

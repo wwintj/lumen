@@ -622,3 +622,131 @@ figcaption,
 		transition: none;
 	}
 }
+
+/* ============================================================
+   Homepage — latest posts only (.lumen-home-*)
+   ============================================================ */
+
+/* Content column, same width as single posts. */
+.lumen-home-wrap {
+	max-width: var(--lumen-content-max);
+	margin-inline: auto;
+}
+
+/* Small quiet section label, NOT a hero heading. */
+.lumen-home-heading {
+	margin: 0 0 2rem;
+	font-size: 0.75rem;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--lumen-muted);
+}
+
+/* Quiet list: whitespace-separated articles, no cards / borders / shadows. */
+.lumen-home-list {
+	display: grid;
+	gap: 2.5rem;
+	margin: 0;
+	padding: 0;
+}
+
+.lumen-home-post {
+	margin: 0;
+	min-width: 0;
+}
+
+/* DATE · CATEGORY meta line. */
+.lumen-home-meta {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	margin: 0 0 0.5rem;
+	font-size: 0.8125rem;
+	line-height: 1.5;
+	color: var(--lumen-muted);
+}
+.lumen-home-meta .lumen-post-date {
+	font-variant-numeric: tabular-nums;
+}
+.lumen-home-meta .lumen-post-cats {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	margin-left: 0.5rem;
+}
+/* Middle dot between date and categories; only appears when categories render. */
+.lumen-home-meta .lumen-post-cats::before {
+	content: '\00B7';
+}
+.lumen-home-meta .lumen-post-cat {
+	font-size: 0.8125rem;
+	color: var(--lumen-muted);
+}
+.lumen-home-meta .lumen-post-cat:hover {
+	color: var(--lumen-fg);
+}
+
+/* Title: no underline by default, only a subtle change on hover. */
+.lumen-home-title {
+	margin: 0 0 0.75rem;
+	font-size: 1.5rem;
+	font-weight: 600;
+	line-height: 1.3;
+}
+.lumen-home-title a {
+	font-weight: 600;
+	text-decoration: none;
+}
+.lumen-home-title a:hover {
+	opacity: 0.7;
+}
+
+/* Excerpt. */
+.lumen-home-excerpt {
+	margin: 0;
+	font-size: 1rem;
+	line-height: 1.7;
+	color: var(--lumen-fg-soft);
+}
+
+/* Pagination (prev = Newer Posts, next = Older Posts). */
+.lumen-home-pagination {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	margin-top: 3rem;
+}
+.lumen-home-pagination a {
+	font-size: 0.95rem;
+	color: var(--lumen-fg-soft);
+}
+.lumen-home-pagination a:hover {
+	color: var(--lumen-fg);
+}
+.lumen-home-pagination-left {
+	margin-right: auto;
+}
+.lumen-home-pagination-right {
+	margin-left: auto;
+}
+/* Decorative directional arrows kept out of the translatable string. */
+.lumen-home-pagination-left::before {
+	content: '\2190\00A0';
+	color: var(--lumen-muted);
+}
+.lumen-home-pagination-right::after {
+	content: '\00A0\2192';
+	color: var(--lumen-muted);
+}
+
+/* Mobile: tighter spacing + slightly smaller titles. */
+@media (max-width: 768px) {
+	.lumen-home-list {
+		gap: 2rem;
+	}
+	.lumen-home-title {
+		font-size: 1.375rem;
+	}
+}

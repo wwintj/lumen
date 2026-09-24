@@ -62,6 +62,18 @@
 "Skip to content";
 "";
 
+#: home.php:21
+"Latest";
+"";
+
+#: home.php:36
+"Newer Posts";
+"";
+
+#: home.php:39
+"Older Posts";
+"";
+
 #: header.php:36
 #: inc/setup.php:54
 "Primary menu";
@@ -98,6 +110,7 @@
 "Search";
 "";
 
+#: home.php:46
 #: template-parts/post-list.php:27
 "No posts found.";
 "";

@@ -60,3 +60,20 @@ if ( ! function_exists( 'lumen_setup' ) ) {
 		add_image_size( 'lumen-square', 640, 640, true );
 	}
 }
+
+if ( ! function_exists( 'lumen_homeposts' ) ) {
+	add_action( 'pre_get_posts', 'lumen_homeposts' );
+
+	function lumen_homeposts( $query ) {
+		// Homepage only: 8 posts per page.
+		// Does not touch Archive, Search, Category, Tag, Author,
+		// or the admin ( is_main_query() + is_home() ).
+		if (
+			! is_admin()
+			&& $query->is_main_query()
+			&& $query->is_home()
+		) {
+			$query->set( 'posts_per_page', 8 );
+		}
+	}
+}

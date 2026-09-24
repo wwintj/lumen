@@ -1,9 +1,9 @@
 <?php
 /**
- * Lumen — archive / blog home / fallback template.
+ * Lumen — archive / fallback template.
  *
  * Template hierarchy:
- *   - Home (latest posts): home.php, or index.php (front page, no posts page)
+ *   - Home (latest posts): home.php
  *   - Posts page: the page selected in Settings → Reading (page.php)
  *   - category / tag / author / date / taxonomy archives: index.php (fallback)
  *   - search: search.php

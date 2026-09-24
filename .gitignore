@@ -11,7 +11,9 @@ node_modules/
 # Release / candidate artifacts (GitHub Release asset, not source)
 lumen.zip
 lumen-0.2.0-rc1.zip
+lumen-*-dev*.zip
 
 # Generated QA reports
 .lumen-qa/report.json
 .lumen-qa/report-release.json
+.lumen-qa/report-home.json

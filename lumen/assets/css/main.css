@@ -50,9 +50,34 @@
 
 /* When the WordPress Admin Bar is visible, offset the sticky header
    (progressive, pure CSS — no JS). The .admin-bar class is added to <body>
-   by WordPress when the logged-in admin bar is shown. */
+   by WordPress when the logged-in admin bar is shown.
+
+   The WordPress admin bar behaves differently per breakpoint:
+     * desktop (>= 783px):  position: fixed, 32px tall -> header sits 32px down
+     * tablet  (601-782px): position: fixed, 46px tall -> header sits 46px down
+     * mobile  (<= 600px):  position: absolute (scrolls with the page), 46px tall
+        -> header must end up at the viewport top once the bar scrolls out
+   */
 body.admin-bar .lumen-site-header {
 	top: 32px;
+}
+
+/* Tablet: the admin bar is fixed but 46px tall, so the header must sit 46px
+   down to avoid overlapping it. */
+@media (min-width: 601px) and (max-width: 782px) {
+	body.admin-bar .lumen-site-header {
+		top: 46px;
+	}
+}
+
+/* Mobile: the admin bar scrolls with the page (position: absolute) and is no
+   longer fixed. The header must end up at the viewport top once the bar
+   scrolls out. top: 0 lets it transition from below the bar (at scroll 0)
+   to the top edge as it scrolls. */
+@media (max-width: 600px) {
+	body.admin-bar .lumen-site-header {
+		top: 0;
+	}
 }
 
 .lumen-header-inner {
@@ -91,9 +116,11 @@ body.admin-bar .lumen-site-header {
 	font-size: 1rem;
 	padding: 0.25rem 0.5rem;
 	border-radius: var(--lumen-radius);
+	color: var(--lumen-fg-soft);
+	transition: color var(--lumen-duration);
 }
 .lumen-site-nav a:hover {
-	background: var(--lumen-bg-soft);
+	color: var(--lumen-fg);
 }
 
 /* Desktop: title left, nav right */
@@ -631,6 +658,8 @@ figcaption,
 .lumen-home-wrap {
 	max-width: var(--lumen-content-max);
 	margin-inline: auto;
+	/* Divider spacing: equal whitespace on each side of the line. */
+	--lumen-home-divider-gap: 2rem;
 }
 
 /* Comfortable side spacing for the homepage reading area on mobile.
@@ -638,6 +667,7 @@ figcaption,
 @media (max-width: 768px) {
 	.lumen-home-wrap {
 		padding-inline: 24px;
+		--lumen-home-divider-gap: 1.75rem;
 	}
 }
 @media (max-width: 360px) {
@@ -656,9 +686,15 @@ figcaption,
 .lumen-home-post {
 	margin: 0;
 	min-width: 0;
-	padding-bottom: 2.5rem;
+	padding-bottom: var(--lumen-home-divider-gap);
 	border-bottom: 1px solid var(--lumen-border);
 }
+
+/* Space below each divider, measured against the next post's content. */
+.lumen-home-post + .lumen-home-post {
+	padding-top: var(--lumen-home-divider-gap);
+}
+
 .lumen-home-post:last-child {
 	padding-bottom: 0;
 	border-bottom: none;
@@ -687,9 +723,12 @@ figcaption,
 .lumen-home-meta .lumen-post-cats::before {
 	content: '\00B7';
 }
+/* Category links: quiet by default, strong-contrast on hover
+   (text color), smooth transition, no underline/pill/bold. */
 .lumen-home-meta .lumen-post-cat {
 	font-size: 0.8125rem;
 	color: var(--lumen-muted);
+	transition: color var(--lumen-duration);
 }
 .lumen-home-meta .lumen-post-cat:hover {
 	color: var(--lumen-fg);
@@ -751,11 +790,10 @@ figcaption,
 	color: var(--lumen-muted);
 }
 
-/* Mobile: tighter post spacing + slightly smaller titles. */
+/* Mobile: slightly smaller titles.
+   Divider spacing is now controlled by --lumen-home-divider-gap
+   (set to 1.75rem in the 768px media query above). */
 @media (max-width: 768px) {
-	.lumen-home-post {
-		padding-bottom: 2rem;
-	}
 	.lumen-home-title {
 		font-size: 1.375rem;
 	}

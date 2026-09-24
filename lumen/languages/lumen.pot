@@ -66,14 +66,6 @@
 "Latest";
 "";
 
-#: home.php:36
-"Newer Posts";
-"";
-
-#: home.php:39
-"Older Posts";
-"";
-
 #: header.php:36
 #: inc/setup.php:54
 "Primary menu";
@@ -97,10 +89,12 @@
 "Next post";
 "";
 
+#: home.php:30
 #: inc/template-functions.php:39
 "Previous";
 "";
 
+#: home.php:34
 #: inc/template-functions.php:40
 "Next";
 "";

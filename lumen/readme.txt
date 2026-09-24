@@ -4,7 +4,7 @@ Contributor URI: https://lumen.example/
 Author: Lumen Team
 Author URI: https://lumen.example/
 Homepage URL: https://lumen.example/
-Version: 1.1.0-dev.3
+Version: 1.1.0-dev.4
 Requires at least: 6.3
 Tested up to: 6.7
 Requires PHP: 8.2
@@ -51,6 +51,13 @@ A minimalist, SEO-friendly content blog theme built for a bilingual (English + C
 At 0.1.0 the plugin is a thin bootstrap: plugin header, LBN_VERSION constant, and a text-domain load (lumen-blog) so future extensions are i18n-ready. It ships no features, no UI, no REST endpoints, and no hooks beyond the text-domain load. Concrete features (CPTs, forms, REST API) are added in later phases only when a concrete need exists (YAGNI).
 
 == Changelog ==
+* 1.1.0-dev.4 (UX & bug-fix revision)
+  * Fixed the logged-in mobile sticky-header / admin-bar gap: three-breakpoint header offset (46px bar → top:46px on tablet, top:0 on mobile; 32px bar → top:32px on desktop) so the header never overlaps the bar or leaves a gap.
+  * Balanced the homepage post-divider vertical rhythm: equal whitespace above and below the line (~32px/32px desktop, 28px/28px mobile).
+  * Renamed homepage pagination to "Previous" / "Next" (previous page on the left, next page on the right; page 1 shows Next only, last page shows Previous only); arrows remain decorative in CSS.
+  * Removed underline on link hover across the Lumen frontend (color-shift only; :focus-visible outline preserved; WP admin-bar core CSS untouched).
+  * Strengthened category hover contrast (muted → text color, ~160ms transition; no underline/pill/bold).
+  * Reworked header nav hover to a color transition (no underline, no font-weight, no background pill).
 * 1.1.0-dev.3 (Development preview — version alignment)
   * Theme development version now matches the prerelease build
   * WordPress admin reports 1.1.0-dev.3; asset cache version follows LUMEN_VERSION

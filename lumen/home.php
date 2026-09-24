@@ -25,11 +25,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div>
 
 		<nav class="lumen-home-pagination">
+			<!-- Left: "Previous" = previous page (lower page number). Empty on page 1. -->
 			<span class="lumen-home-pagination-left">
-				<?php previous_posts_link( esc_html__( 'Newer Posts', 'lumen' ) ); ?>
+				<?php previous_posts_link( esc_html__( 'Previous', 'lumen' ) ); ?>
 			</span>
+			<!-- Right: "Next" = next page (higher page number). Empty on the last page. -->
 			<span class="lumen-home-pagination-right">
-				<?php next_posts_link( esc_html__( 'Older Posts', 'lumen' ) ); ?>
+				<?php next_posts_link( esc_html__( 'Next', 'lumen' ) ); ?>
 			</span>
 		</nav>
 

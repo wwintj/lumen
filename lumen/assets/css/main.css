@@ -92,6 +92,10 @@ body.admin-bar .lumen-site-header {
 	font-size: 1.5rem;
 	font-weight: 700;
 	letter-spacing: -0.02em;
+	transition: color var(--lumen-duration);
+}
+.lumen-site-title:hover {
+	color: var(--lumen-accent-hover);
 }
 
 .lumen-site-logo {
@@ -117,9 +121,22 @@ body.admin-bar .lumen-site-header {
 	padding: 0.25rem 0.5rem;
 	border-radius: var(--lumen-radius);
 	color: var(--lumen-fg-soft);
-	transition: color var(--lumen-duration);
+	transition: color var(--lumen-duration), background-color var(--lumen-duration);
 }
 .lumen-site-nav a:hover {
+	color: var(--lumen-fg);
+	background: var(--lumen-bg-soft);
+}
+/* Persistent active state for the current page / category.
+   WordPress marks it via current-menu-item / -parent / -ancestor on the
+   <li> and/or <a>; here we color only (no bg) so it reads as the "here"
+   item, while hover adds the soft background. */
+.lumen-site-nav li.current-menu-item a,
+.lumen-site-nav li.current-menu-parent a,
+.lumen-site-nav li.current-menu-ancestor a,
+.lumen-site-nav a.current-menu-item,
+.lumen-site-nav a.current-menu-parent,
+.lumen-site-nav a.current-menu-ancestor {
 	color: var(--lumen-fg);
 }
 
@@ -178,6 +195,13 @@ body.admin-bar .lumen-site-header {
 
 .lumen-site-footer-nav a {
 	font-size: 0.95rem;
+	padding: 0.2rem 0.5rem;
+	border-radius: var(--lumen-radius);
+	transition: color var(--lumen-duration), background-color var(--lumen-duration);
+}
+.lumen-site-footer-nav a:hover {
+	color: var(--lumen-fg);
+	background: var(--lumen-bg-soft);
 }
 
 .lumen-footer-copyright {
@@ -189,9 +213,13 @@ body.admin-bar .lumen-site-header {
 .lumen-footer-feed {
 	font-size: 0.9rem;
 	color: var(--lumen-muted);
+	padding: 0.15rem 0.5rem;
+	border-radius: var(--lumen-radius);
+	transition: color var(--lumen-duration), background-color var(--lumen-duration);
 }
 .lumen-footer-feed:hover {
 	color: var(--lumen-fg);
+	background: var(--lumen-bg-soft);
 }
 
 @media (min-width: 768px) {
@@ -719,6 +747,8 @@ figcaption,
 	flex-wrap: wrap;
 	align-items: center;
 	margin: 0 0 0.5rem;
+	font-family: var(--lumen-font-reading);
+	font-weight: 400;
 	font-size: 0.8125rem;
 	line-height: 1.5;
 	color: var(--lumen-muted);

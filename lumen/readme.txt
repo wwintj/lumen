@@ -4,7 +4,7 @@ Contributor URI: https://lumen.example/
 Author: Lumen Team
 Author URI: https://lumen.example/
 Homepage URL: https://lumen.example/
-Version: 1.1.0-dev.5
+Version: 1.1.0-dev.6
 Requires at least: 6.3
 Tested up to: 6.7
 Requires PHP: 8.2
@@ -51,6 +51,15 @@ A minimalist, SEO-friendly content blog theme built for a bilingual (English + C
 At 0.1.0 the plugin is a thin bootstrap: plugin header, LBN_VERSION constant, and a text-domain load (lumen-blog) so future extensions are i18n-ready. It ships no features, no UI, no REST endpoints, and no hooks beyond the text-domain load. Concrete features (CPTs, forms, REST API) are added in later phases only when a concrete need exists (YAGNI).
 
 == Changelog ==
+* 1.1.0-dev.6 (Header/footer interactions + homepage metadata typography)
+  * EN — Homepage date/category metadata typography now uses the FangSong reading font (font-family: --lumen-font-reading, weight 400); size, muted tone, line-height, tabular-nums date, and hover contrast unchanged.
+  * EN — Header nav links get a soft hover background (--lumen-bg-soft) + a persistent current-page/category active state (current-menu-item/-parent/-ancestor); the site title gains a subtle hover color.
+  * EN — Footer RSS feed and footer-menu links get a soft hover background; the copyright line stays static.
+  * EN — Interactions reuse only existing tokens; :focus-visible and the no-underline policy are preserved; a bilingual README.md is added at the repo root.
+  * 中文 — 首页日期/分类元数据改用仿宋阅读字体（--lumen-font-reading，字重 400）；尺寸、柔和色、行高、日期 tabular-nums、悬停对比度保持不变。
+  * 中文 — 顶部导航链接悬停显示柔和背景（--lumen-bg-soft），并添加常驻当前页/分类高亮；站点标题添加轻微悬停效果。
+  * 中文 — 页脚 RSS 与页脚菜单链接悬停显示柔和背景；版权信息保持不变。
+  * 中文 — 仅复用既有颜色/尺寸令牌；保留 :focus-visible 与无下划线策略；在仓库根目录添加双语 README.md。
 * 1.1.0-dev.5 (Typography — FangSong reading font)
   * Unified reading typography around a FangSong-style Chinese serif stack (token --lumen-font-reading)
   * Homepage post titles and excerpts now use the FangSong reading stack (medium 500 weight; excerpt line-height 1.85)

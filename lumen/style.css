@@ -4,7 +4,7 @@ Theme URI: https://lumen.example/
 Author: Lumen Team
 Author URI: https://lumen.example/
 Description: Lumen is a minimalist, SEO-friendly content blog theme for a bilingual (EN/CN) site. Semantic structure, fast loading, mobile-first, and designed to pair with a thin companion plugin.
-Version: 1.1.0-dev.4
+Version: 1.1.0-dev.5
 Requires at least: 6.3
 Requires PHP: 8.2
 Text Domain: lumen
@@ -30,8 +30,9 @@ Tags: blog, content, minimalist, responsive-layout, custom-menu, translation-rea
 
 	/* Type */
 	--lumen-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-	--lumen-serif: Georgia, "Times New Roman", serif;
-	--lumen-serif-cn: "Songti SC", "STSong", "FangSong", "STFangsong", "SimSun", serif;
+	/* Reading (FangSong-style Chinese serif) — blog/post/page content & titles.
+       UI/nav/metadata stay on --lumen-sans; code/pre/kbd/samp on --lumen-mono. */
+	--lumen-font-reading: "FangSong", "STFangsong", "仿宋", "仿宋_GB2312", serif;
 	--lumen-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 	--lumen-fs: 17px;
 
@@ -164,6 +165,7 @@ code {
 	font-size: 0.9em;
 }
 pre {
+	font-family: var(--lumen-mono);
 	background: var(--lumen-bg-soft);
 	padding: 1em 1.25em;
 	border-radius: var(--lumen-radius);
@@ -174,6 +176,11 @@ pre {
 pre code {
 	background: 0;
 	padding: 0;
+}
+kbd,
+samp {
+	font-family: var(--lumen-mono);
+	font-size: 0.9em;
 }
 
 form {
@@ -188,6 +195,7 @@ textarea,
 select {
 	width: 100%;
 	font: inherit;
+	font-family: var(--lumen-sans);
 	color: var(--lumen-fg);
 	background: #fff;
 	border: 1px solid var(--lumen-border);
@@ -202,6 +210,7 @@ textarea {
 button,
 .wp-block-button__link {
 	font: inherit;
+	font-family: var(--lumen-sans);
 	padding: 0.5em 1em;
 	border: 1px solid var(--lumen-fg);
 	border-radius: var(--lumen-radius);

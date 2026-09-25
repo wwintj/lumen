@@ -4,7 +4,7 @@ Contributor URI: https://lumen.example/
 Author: Lumen Team
 Author URI: https://lumen.example/
 Homepage URL: https://lumen.example/
-Version: 1.1.0-dev.4
+Version: 1.1.0-dev.5
 Requires at least: 6.3
 Tested up to: 6.7
 Requires PHP: 8.2
@@ -51,6 +51,14 @@ A minimalist, SEO-friendly content blog theme built for a bilingual (English + C
 At 0.1.0 the plugin is a thin bootstrap: plugin header, LBN_VERSION constant, and a text-domain load (lumen-blog) so future extensions are i18n-ready. It ships no features, no UI, no REST endpoints, and no hooks beyond the text-domain load. Concrete features (CPTs, forms, REST API) are added in later phases only when a concrete need exists (YAGNI).
 
 == Changelog ==
+* 1.1.0-dev.5 (Typography — FangSong reading font)
+  * Unified reading typography around a FangSong-style Chinese serif stack (token --lumen-font-reading)
+  * Homepage post titles and excerpts now use the FangSong reading stack (medium 500 weight; excerpt line-height 1.85)
+  * Single-post titles and article content use the same reading font (body line-height 1.9)
+  * Page titles and page content use the same reading font
+  * Navigation, metadata, pagination, and footer remain sans-serif; archive card titles unchanged
+  * code / pre / kbd / samp remain monospace (no FangSong pollution)
+  * Preserved all dev.4 UX fixes (hover, focus-visible, sticky header, Previous/Next pagination)
 * 1.1.0-dev.4 (UX & bug-fix revision)
   * Fixed the logged-in mobile sticky-header / admin-bar gap: three-breakpoint header offset (46px bar → top:46px on tablet, top:0 on mobile; 32px bar → top:32px on desktop) so the header never overlaps the bar or leaves a gap.
   * Balanced the homepage post-divider vertical rhythm: equal whitespace above and below the line (~32px/32px desktop, 28px/28px mobile).

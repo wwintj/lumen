@@ -165,6 +165,42 @@ async function measureAdminBarAt(page, scrollY) {
   });
 }
 
+// ---------------------------------------------------------------------------
+// Static inspection (fallback) of the admin-bar / sticky-header CSS.
+//
+// Used ONLY when a real logged-in runtime is NOT possible (env credentials
+// missing AND the temporary admin could not be created / logged in). It reads
+// main.css (READ-ONLY; never modifies the theme) and confirms the declared
+// offsets. This is WEAKER than a runtime check — it verifies the CSS source,
+// not that the admin bar actually rendered. It is labeled "Static inspection
+// only" and STILL fails the admin-bar gate (a real logged-in run is required).
+// ---------------------------------------------------------------------------
+function staticInspectAdminBar() {
+  const cssPath = path.join(THEME, 'assets', 'css', 'main.css');
+  let css;
+  try {
+    css = fs.readFileSync(cssPath, 'utf8');
+  } catch (e) {
+    return { file: cssPath, pass: false, errors: [e.message], checks: [] };
+  }
+  const c = css.replace(/\/\*[\s\S]*?\*\//g, ''); // strip CSS comments
+  const checks = [
+    {
+      name: 'base rule body.admin-bar .lumen-site-header { top: 32px; }  (desktop >= 783px)',
+      ok: /body\.admin-bar\s+\.lumen-site-header/.test(c) && /top\s*:\s*32px\s*;/i.test(c),
+    },
+    {
+      name: '@media (min-width: 601px) and (max-width: 782px) -> body.admin-bar .lumen-site-header top: 46px',
+      ok: /@media\s*\(\s*min-width:\s*601px\s*\)\s*and\s*\(\s*max-width:\s*782px\s*\)/i.test(c) && /top\s*:\s*46px\s*;/i.test(c),
+    },
+    {
+      name: '@media (max-width: 600px) -> body.admin-bar .lumen-site-header top: 0',
+      ok: /@media\s*\(\s*max-width:\s*600px\s*\)\s*\{[\s\S]*?top\s*:\s*0\s*;/i.test(c),
+    },
+  ];
+  return { file: cssPath, pass: checks.every((x) => x.ok), checks };
+}
+
 async function adminBarTest(browser) {
   const { creds, cleanup } = await auth.resolveAuth();
   const result = {
@@ -238,12 +274,18 @@ async function adminBarTest(browser) {
       }
       result.viewports[vp.name] = item;
     }
+    result.mode = 'runtime-verified';
     result.auth.loggedIn = true;
     result.pass = Object.values(result.viewports).every(v => v.pass);
   } catch (e) {
     result.auth.error = String(e.message);
     result.auth.loggedIn = false;
     result.pass = false;
+    // Real login failed -> fall back to a static (CSS-source) inspection of the
+    // admin-bar / sticky-header offsets. This is labeled "Static inspection
+    // only" and still FAILs the gate (a real logged-in run is required).
+    result.mode = 'static-inspection-only';
+    result.staticInspection = staticInspectAdminBar();
   } finally {
     result.auth.cleanup = await cleanup();
     if (creds.source === 'temp') result.auth.cleanup.wasTemp = true;
@@ -686,8 +728,20 @@ function printSummary(R) {
   // admin bar
   const ab = B.adminBar;
   if (ab) {
-    log('\n[ADMIN BAR] source=' + (ab.auth ? ab.auth.source : '?') +
-        (ab.auth && ab.auth.loggedIn ? ' (REAL LOGGED-IN RUNTIME)' : ' (NOT LOGGED-IN: RUNTIME VERIFICATION SKIPPED)'));
+    const modeLabel =
+      ab.mode === 'static-inspection-only'
+        ? ' STATIC INSPECTION ONLY (no real logged-in run)'
+        : (ab.auth && ab.auth.loggedIn
+          ? ' RUNTIME VERIFIED (real logged-in run)'
+          : ' NOT LOGGED-IN');
+    log('\n[ADMIN BAR] source=' + (ab.auth ? ab.auth.source : '?') + modeLabel);
+    if (ab.mode === 'static-inspection-only' && ab.staticInspection) {
+      ab.staticInspection.checks.forEach((c) =>
+        log('    ' + (c.ok ? '[OK] ' : '[X] ') + c.name));
+      const si = ab.staticInspection;
+      log('  static inspection (CSS source): ' +
+          (si.pass ? 'offsets present — WEAKER, not a runtime verification' : 'offsets MISSING/WRONG'));
+    }
     if (ab.auth && ab.auth.error) log('  error: ' + ab.auth.error);
     if (ab.auth) {
       const c = ab.auth.cleanup || {};

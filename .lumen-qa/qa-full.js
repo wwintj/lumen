@@ -464,7 +464,21 @@ async function commentsTest(browser) {
       if (link3) { await link3.click(); await pp.waitForTimeout(300); pagResult.pages.push({page:'3', cpage:3, url:pp.url()}); }
     } catch(e){}
   } catch(e){ log('[pagination] '+e.message); }
-  out.pagination = pagResult;
+  // pagination.pass is derived from the reliable per-page render assertions
+  // (out.pages: p26 cpage 1/2/3 each render without overflow and show the
+  // comments heading; p28 closed page renders; the open post actually contains
+  // comments; the closed post shows a closed message). The click loop above
+  // only records which pages were navigated in the real UI, so it is reported
+  // separately and does not, by itself, gate the suite.
+  let pagPass = true;
+  for (const key of ['p26_1','p26_2','p26_3']) {
+    const d = out.pages[key];
+    if (!d || d.status !== 'ok' || !d.hasCommentsHeading) pagPass = false;
+  }
+  if (out.pages.p28 && out.pages.p28.status !== 'ok') pagPass = false;
+  if (!(out.open && out.open.commentCount > 0)) pagPass = false;
+  if (!(out.closed && out.closed.hasClosedMsg)) pagPass = false;
+  out.pagination = { pages: pagResult.pages, pass: pagPass };
   await ctxp.close();
   return out;
 }
@@ -793,7 +807,7 @@ function printSummary(R) {
     const c = B.comments;
     log(`  open (p26): comments=${c.open?c.open.commentCount:0} hasForm=${!!(c.open&&c.open.hasForm)}`);
     log(`  closed (p28): closedMsg=${!!(c.closed&&c.closed.hasClosedMsg)} text="${(c.closed&&c.closed.text)||''}" hasForm=${!!(c.closed&&c.closed.hasForm)}`);
-    if (c.pagination) log(`  pagination click test: [${c.pagination.pages.map(p=>p.page).join(' ')}]`);
+    if (c.pagination) log(`  pagination click test: [${c.pagination.pages.map(p=>p.page).join(' ')}] pass=${!!c.pagination.pass}`);
     for (const [key,d] of Object.entries(c.pages)) log(`    ${key}: commentsHeading=${!!d.hasCommentsHeading} closedMsg=${!!d.closedMsg} over=${d.over}`);
   }
   // gutenberg
@@ -819,9 +833,11 @@ function printSummary(R) {
   log('  smoke: '+Object.entries(sv?.smoke||{}).map(([k,v])=>`${k}:${v}`).join(' '));
   // decision — the admin-bar gate requires a REAL logged-in runtime run
   // (admin bar rendered + geometry verified across viewports) AND the
-  // logged-out regression. A skipped (not logged-in) admin-bar run is a FAIL.
+  // logged-out regression AND reliable comment pagination rendering.
+  // A skipped (not logged-in) admin-bar run is a FAIL.
   const adminBarOk = ab && ab.auth && ab.auth.loggedIn && ab.pass;
   const loggedOutOk = lo && lo.pass;
+  const paginationOk = B.comments && B.comments.pagination && B.comments.pagination.pass;
   const pass = (
     overflowFails.length===0 &&
     B.lumenErrors.length===0 &&
@@ -830,7 +846,8 @@ function printSummary(R) {
     loggedOutOk &&
     (k && k.skipPass && k.noTrap) &&
     (lg && lg.set?.logoExists) &&
-    (sv && failPhp.length===0)
+    (sv && failPhp.length===0) &&
+    paginationOk
   );
   log('\n================ DECISION ================');
   log(pass ? 'Phase 1.3 Browser Validation: PASS' : 'Phase 1.3 Browser Validation: FAIL');
@@ -861,6 +878,7 @@ function printSummary(R) {
     }
     if (!lg?.set?.logoExists) log('  - logo not showing');
     if (sv && failPhp.length) log('  - php parse errors');
+    if (B.comments && !B.comments.pagination?.pass) log('  - comment pagination rendering FAIL (page render / open comments / closed message)');
   }
   const ss = B.screenshots||[];
   log('\nScreenshots: '+ss.length);

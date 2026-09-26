@@ -12,6 +12,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 <?php get_header(); ?>
 <article class="lumen-post">
 	<header class="lumen-post-header">
+		<h1 class="lumen-post-title"><?php the_title(); ?></h1>
+
+		<div class="lumen-single-meta">
+			<?php lumen_post_date(); ?>
+			<?php lumen_post_categories(); ?>
+		</div>
+
 		<?php
 		if ( has_post_thumbnail() ) : ?>
 			<div class="lumen-post-featured">
@@ -20,11 +27,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 				?>
 			</div>
 		<?php endif; ?>
-
-		<h1 class="lumen-post-title"><?php the_title(); ?></h1>
-
-		<?php lumen_post_meta(); ?>
-		<?php lumen_post_categories(); ?>
 	</header>
 
 	<div class="lumen-post-body">
@@ -41,8 +43,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div class="lumen-post-nav">
 	<?php
 	the_post_navigation( array(
-		'prev_text' => esc_html__( 'Previous post', 'lumen' ) . ': %title',
-		'next_text' => esc_html__( 'Next post', 'lumen' ) . ': %title',
+		'prev_text' => '<span class="lumen-post-nav-label">← ' . esc_html__( 'Previous', 'lumen' ) . '</span><span class="lumen-post-nav-title">%title</span>',
+		'next_text' => '<span class="lumen-post-nav-title">%title</span><span class="lumen-post-nav-label">' . esc_html__( 'Next', 'lumen' ) . ' →</span>',
 	) );
 	?>
 </div>

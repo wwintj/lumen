@@ -353,6 +353,10 @@ body.admin-bar .lumen-site-header {
 	padding-bottom: 2rem;
 }
 
+.lumen-post-featured {
+	margin-top: 1.75rem;
+}
+
 .lumen-post-featured img {
 	width: 100%;
 	height: auto;
@@ -364,9 +368,48 @@ body.admin-bar .lumen-site-header {
 
 .lumen-post-header .lumen-post-title {
 	font-family: var(--lumen-font-reading);
-	font-size: clamp(2rem, 4.5vw, 3rem);
-	font-weight: 500;
-	margin-bottom: 0.5rem;
+	font-size: clamp(1.75rem, 3vw, 2.5rem);
+	font-weight: 400;
+	line-height: 1.5;
+	margin-bottom: 0.75rem;
+}
+
+.lumen-single-meta {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	font-family: var(--lumen-font-reading);
+	font-weight: 400;
+	font-size: 0.875rem;
+	line-height: 1.6;
+	color: var(--lumen-muted);
+}
+
+.lumen-single-meta .lumen-post-date {
+	font-variant-numeric: tabular-nums;
+}
+
+.lumen-single-meta .lumen-post-cats {
+	display: inline-flex;
+	align-items: baseline;
+	gap: 0.5rem;
+	margin-left: 0.25rem;
+}
+
+/* Middle dot between date and categories; only appears when categories render. */
+.lumen-single-meta .lumen-post-cats::before {
+	content: '\00B7';
+}
+
+.lumen-single-meta .lumen-post-cat {
+	font-size: 0.875rem;
+	color: var(--lumen-muted);
+	text-decoration: none;
+	transition: color var(--lumen-duration);
+}
+
+.lumen-single-meta .lumen-post-cat:hover {
+	color: var(--lumen-fg);
 }
 
 .lumen-post-body {
@@ -406,7 +449,9 @@ body.admin-bar .lumen-site-header {
 .lumen-post-nav {
 	max-width: var(--lumen-content-max);
 	margin-inline: auto;
-	margin-top: var(--lumen-space-4);
+	margin-top: 2.75rem;
+	padding-top: 1.75rem;
+	border-top: 1px solid var(--lumen-border);
 	display: flex;
 	flex-wrap: wrap;
 	gap: 1rem;
@@ -419,7 +464,9 @@ body.admin-bar .lumen-site-header {
          <div class="nav-next">…</div>
        </div>
      </nav>
-   Style those exact Core classes; no nth-child fallback. */
+   Style those exact Core classes; no nth-child fallback.
+   The link text is two-layer: a small sans .lumen-post-nav-label and a
+   FangSong .lumen-post-nav-title; both live inside the same <a>. */
 .lumen-post-nav .post-navigation {
 	flex: 1 1 100%;
 }
@@ -427,7 +474,7 @@ body.admin-bar .lumen-site-header {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 1rem;
-	align-items: center;
+	align-items: baseline;
 }
 .lumen-post-nav .post-navigation .nav-previous,
 .lumen-post-nav .post-navigation .nav-next {
@@ -442,12 +489,46 @@ body.admin-bar .lumen-site-header {
 	margin-left: auto;
 }
 .lumen-post-nav a {
-	font-size: 0.95rem;
+	display: inline-flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0 0.5rem;
 	color: var(--lumen-fg-soft);
+	text-decoration: none;
 	overflow-wrap: anywhere;
 }
 .lumen-post-nav a:hover {
 	color: var(--lumen-fg);
+}
+.lumen-post-nav-label {
+	font-family: var(--lumen-sans);
+	font-size: 0.8125rem;
+	font-weight: 400;
+	color: var(--lumen-muted);
+}
+.lumen-post-nav a:hover .lumen-post-nav-label {
+	color: var(--lumen-fg-soft);
+}
+.lumen-post-nav-title {
+	font-family: var(--lumen-font-reading);
+	font-size: 1.05rem;
+	font-weight: 400;
+	line-height: 1.4;
+}
+
+/* Stack on mobile; keep each link full width so Previous / Next never
+   squeeze into two narrow columns. */
+@media (max-width: 480px) {
+	.lumen-post-nav .post-navigation .nav-links {
+		flex-direction: column;
+		gap: 1.25rem;
+	}
+	.lumen-post-nav .post-navigation .nav-previous {
+		margin-right: 0;
+	}
+	.lumen-post-nav .post-navigation .nav-next {
+		margin-left: 0;
+	}
 }
 
 /* ============================================================

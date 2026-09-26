@@ -81,21 +81,15 @@
 "Search results for “%1$s”";
 "";
 
-#: single.php:44
-"Previous post";
-"";
-
-#: single.php:45
-"Next post";
-"";
-
 #: home.php:30
 #: inc/template-functions.php:39
+#: single.php:46
 "Previous";
 "";
 
 #: home.php:34
 #: inc/template-functions.php:40
+#: single.php:47
 "Next";
 "";
 

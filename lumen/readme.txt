@@ -4,7 +4,7 @@ Contributor URI: https://lumen.example/
 Author: Lumen Team
 Author URI: https://lumen.example/
 Homepage URL: https://lumen.example/
-Version: 1.1.0-dev.6
+Version: 1.1.0-dev.7
 Requires at least: 6.3
 Tested up to: 6.7
 Requires PHP: 8.2
@@ -51,6 +51,13 @@ A minimalist, SEO-friendly content blog theme built for a bilingual (English + C
 At 0.1.0 the plugin is a thin bootstrap: plugin header, LBN_VERSION constant, and a text-domain load (lumen-blog) so future extensions are i18n-ready. It ships no features, no UI, no REST endpoints, and no hooks beyond the text-domain load. Concrete features (CPTs, forms, REST API) are added in later phases only when a concrete need exists (YAGNI).
 
 == Changelog ==
+* 1.1.0-dev.7 (Single post reading layout)
+  * EN — Single post title now sits above the featured image, tuned to the reading scale (clamp 1.75–2.5rem, FangSong, line-height 1.5); default single meta shows only "Date · Category" (no author) in the FangSong reading typeface with a middle-dot separator and a tabular-nums date.
+  * EN — Previous/Next post navigation reworked as a two-layer link (small sans "← Previous" / "Next →" label + FangSong title), with a top border, generous spacing, and a full-width stacked layout on mobile.
+  * EN — No layout changes to homepage, archive, search, page, header, footer, comments structure, or Gutenberg; stable v1.0.0 untouched.
+  * 中文 — 单篇阅读版式：标题移至特色图上方，按阅读比例微调（clamp 1.75–2.5rem，仿宋，行高 1.5）；默认单篇元数据只显示"日期 · 分类"（不显示作者），采用仿宋阅读字体、居中点分隔与日期 tabular-nums。
+  * 中文 — 上一篇/下一篇导航重构为两层链接（小号无衬线"← 上一篇"/"下一篇 →"标签 + 仿宋标题），顶部边框、宽松间距，移动端堆叠全宽布局。
+  * 中文 — 首页、分类、搜索、页面、页头、页脚、评论结构、Gutenberg 布局保持不变；稳定版 v1.0.0 未改动。
 * 1.1.0-dev.6 (Header/footer interactions + homepage metadata typography)
   * EN — Homepage date/category metadata typography now uses the FangSong reading font (font-family: --lumen-font-reading, weight 400); size, muted tone, line-height, tabular-nums date, and hover contrast unchanged.
   * EN — Header nav links get a soft hover background (--lumen-bg-soft) + a persistent current-page/category active state (current-menu-item/-parent/-ancestor); the site title gains a subtle hover color.

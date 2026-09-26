@@ -85,6 +85,20 @@ Phase 1.2: deploy to a real WordPress environment and validate.
 - No options written on activation.
 - Deactivation is clean.
 
+## Automated QA (Phase 1.3)
+
+`.lumen-qa/` holds the automated regression scripts (run with plain `node`).
+
+- **Primary suite**: `qa-full.js` — full page regression + logged-in Admin Bar / sticky-header geometry.
+- **Secondary suite**: `qa.js` — lighter page regression + admin-bar check.
+- **Authentication** (no credentials are ever hardcoded in the repo):
+  1. If `LUMEN_QA_WP_USER` / `LUMEN_QA_WP_PASSWORD` are set, the suite logs in with those credentials.
+  2. Otherwise a **temporary** administrator is created via WP-CLI (random name `lumen_qa_<random>`, random high-entropy password, `@example.invalid` email), used only for the run, and deleted in cleanup — even when the run fails.
+- **Admin-bar geometry** is measured at scroll offsets 0/100/300/800 across viewports 1440 / 783 / 782 / 768 / 601 / 600 / 390 / 320. A logged-in run is required; a failed login is a **FAIL**, never a skip.
+- Logged-out regression confirms the header sits at the top with no admin bar and no extra gap.
+- Screenshots for the auth checks go to `.runtime/lumen-qa-auth/` (gitignored).
+- A **PASS** requires real logged-in runtime verification (not static inspection) and completed temp-account cleanup.
+
 ## Sign-off
 
 [ ] All pages pass

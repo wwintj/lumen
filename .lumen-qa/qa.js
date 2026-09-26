@@ -1,6 +1,7 @@
 const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
+const auth = require('./wp-auth');
 
 const BASE = 'http://127.0.0.1:4242';
 const ROOT = path.resolve(__dirname, '..');
@@ -315,44 +316,73 @@ function printSection(name, data) {
 })();
 
 // ---------- Admin bar test ----------
+// ---------- Admin bar (logged in) desktop + mobile ----------
+// Uses the shared QA auth helper (wp-auth): env credentials if set, otherwise
+// a temporary WP-CLI administrator (random name, high-entropy password) that
+// is created, used, and deleted. A failed login makes the viewport FAIL rather
+// than being skipped.
 async function testAdminBar(browser, results) {
-  const out = { desktop: null, mobile: null };
+  const GAP_TOL = 1;
+  const out = {
+    desktop: null,
+    mobile: null,
+    auth: { source: null, loggedIn: false, error: null, cleanup: { deleted: false, wasTemp: false, error: null } },
+  };
+  let authInfo = null;
+  try {
+    authInfo = await auth.resolveAuth();
+    out.auth.source = authInfo.creds.source;
+    out.auth.cleanup.wasTemp = authInfo.creds.source === 'temp';
+  } catch (e) {
+    out.auth.error = String(e.message);
+    return out;
+  }
+  let loggedIn = false;
   for (const vpName of ['desktop', 'mobile']) {
     const vp = VIEWPORTS[vpName];
     const ctx = await browser.newContext({ viewport: { width: vp.width, height: vp.height } });
     const page = await ctx.newPage();
-    let status = '';
+    const item = { pass: false, noOverlap: false, error: null, bodyAdminBar: false, barExists: false, gap: null };
     try {
-      await page.goto(BASE + '/wp-login.php', { waitUntil: 'domcontentloaded' });
-      await page.fill('input[name="log"]', 'admin');
-      await page.fill('input[name="pwd"]', 'admin');
-      await page.click('#wp-submit');
-      await page.waitForURL(BASE + '/wp-admin/**', { timeout: 30000 });
+      await auth.loginWordPressAdmin(page, authInfo.creds, BASE);
+      loggedIn = true;
       await page.goto(BASE + '/', { waitUntil: 'domcontentloaded' });
-      await page.waitForSelector('body.admin-bar', { state: 'visible', timeout: 5000 }).catch(()=>{});
-      await page.waitForSelector('#wpadminbar', { timeout: 5000 }).catch(()=>{});
       await page.waitForTimeout(300);
-    } catch (e) { log('[admin bar] ' + vpName + ' login/nav error: ' + e.message); }
-    // measure
-    let m = null;
-    try {
-      m = await page.evaluate(() => {
+      const m = await page.evaluate(() => {
         const b = document.getElementById('wpadminbar');
         const h = document.querySelector('.lumen-site-header');
-        const r = (el) => el ? { x:Math.round(el.getBoundingClientRect().x), y:Math.round(el.getBoundingClientRect().y), w:Math.round(el.getBoundingClientRect().width), h:Math.round(el.getBoundingClientRect().height), top:Math.round(el.getBoundingClientRect().top), bottom:Math.round(el.getBoundingClientRect().bottom), display:getComputedStyle(el).display } : null;
+        const r = (el) => el ? { top: Math.round(el.getBoundingClientRect().top), bottom: Math.round(el.getBoundingClientRect().bottom), display: getComputedStyle(el).display } : null;
         return { bodyAdminBar: document.body.classList.contains('admin-bar'), barExists: !!b, bar: r(b), header: r(h), headerExists: !!h };
       });
-    } catch (e) { m = { error: e.message }; }
-    if (m && m.bar && m.header) {
-      out[vpName] = { ...m, pass: m.bar.bottom <= m.header.top ? 'header at/below bar' : 'header above bar',
-        overlap: m.bar.bottom > m.header.top ? Math.round(m.header.top - m.bar.bottom) + 'px overlap' : 'none',
-        noOverlap: m.header.top >= m.bar.bottom };
-    } else out[vpName] = m;
-    if (vpName === 'desktop') { await page.screenshot({ path: SCREENS + '/admin-bar-desktop.png' }).catch(()=>{}); }
-    if (vpName === 'mobile') { await page.screenshot({ path: SCREENS + '/admin-bar-mobile.png' }).catch(()=>{}); }
-    // logout
-    try { await page.goto(BASE + '/wp-admin/logout.php', { waitUntil: 'domcontentloaded' }); } catch(e){}
-    await ctx.close();
+      item.bodyAdminBar = m.bodyAdminBar;
+      item.barExists = m.barExists;
+      if (m && m.bar && m.header) {
+        const gap = m.header.top - m.bar.bottom;
+        item.gap = Math.round(gap);
+        item.noOverlap = gap >= 0;
+        item.pass = gap >= 0 && gap <= GAP_TOL;
+        out[vpName] = { ...m, gap: item.gap, pass: item.pass,
+          overlap: item.noOverlap ? 'none' : Math.round(gap) + 'px overlap', noOverlap: item.noOverlap };
+      } else {
+        out[vpName] = m;
+      }
+      if (vpName === 'desktop') await page.screenshot({ path: SCREENS + '/admin-bar-desktop.png' }).catch(() => {});
+      if (vpName === 'mobile') await page.screenshot({ path: SCREENS + '/admin-bar-mobile.png' }).catch(() => {});
+    } catch (e) {
+      item.error = String(e.message);
+      item.pass = false;
+      item.noOverlap = false;
+      out[vpName] = item;
+    } finally {
+      try { await auth.logoutWordPressAdmin(page, BASE); } catch (e) {}
+      await ctx.close();
+    }
+  }
+  out.auth.loggedIn = loggedIn;
+  try {
+    out.auth.cleanup = await authInfo.cleanup();
+  } catch (e) {
+    out.auth.cleanup = { deleted: false, wasTemp: true, error: String(e.message) };
   }
   return out;
 }
@@ -472,27 +502,29 @@ async function testGutenbergMobile(browser, url, out) {
 }
 
 // ---------- Editor test (admin) ----------
+// Uses the shared QA auth helper (wp-auth) instead of hardcoded credentials.
 async function testGutenbergEditor(browser, out) {
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
   const page = await ctx.newPage();
   let loaded = false;
+  let slug = null;
+  let authInfo = null;
   try {
-    await page.goto(BASE + '/wp-admin/login.php', { waitUntil: 'domcontentloaded' });
-    await page.fill('input[name="log"]', 'admin');
-    await page.fill('input[name="pwd"]', 'admin');
-    await page.click('#wp-submit');
-    await page.waitForURL(BASE + '/wp-admin/**', { timeout: 30000 });
+    authInfo = await auth.resolveAuth();
+    await auth.loginWordPressAdmin(page, authInfo.creds, BASE);
     // open the editor for the test page
-    const slug = await getGutenbergSlug();
+    slug = await getGutenbergSlug();
     await page.goto(BASE + '/wp-admin/post.php?post=' + slug, { waitUntil: 'domcontentloaded' });
     // wait for the editor
-    try { await page.waitForSelector('.wp-block-editor', { timeout: 15000 }); loaded = true; } catch(e) {}
+    try { await page.waitForSelector('.wp-block-editor', { timeout: 15000 }); loaded = true; } catch (e) {}
     await page.waitForTimeout(300);
-    // check alignwide/alignfull available
-    await page.screenshot({ path: SCREENS + '/gutenberg-editor.png' }).catch(()=>{});
+    await page.screenshot({ path: SCREENS + '/gutenberg-editor.png' }).catch(() => {});
   } catch (e) { log('[gutenberg editor] ' + e.message); }
-  out.editor = { loaded, url: 'wp-admin/post.php?' + slug };
-  await ctx.close();
+  finally {
+    if (authInfo) { try { await authInfo.cleanup(); } catch (e) {} }
+    await ctx.close();
+  }
+  out.editor = { loaded, url: slug ? 'wp-admin/post.php?' + slug : 'wp-admin/post.php' };
 }
 
 // ---------- Custom logo test ----------
@@ -658,14 +690,18 @@ function printSummary(results) {
   log('Skip link pass: ' + (results.keyboard?.skipLink?.pass ? 'YES' : 'NO'));
   log('Invisible focus count (tab 40): ' + (results.keyboard?.invisibleFocusCount ?? 'n/a'));
 
-  // decision
+  // decision — admin bar requires a REAL logged-in runtime (not skipped)
+  // plus no overlap on both desktop and mobile.
+  const adminBarOk =
+    results.adminBar?.auth?.loggedIn === true &&
+    results.adminBar?.desktop?.noOverlap === true &&
+    results.adminBar?.mobile?.noOverlap === true;
   const pass = (
     overflowFails.length === 0 &&
     lumenErrs.length === 0 &&
     themeFails.length === 0 &&
     results.keyboard?.skipLink?.pass === true &&
-    results.adminBar?.desktop?.noOverlap === true &&
-    results.adminBar?.mobile?.noOverlap === true &&
+    adminBarOk &&
     (results.keyboard?.invisibleFocusCount === 0)
   );
   results.decision = pass
@@ -679,6 +715,7 @@ function printSummary(results) {
   if (lumenErrs.length) issues.push('lumen console errors');
   if (themeFails.length) issues.push('theme asset failures');
   if (!results.keyboard?.skipLink?.pass) issues.push('skip link failure');
+  if (!results.adminBar?.auth?.loggedIn) issues.push('admin bar: not a real logged-in run (auth failed)');
   if (!results.adminBar?.desktop?.noOverlap) issues.push('admin bar desktop overlap');
   if (!results.adminBar?.mobile?.noOverlap) issues.push('admin bar mobile overlap');
   log(issues.join('; ') || 'NONE (within tested scope)');

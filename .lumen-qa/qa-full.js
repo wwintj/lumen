@@ -2,13 +2,16 @@ const { chromium } = require('playwright');
 const fs = require('fs');
 const { execSync } = require('child_process');
 const path = require('path');
+const auth = require('./wp-auth');
 
-const BASE = 'http://127.0.0.1:4242';
+const BASE = process.env.LUMEN_QA_BASE || 'http://127.0.0.1:4242';
 const ROOT = path.resolve(__dirname, '..');
 const SCREENS = path.join(ROOT, '.runtime', 'screenshots');
 const OUT = path.join(__dirname, 'report.json');
 const THEME = path.join(ROOT, 'lumen');
 const WP = path.join(ROOT, '.runtime', 'wordpress');
+const AUTH_SHOTS = path.join(ROOT, '.runtime', 'lumen-qa-auth');
+try { fs.mkdirSync(AUTH_SHOTS, { recursive: true }); } catch (e) { /* ignore */ }
 
 const VP = {
   desktop: {width:1440, height:900},
@@ -16,6 +19,20 @@ const VP = {
   mobile:  {width:390,  height:844},
   narrow:  {width:320,  height:568},
 };
+// Admin-bar breakpoints: fixed 32px (>=783), fixed 46px (601-782),
+// absolute/scrolls (<=600). Representative widths plus the exact edges.
+const ADMIN_BAR_VP = [
+  { name:'desktop-1440', width:1440, height:900,  fixed:true,  barH:32 },
+  { name:'desktop-783',  width:783,  height:900,  fixed:true,  barH:32 },
+  { name:'tablet-782',   width:782,  height:1024, fixed:true,  barH:46 },
+  { name:'tablet-768',   width:768,  height:1024, fixed:true,  barH:46 },
+  { name:'tablet-601',   width:601,  height:1024, fixed:true,  barH:46 },
+  { name:'mobile-600',   width:600,  height:844,  fixed:false, barH:46 },
+  { name:'mobile-390',   width:390,  height:844,  fixed:false, barH:46 },
+  { name:'mobile-320',   width:320,  height:568,  fixed:false, barH:46 },
+];
+const SCROLLS = [0, 100, 300, 800];
+const GAP_TOL = 1; // px
 const PAGES = {
   home: BASE + '/',
   single: BASE + '/?p=28',
@@ -125,44 +142,151 @@ async function pageAudit(browser, vpName, url, shot=null) {
   return result;
 }
 
-// Admin bar (logged in)
+// Admin bar + logged-out regression. Logged in via the shared QA auth helper
+// (wp-auth): environment credentials if set, otherwise a temporary WP-CLI
+// administrator (random name, high-entropy password, deleted in cleanup).
+// Each viewport is measured at four scroll offsets so the fixed/absolute
+// admin-bar behaviour is verified, and a logged-out regression confirms the
+// header sits at the top with no extra gap when no admin bar is present.
+async function measureAdminBarAt(page, scrollY) {
+  await page.evaluate((y) => window.scrollTo(0, y), scrollY);
+  await page.waitForTimeout(300);
+  return page.evaluate(() => {
+    const b = document.getElementById('wpadminbar');
+    const h = document.querySelector('.lumen-site-header');
+    const r = el => el ? { top: Math.round(el.getBoundingClientRect().top), bottom: Math.round(el.getBoundingClientRect().bottom), height: Math.round(el.getBoundingClientRect().height) } : null;
+    return {
+      scrollY: window.scrollY,
+      bar: r(b),
+      header: r(h),
+      headerComputedTop: h ? getComputedStyle(h).top : null,
+      bodyAdminBar: document.body.classList.contains('admin-bar'),
+    };
+  });
+}
+
 async function adminBarTest(browser) {
-  const out = {};
-  for (const vpName of ['desktop','mobile']) {
-    const v = VP[vpName];
-    const ctx = await browser.newContext({ viewport:{width:v.width,height:v.height} });
-    const page = await ctx.newPage();
-    let ok = false, m = null;
-    try {
-      await page.goto(BASE+'/wp-login.php', { waitUntil:'domcontentloaded', timeout:30000 });
-      await page.fill('input[name="log"]','admin');
-      await page.fill('input[name="pwd"]','admin');
-      await page.click('#wp-submit');
-      await page.waitForURL(BASE + '/wp-admin/**', { timeout:30000 });
-      await page.goto(BASE + '/', { waitUntil:'domcontentloaded', timeout:30000 });
-      await page.waitForTimeout(400);
-      await page.waitForSelector('#wpadminbar', { timeout:5000 }).catch(()=>{});
-      await page.waitForTimeout(300);
-      m = await page.evaluate(() => {
-        const b = document.getElementById('wpadminbar');
-        const h = document.querySelector('.lumen-site-header');
-        const r = el => el ? { top:Math.round(el.getBoundingClientRect().top), bottom:Math.round(el.getBoundingClientRect().bottom), display:getComputedStyle(el).display } : null;
-        return { bodyAdminBar:document.body.classList.contains('admin-bar'), barExists:!!b, bar:r(b), header:r(h), headerExists:!!h };
-      });
-      ok = !!m;
-      if (vpName==='desktop') await page.screenshot({ path:SCREENS+'/admin-bar-desktop.png' }).catch(()=>{});
-      if (vpName==='mobile') await page.screenshot({ path:SCREENS+'/admin-bar-mobile.png' }).catch(()=>{});
-    } catch (e) { log('[admin bar] '+vpName+': '+e.message); }
-    if (m && m.bar && m.header) {
-      m.noOverlap = m.header.top >= m.bar.bottom;
-      m.gap = m.header.top - m.bar.bottom;
-      m.pass = m.noOverlap;
-      ok = true;
+  const { creds, cleanup } = await auth.resolveAuth();
+  const result = {
+    auth: { source: creds.source, loggedIn: false, error: null, cleanup: { deleted: false, wasTemp: false, error: null } },
+    viewports: {},
+    pass: false,
+  };
+  const SCROLL_FIRST = SCROLLS[0];
+  const SCROLL_LAST = SCROLLS[SCROLLS.length - 1];
+  const wantedShots = {
+    ['desktop-1440:' + SCROLL_FIRST]: '01-adminbar-desktop-top.png',
+    ['desktop-1440:' + SCROLL_LAST]: '02-adminbar-desktop-scrolled.png',
+    ['mobile-390:' + SCROLL_FIRST]: '03-adminbar-mobile-top-390.png',
+    ['mobile-390:' + SCROLL_LAST]: '04-adminbar-mobile-scrolled-390.png',
+    ['mobile-320:' + SCROLL_LAST]: '05-adminbar-mobile-scrolled-320.png',
+  };
+  try {
+    for (const vp of ADMIN_BAR_VP) {
+      const ctx = await browser.newContext({ viewport: { width: vp.width, height: vp.height }, ignoreHttpErrors: true });
+      const page = await ctx.newPage();
+      const item = { name: vp.name, width: vp.width, fixed: vp.fixed, barH: vp.barH, pass: false, scroll: [] };
+      try {
+        await auth.loginWordPressAdmin(page, creds, BASE);
+        // A successful login redirects to /wp-admin/, which has no theme site
+        // header. The admin bar / sticky header must be measured on a THEME
+        // page, so move to the front page where the .lumen-site-header co-exists
+        // with the admin bar. The admin bar persists on theme pages for a
+        // logged-in user; the session cookie is preserved across this same-origin
+        // navigation.
+        await page.goto(BASE.replace(/\/$/, '') + '/', {
+          waitUntil: 'domcontentloaded',
+          timeout: 30000,
+        });
+        const front = await page.evaluate(() => ({
+          bodyAdminBar: document.body.classList.contains('admin-bar'),
+          barExists: !!document.getElementById('wpadminbar'),
+          headerExists: !!document.querySelector('.lumen-site-header'),
+        }));
+        if (!front.bodyAdminBar || !front.barExists || !front.headerExists) {
+          throw new Error(
+            'front page after login lacks body.admin-bar / #wpadminbar / .lumen-site-header: ' +
+              JSON.stringify(front)
+          );
+        }
+        for (const s of SCROLLS) {
+          item.scroll.push(await measureAdminBarAt(page, s));
+          const shotName = wantedShots[vp.name + ':' + s];
+          if (shotName) await page.screenshot({ path: AUTH_SHOTS + '/' + shotName, fullPage: false }).catch(() => {});
+        }
+        if (vp.fixed) {
+          // Fixed bar: pinned at the top, header directly below it at every offset.
+          item.pass = item.scroll.every(s =>
+            s.bar && s.header &&
+            Math.abs(s.header.top - s.bar.bottom) <= GAP_TOL &&
+            Math.abs(s.bar.bottom) <= vp.barH + 2 &&
+            Math.abs(s.bar.top) <= GAP_TOL
+          );
+        } else {
+          // Absolute bar (mobile): pinned at top at scroll 0; header ends up at
+          // the viewport top once the bar has scrolled out at the last offset.
+          const first = item.scroll[0];
+          const last = item.scroll[item.scroll.length - 1];
+          item.pass = !!first && !!first.bar && Math.abs(first.bar.top) <= 1 &&
+                     !!last && !!last.header && Math.abs(last.header.top) <= GAP_TOL;
+        }
+      } catch (e) {
+        throw new Error(vp.name + ': ' + String(e.message));
+      } finally {
+        await auth.logoutWordPressAdmin(page, BASE);
+        await ctx.close();
+      }
+      result.viewports[vp.name] = item;
     }
-    out[vpName] = m;
-    await ctx.close();
+    result.auth.loggedIn = true;
+    result.pass = Object.values(result.viewports).every(v => v.pass);
+  } catch (e) {
+    result.auth.error = String(e.message);
+    result.auth.loggedIn = false;
+    result.pass = false;
+  } finally {
+    result.auth.cleanup = await cleanup();
+    if (creds.source === 'temp') result.auth.cleanup.wasTemp = true;
   }
-  return out;
+  return result;
+}
+
+// Logged-out regression: no admin bar, header at the top, no extra gap.
+async function loggedOutTest(browser) {
+  const out = { desktop: null, mobile: null };
+  for (const vpName of ['desktop', 'mobile']) {
+    const v = VP[vpName];
+    const ctx = await browser.newContext({ viewport: { width: v.width, height: v.height }, ignoreHttpErrors: true });
+    const page = await ctx.newPage();
+    const item = { name: vpName, width: v.width, pass: false, over: false };
+    try {
+      await page.goto(BASE + '/', { waitUntil: 'domcontentloaded', timeout: 30000 });
+      await page.waitForTimeout(300);
+      await page.evaluate(() => window.scrollTo(0, 0));
+      item.check = await page.evaluate(() => {
+        const h = document.querySelector('.lumen-site-header');
+        return {
+          barExists: !!document.getElementById('wpadminbar'),
+          bodyAdminBar: document.body.classList.contains('admin-bar'),
+          headerTop: h ? Math.round(h.getBoundingClientRect().top) : null,
+          over: document.documentElement.scrollWidth > document.documentElement.clientWidth,
+        };
+      });
+      item.over = item.check.over;
+      item.pass = !item.check.barExists && !item.check.bodyAdminBar &&
+                  item.check.headerTop !== null && Math.abs(item.check.headerTop) <= GAP_TOL &&
+                  !item.check.over;
+      if (vpName === 'mobile') {
+        await page.screenshot({ path: AUTH_SHOTS + '/06-logged-out-mobile.png', fullPage: false }).catch(() => {});
+      }
+    } catch (e) {
+      item.error = String(e.message);
+    } finally {
+      await ctx.close();
+    }
+    out[vpName] = item;
+  }
+  return { ...out, pass: !!out.desktop?.pass && !!out.mobile?.pass };
 }
 
 // Skip link + keyboard (desktop). First Tab must land on the skip link and be
@@ -354,44 +478,107 @@ async function gutenbergTest(browser) {
   return out;
 }
 
-// Logo test: set, measure, delete, measure fallback
+// ---------------------------------------------------------------------------
+// Logo test: set a real custom logo, measure it, clear it, measure the title
+// fallback.
+//
+// The theme renders a logo only when a VALID attachment is configured as the
+// custom logo (header.php: has_custom_logo() / the_custom_logo()). The original
+// test hardcoded attachment id 66, which was never seeded in the test instance,
+// so the logo never rendered. This test is now self-contained: it imports the
+// version-controlled fixture PNG (assets/logo.png) as a fresh attachment, points
+// the theme mod at it, measures the rendered <img .custom-logo>, clears the
+// theme mod, measures the .lumen-site-title fallback, and deletes the attachment
+// on cleanup.
+// ---------------------------------------------------------------------------
+function importLogoAttachment() {
+  const fixture = path.join(__dirname, 'assets', 'logo.png');
+  const out = execSync(
+    'wp media import ' + JSON.stringify(fixture) + ' --title="QA Logo" --porcelain',
+    { cwd: WP, encoding: 'utf8' }
+  );
+  // wp prints PHP deprecation noise to the same stream; the attachment id is
+  // the last purely-numeric token.
+  const id = parseInt(
+    out.split('\n').map((l) => l.trim()).filter((l) => /^\d+$/.test(l)).pop() || '',
+    10
+  );
+  if (!Number.isFinite(id) || id <= 0) {
+    throw new Error('wp media import did not return a numeric attachment id: ' + String(out).slice(0, 120));
+  }
+  return id;
+}
+function setCustomLogo(id) {
+  execSync(
+    'php ' + JSON.stringify(path.join(__dirname, 'lib', 'set-custom-logo.php')) + ' ' + id,
+    { cwd: WP, encoding: 'utf8' }
+  );
+}
+function clearCustomLogo() {
+  execSync(
+    'php ' + JSON.stringify(path.join(__dirname, 'lib', 'clear-custom-logo.php')),
+    { cwd: WP, encoding: 'utf8' }
+  );
+}
+function deleteAttachment(id) {
+  try {
+    // best-effort fixture cleanup; not part of the pass/fail
+    execSync('wp post delete ' + id + ' --force --quiet', { cwd: WP, encoding: 'utf8' });
+  } catch (e) {
+    /* ignore */
+  }
+}
 async function logoTest(browser) {
-  const out = { set:null, del:null, pass:false };
-  const ctx = await browser.newContext({viewport:{width:VP.desktop.width,height:VP.desktop.height}});
+  const out = { set: null, del: null, pass: false };
+  let logoId = null;
+  const ctx = await browser.newContext({ viewport: { width: VP.desktop.width, height: VP.desktop.height } });
   const page = await ctx.newPage();
   try {
-    // set logo (attachment 66)
-    execSync('php /tmp/set-logo-id.php');
-    await page.goto(BASE + '/', { waitUntil:'domcontentloaded', timeout:30000 });
+    logoId = importLogoAttachment();
+    setCustomLogo(logoId);
+    await page.goto(BASE + '/', { waitUntil: 'domcontentloaded', timeout: 30000 });
     await page.waitForTimeout(300);
-    out.set = await page.evaluate(()=>{
+    out.set = await page.evaluate(() => {
       const logo = document.querySelector('.lumen-site-logo');
       const img = document.querySelector('img.custom-logo');
       const header = document.querySelector('.lumen-site-header');
-      return { logoExists:!!logo, imgExists:!!img,
-        imgSrc:img?img.src:null, imgW:img?Math.round(img.width):null, imgH:img?Math.round(img.height):null,
-        over:document.documentElement.scrollWidth>document.documentElement.clientWidth,
-        headerH:header?Math.round(header.getBoundingClientRect().height):null };
+      return {
+        logoExists: !!logo,
+        imgExists: !!img,
+        imgSrc: img ? img.src : null,
+        imgW: img ? Math.round(img.width) : null,
+        imgH: img ? Math.round(img.height) : null,
+        over: document.documentElement.scrollWidth > document.documentElement.clientWidth,
+        headerH: header ? Math.round(header.getBoundingClientRect().height) : null
+      };
     });
-    await page.screenshot({ path:SCREENS+'/logo-desktop.png', fullPage:false }).catch(()=>{});
-    // delete logo
-    execSync('php /tmp/clear-logo.php');
-    await page.goto(BASE + '/', { waitUntil:'domcontentloaded', timeout:30000 });
+    await page.screenshot({ path: SCREENS + '/logo-desktop.png', fullPage: false }).catch(() => {});
+
+    clearCustomLogo();
+    await page.goto(BASE + '/', { waitUntil: 'domcontentloaded', timeout: 30000 });
     await page.waitForTimeout(300);
-    out.del = await page.evaluate(()=>{
+    out.del = await page.evaluate(() => {
       const logo = document.querySelector('.lumen-site-logo');
       const img = document.querySelector('img.custom-logo');
       const title = document.querySelector('.lumen-site-title');
       const header = document.querySelector('.lumen-site-header');
-      return { logoExists:!!logo, imgExists:!!img,
-        titleExists:!!title, titleText:title?title.textContent.trim():null,
-        over:document.documentElement.scrollWidth>document.documentElement.clientWidth,
-        headerH:header?Math.round(header.getBoundingClientRect().height):null };
+      return {
+        logoExists: !!logo,
+        imgExists: !!img,
+        titleExists: !!title,
+        titleText: title ? title.textContent.trim() : null,
+        over: document.documentElement.scrollWidth > document.documentElement.clientWidth,
+        headerH: header ? Math.round(header.getBoundingClientRect().height) : null
+      };
     });
-    await page.screenshot({ path:SCREENS+'/logo-fallback.png', fullPage:false }).catch(()=>{});
+    await page.screenshot({ path: SCREENS + '/logo-fallback.png', fullPage: false }).catch(() => {});
     out.pass = !!out.set.logoExists && !!out.del.titleExists;
-  } catch(e){ log('[logo] '+e.message); }
-  await ctx.close();
+  } catch (e) {
+    log('[logo] ' + e.message);
+  } finally {
+    if (logoId) deleteAttachment(logoId);
+    await ctx.close();
+  }
   return out;
 }
 
@@ -445,9 +632,11 @@ async function serverRegression() {
     }
   }
 
-  // 2. admin bar
+  // 2. admin bar (real logged-in runtime) + logged-out regression
   R.browser.adminBar = await adminBarTest(browser);
   log('[admin bar] done');
+  R.browser.loggedOut = await loggedOutTest(browser);
+  log('[logged-out regression] done');
 
   // 3. keyboard
   R.browser.keyboard = await keyboardTest(browser);
@@ -495,10 +684,47 @@ function printSummary(R) {
   log('  total: '+B.themeAssetFailures.length);
   if (B.themeAssetFailures.length) B.themeAssetFailures.slice(0,10).forEach(f=>log(`    - ${f.err} ${f.url} (status=${f.status})`));
   // admin bar
-  log('\n[ADMIN BAR]');
   const ab = B.adminBar;
-  for (const [k,v] of Object.entries(ab||{})) {
-    log(`  ${k}: barBottom=${v&&v.bar?Math.round(v.bar.bottom):0} headerTop=${v&&v.header?Math.round(v.header.top):0} headerBottom=${v&&v.header?Math.round(v.header.bottom):0} gap=${v&&v.gap!==undefined?Math.round(v.gap):'-'} noOverlap=${!!(v&&v.pass)} ${v&&v.pass?'PASS':'FAIL'}`);
+  if (ab) {
+    log('\n[ADMIN BAR] source=' + (ab.auth ? ab.auth.source : '?') +
+        (ab.auth && ab.auth.loggedIn ? ' (REAL LOGGED-IN RUNTIME)' : ' (NOT LOGGED-IN: RUNTIME VERIFICATION SKIPPED)'));
+    if (ab.auth && ab.auth.error) log('  error: ' + ab.auth.error);
+    if (ab.auth) {
+      const c = ab.auth.cleanup || {};
+      if (ab.auth.source === 'temp') {
+        if (!c.deleted) log('  CLEANUP WARNING: temporary QA admin could not be deleted: ' + (c.error || 'unknown'));
+        else log('  cleanup: temporary QA admin created & deleted: YES');
+      } else {
+        log('  cleanup: env credentials (nothing to delete)');
+      }
+    }
+    for (const [k, v] of Object.entries(ab.viewports || {})) {
+      const s = (v && v.scroll) ? v.scroll : [];
+      let topBar = 0, topHeader = 0, scrolledHeader = 0, gap0 = '-';
+      if (s.length) {
+        const f = s[0], l = s[s.length - 1];
+        if (f && f.bar) topBar = Math.round(f.bar.bottom);
+        if (f && f.header) topHeader = Math.round(f.header.top);
+        if (l && l.header) scrolledHeader = Math.round(l.header.top);
+        if (f && f.header && f.bar) gap0 = Math.round(f.header.top - f.bar.bottom);
+      }
+      log(`  ${k} ${v.fixed ? '(fixed bar)' : '(mobile/absolute bar)'}: barBottom@top=${topBar}px headerTop@top=${topHeader}px headerTop@scrolled=${scrolledHeader}px gap@top=${gap0}px ${v.pass ? 'PASS' : 'FAIL'}`);
+    }
+  } else {
+    log('\n[ADMIN BAR] no data (auth failed)');
+  }
+  // logged-out regression
+  const lo = B.loggedOut;
+  if (lo) {
+    log('\n[LOGGED-OUT REGRESSION] (no admin bar -> header top = 0, no gap)');
+    for (const [k, v] of Object.entries(lo)) {
+      if (k === 'pass') continue;
+      if (!v) { log('  ' + k + ': n/a'); continue; }
+      const ck = v.check || {};
+      log(`  ${k}: bar=${!!ck.barExists} headerTop=${ck.headerTop !== undefined ? Math.round(ck.headerTop) : 'n/a'} over=${v.over ? 'yes' : 'no'} ${v.pass ? 'PASS' : 'FAIL'}`);
+      if (v.error) log('    error: ' + v.error);
+    }
+    log('  loggedOut pass: ' + !!lo.pass);
   }
   // keyboard
   log('\n[KEYBOARD / ACCESSIBILITY]');
@@ -537,12 +763,17 @@ function printSummary(R) {
   const failPhp = sv ? Object.entries(sv.phpL||{}).filter(([k,v])=>v!=='PASS') : [];
   log('  php -l: '+(failPhp.length ? failPhp.map(([k])=>k).join(', ') : 'all PASS'));
   log('  smoke: '+Object.entries(sv?.smoke||{}).map(([k,v])=>`${k}:${v}`).join(' '));
-  // decision
+  // decision — the admin-bar gate requires a REAL logged-in runtime run
+  // (admin bar rendered + geometry verified across viewports) AND the
+  // logged-out regression. A skipped (not logged-in) admin-bar run is a FAIL.
+  const adminBarOk = ab && ab.auth && ab.auth.loggedIn && ab.pass;
+  const loggedOutOk = lo && lo.pass;
   const pass = (
     overflowFails.length===0 &&
     B.lumenErrors.length===0 &&
     B.themeAssetFailures.length===0 &&
-    (ab && ab.desktop?.pass && ab.mobile?.pass) &&
+    adminBarOk &&
+    loggedOutOk &&
     (k && k.skipPass && k.noTrap) &&
     (lg && lg.set?.logoExists) &&
     (sv && failPhp.length===0)
@@ -554,7 +785,19 @@ function printSummary(R) {
     if (overflowFails.length) log('  - horizontal overflow: '+overflowFails.map(o=>o.label+'@'+o.vp).join(', '));
     if (B.lumenErrors.length) log('  - Lumen console errors: '+B.lumenErrors.length);
     if (B.themeAssetFailures.length) log('  - failed theme asset requests: '+B.themeAssetFailures.length);
-    if (ab) { if(!ab.desktop?.pass) log('  - admin bar desktop overlap'); if(!ab.mobile?.pass) log('  - admin bar mobile overlap'); }
+    if (ab) {
+      if (!(ab.auth && ab.auth.loggedIn)) {
+        log('  - admin bar: NOT a real logged-in run (auth failed / skipped)' + (ab.auth && ab.auth.error ? ' — ' + ab.auth.error : ''));
+      }
+      if (!ab.pass) {
+        const failed = Object.keys(ab.viewports || {}).filter(n => !ab.viewports[n].pass);
+        log(failed.length ? '  - admin bar geometry FAIL at: ' + failed.join(', ') : '  - admin bar geometry FAIL (no viewports recorded)');
+      }
+      if (ab.auth && ab.auth.source === 'temp' && !(ab.auth.cleanup && ab.auth.cleanup.deleted)) {
+        log('  - CLEANUP WARNING: temporary QA admin not deleted: ' + ((ab.auth.cleanup && ab.auth.cleanup.error) || 'unknown'));
+      }
+    }
+    if (lo && !lo.pass) log('  - logged-out regression FAIL (admin bar present / header not at top / overflow)');
     if (k) {
       if (k.error) log('  - keyboard test error: '+k.error);
       if (!k.skipPass) log('  - skip link failure (first tab not skip link or not in-viewport on focus)');

@@ -4,7 +4,7 @@ Contributor URI: https://lumen.example/
 Author: Lumen Team
 Author URI: https://lumen.example/
 Homepage URL: https://lumen.example/
-Version: 1.1.0-dev.8
+Version: 1.1.0-dev.9
 Requires at least: 6.3
 Tested up to: 6.7
 Requires PHP: 8.2
@@ -51,6 +51,19 @@ A minimalist, SEO-friendly content blog theme built for a bilingual (English + C
 At 0.1.0 the plugin is a thin bootstrap: plugin header, LBN_VERSION constant, and a text-domain load (lumen-blog) so future extensions are i18n-ready. It ships no features, no UI, no REST endpoints, and no hooks beyond the text-domain load. Concrete features (CPTs, forms, REST API) are added in later phases only when a concrete need exists (YAGNI).
 
 == Changelog ==
+* 1.1.0-dev.9 (Comments — reading + interaction refinement)
+  * EN — Comments section now wraps in a semantic <section id="comments" class="lumen-comments"> (a single landmark). Top-level comments are wrapped in an <ol class="lumen-comment-list"> so the document is valid HTML while the nested <ul class="children"> remain valid Core child lists.
+  * EN — Core args corrected: wp_list_comments() now passes only valid args (avatar_size); the former 'class'/'time_on' args were no-ops and are removed. comment_form() is left untouched (no new class/form args).
+  * EN — CSS now targets the real Core DOM (xhtml format): comment body text — the only reading content — uses the FangSong reading typeface; author name, date, reply link, count title, and form use the sans UI layer. No card, no shadow — a single top border and generous spacing separate the section from the Previous/Next nav.
+  * EN — Nested replies render as a left guide (1px border) with a modest per-level indent, so 3-4 deep replies stay readable without infinite indentation.
+  * EN — URL-based threading (#respond, ?replytocom=ID) works without JavaScript; pagination, accessibility, translations, moderation notes, and edit-link are preserved exactly.
+  * EN — No layout changes to homepage, archive, search, page, header, footer, Gutenberg, or stable v1.0.0.
+  * 中文 — 评论区现包裹为语义化 <section id="comments" class="lumen-comments">（单一地标）。顶级评论包裹于 <ol class="lumen-comment-list">，使文档结构有效，嵌套 <ul class="children"> 保持有效的 Core 子列表。
+  * 中文 — 修正 Core 参数：wp_list_comments() 仅传有效参数（avatar_size）；原 'class'/'time_on' 参数为无效参数（no-op），已移除。comment_form() 保持不变（未新增 class/form 参数）。
+  * 中文 — 样式现针对真实 Core DOM（xhtml 格式）：评论正文（唯一阅读内容）使用仿宋阅读字体；作者名、日期、回复链接、计数标题与表单使用无衬线 UI。无卡片、无阴影——用单条顶部边框与宽松间距将该区与上一篇/下一篇导航区分开。
+  * 中文 — 嵌套回复以左侧引导线（1px 边框）+ 每层适度缩进呈现，3–4 层深度回复仍可阅读，不会无限缩进。
+  * 中文 — 基于 URL 的线程（#respond、?replytocom=ID）无需 JavaScript；精确保留分页、可访问性、翻译、审核提示与编辑链接。
+  * 中文 — 首页、分类、搜索、页面、页头、页脚、Gutenberg 及稳定版 v1.0.0 布局不变。
 * 1.1.0-dev.8 (Single post content typography, phase 2)
   * EN — Single post body content (.lumen-post-body) refines long-form typography: an H2–H6 reading-serif size scale, list spacing, a minimal left-rule blockquote, a subtle persistent link underline, true non-wrapping code blocks (horizontal scroll confined to the block), compact tables, quiet captions, and generous separators. Global typography and the 720px content column are unchanged.
   * EN — Zero-JS: no new scripts; code-block scrolling uses CSS overflow only.

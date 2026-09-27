@@ -1,21 +1,11 @@
 <?php
 /**
- * Lumen — comments template (Core).
+ * Lumen — comments template.
  *
- * Self-contained: it renders its own <section id="comments"> wrapper.
- * Called from single.php via comments_template(), behind the Core gate:
- *     if ( comments_open() || get_comments_number() ) {
- *         comments_template();
- *     }
- *
- * Core APIs used (all WordPress Core, correct return types):
- *   post_password_required()         bool   skip output for password-protected posts
- *   have_comments()                  bool   whether the comment list exists
- *   get_comments_number_text()       string localized count, e.g. "1 comment"
- *   wp_list_comments()               void   comment list only (no pagination)
- *   the_comments_pagination()        void   Core comment pagination links
- *   comments_open()                  bool   whether the form may be shown
- *   comment_form()                   void   the form
+ * Renders the comments section using WordPress Core's native comment system.
+ * No custom walker, no custom comment form, no theme JS. Core threading and
+ * pagination are preserved exactly; this file only (a) fixes a structurally
+ * invalid list wrapper and (b) targets the real Core classes for CSS.
  *
  * @package lumen
  */
@@ -24,64 +14,54 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Password-protected post: Core does not show comments at all.
-if ( post_password_required() ) {
+// Password-protected posts must never expose the comment UI.
+if ( post_password_required( get_the_ID() ) ) {
 	return;
 }
-?>
-<section id="comments" class="lumen-comments">
-	<?php if ( have_comments() ) : ?>
-		<h2 class="lumen-comments-title">
-			<?php
-			// Localized Core count string ("1 comment" / "12 comments").
-			echo esc_html( get_comments_number_text() );
-			?>
-		</h2>
 
-		<?php
-		// wp_list_comments() outputs the list only; comment pagination is a
-		// separate Core output. Emit it explicitly so paged, threaded comments
-		// are navigable without JavaScript.
-		wp_list_comments( array(
-			'class'       => 'lumen-comment-list',
-			'avatar_size' => 48,
-			'time_on'     => true,
-		) );
-		the_comments_pagination();
-		?>
+if ( have_comments() ) :
+	?>
+	<!--
+		Comments (Core). Single #comments landmark, once, as required by the
+		reading-focused contract. wp_list_comments() emits top-level <li> items
+		with no list container (in xhtml format they are bare <li>), so we wrap
+		them in a semantic <ol class="lumen-comment-list">; the nested
+		<ul class="children"> remain valid Core child lists. Only valid Core
+		args are passed: 'avatar_size' sizes the gravatar; the former 'class' /
+		'time_on' args were not accepted by wp_list_comments() and were no-ops.
+	-->
+	<section id="comments" class="lumen-comments">
+		<h2 class="lumen-comments-title"><?php echo esc_html( get_comments_number_text() ); ?></h2>
+
+		<ol class="lumen-comment-list">
+			<?php wp_list_comments( array( 'avatar_size' => 48 ) ); ?>
+		</ol>
+
+		<?php the_comments_pagination(); ?>
 
 		<?php if ( comments_open() ) : ?>
 			<div class="lumen-comment-form-wrap">
-				<?php
-				comment_form( array(
-					'class' => 'lumen-comment-form',
-				) );
-				?>
+				<!--
+					comment_form() has no bare 'class' arg; the container/form are
+					already classed #respond.comment-respond / #commentform.comment-form
+					by Core. We scope styling to .lumen-comments in main.css.
+				-->
+				<?php comment_form(); ?>
 			</div>
 		<?php else : ?>
-			<p class="lumen-comments-closed">
-				<?php echo esc_html__( 'Comments are closed.', 'lumen' ); ?>
-			</p>
+			<p class="lumen-comments-closed"><?php echo esc_html__( 'Comments are closed.', 'lumen' ); ?></p>
 		<?php endif; ?>
+	</section>
 	<?php else : ?>
-		<h2 class="lumen-comments-title">
-			<?php echo esc_html__( 'Comments', 'lumen' ); ?>
-		</h2>
-		<p class="lumen-comment-empty">
-			<?php echo esc_html__( 'No comments yet.', 'lumen' ); ?>
-		</p>
+	<section id="comments" class="lumen-comments">
+		<h2 class="lumen-comments-title"><?php echo esc_html__( 'Comments', 'lumen' ); ?></h2>
 		<?php if ( comments_open() ) : ?>
+			<p class="lumen-comment-empty"><?php echo esc_html__( 'No comments yet. Be the first to start the conversation.', 'lumen' ); ?></p>
 			<div class="lumen-comment-form-wrap">
-				<?php
-				comment_form( array(
-					'class' => 'lumen-comment-form',
-				) );
-				?>
+				<?php comment_form(); ?>
 			</div>
 		<?php else : ?>
-			<p class="lumen-comments-closed">
-				<?php echo esc_html__( 'Comments are closed.', 'lumen' ); ?>
-			</p>
+			<p class="lumen-comment-empty"><?php echo esc_html__( 'Comments are closed.', 'lumen' ); ?></p>
 		<?php endif; ?>
+	</section>
 	<?php endif; ?>
-</section>

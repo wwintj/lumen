@@ -732,61 +732,288 @@ body.admin-bar .lumen-site-header {
 
 /* ============================================================
    Comments
-   ============================================================ */
+   ============================================================
+   Reads Core's native comment DOM (xhtml format): bare <li> items are now
+   wrapped in a semantic <ol.lumen-comment-list>; nested replies use Core's
+   <ul class="children">. Only the real Core classes are targeted; the
+   .lumen-comment-author / .lumen-comment-date / top-level .lumen-comment-list
+   selectors formerly here never matched and are replaced below. */
 
+/* Section: clear separation from the Previous/Next nav. No card, no shadow. */
 .lumen-comments {
-	margin-top: var(--lumen-space-5);
+	margin-top: 3rem;
+	padding-top: 2rem;
 	max-width: var(--lumen-content-max);
 	margin-inline: auto;
+	border-top: 1px solid var(--lumen-border);
 }
 
+/* Section title — sans UI label, not reading content. */
 .lumen-comments-title {
+	font-family: var(--lumen-sans);
 	font-size: 1.5rem;
-	margin-bottom: 1.5rem;
+	font-weight: 400;
+	line-height: 1.5;
+	color: var(--lumen-fg);
+	margin: 0 0 1.5rem;
 }
 
+/* Top-level list container (semantic <ol> for the bare <li> items). */
 .lumen-comment-list {
 	list-style: none;
 	margin: 0;
 	padding: 0;
 }
-
-.lumen-comment-list li {
+.lumen-comment-list > li {
 	margin: 0;
-	padding: 1.5rem 0;
+	padding: 1.25rem 0;
 	border-top: 1px solid var(--lumen-border);
 }
-
-.lumen-comment-list li:first-child {
+.lumen-comment-list > li:first-child {
 	padding-top: 0;
+	border-top: none;
 }
 
-.lumen-comment-author {
-	font-weight: 600;
-	margin: 0 0 0.25rem;
+/* Item body: reset the default <div> margins. */
+.lumen-comments .comment-body {
+	margin: 0;
 }
 
-.lumen-comment-date {
-	font-size: 0.85rem;
+/* Author: sans UI layer, no card. */
+.lumen-comments .comment-author {
+	display: flex;
+	align-items: baseline;
+	gap: 0.5rem;
+	flex-wrap: wrap;
+	margin: 0 0 0.35rem;
+}
+.lumen-comments .comment-author .avatar {
+	flex: 0 0 auto;
+	width: 48px;
+	height: 48px;
+	border-radius: 50%;
+	object-fit: cover;
+	/* no border, no shadow, no frame */
+}
+.lumen-comments .comment-author .fn a,
+.lumen-comments .comment-author .fn {
+	font-family: var(--lumen-sans);
+	font-size: 0.925rem;
+	font-weight: 500;
+	color: var(--lumen-fg);
+}
+.lumen-comments .comment-author .fn a {
+	text-decoration: none;
+}
+.lumen-comments .comment-author .fn a:hover {
+	color: var(--lumen-fg-soft);
+}
+.lumen-comments .comment-author .says {
+	font-family: var(--lumen-sans);
+	font-size: 0.8rem;
 	color: var(--lumen-muted);
 }
 
-.lumen-comment-form-wrap {
-	margin-top: 2rem;
+/* Metadata: date + optional edit link. Sans, muted, tabular numerals. */
+.lumen-comments .comment-meta {
+	margin: 0 0 0.5rem;
+	font-family: var(--lumen-sans);
+}
+.lumen-comments .comment-meta a {
+	font-size: 0.8rem;
+	color: var(--lumen-muted);
+	font-variant-numeric: tabular-nums;
+	text-decoration: none;
+}
+.lumen-comments .comment-meta a:hover {
+	color: var(--lumen-fg);
+}
+.lumen-comments .edit-link {
+	font-size: 0.75rem;
+}
+.lumen-comments .edit-link a {
+	color: var(--lumen-muted);
+	text-decoration: none;
+}
+.lumen-comments .edit-link a:hover {
+	color: var(--lumen-fg);
 }
 
-/* Core comment form rows are <p class="comment-form-*"> (no .wp-row divs).
-   The cols="45" #comment textarea has a wide min-content, so constrain the
-   form controls so nothing overflows on narrow viewports. */
-.lumen-comments #commentform textarea {
-	width: 100%;
-	box-sizing: border-box;
+/* Awaiting moderation: quiet, not error-red. */
+.lumen-comments .comment-awaiting-moderation {
+	font-family: var(--lumen-sans);
+	font-size: 0.8rem;
+	color: var(--lumen-muted);
+	margin: 0.25rem 0 0.5rem;
 }
-.lumen-comments #commentform input[type="text"],
-.lumen-comments #commentform input[type="email"],
-.lumen-comments #commentform input[type="url"] {
-	width: 100%;
-	box-sizing: border-box;
+
+/* Comment text: reading content — FangSong / 仿宋, same reading language. */
+.lumen-comments .comment-body p {
+	font-family: var(--lumen-font-reading);
+	font-size: 1rem;
+	font-weight: 400;
+	line-height: 1.85;
+	color: var(--lumen-fg);
+	margin: 0 0 0.9rem;
+}
+.lumen-comments .comment-body p:last-child {
+	margin-bottom: 0;
+}
+
+/* Inline links inside comment text: persistent subtle underline. */
+.lumen-comments .comment-body p a {
+	color: var(--lumen-muted);
+	text-decoration: underline;
+	text-decoration-thickness: 1px;
+	text-decoration-offset: 0.18em;
+}
+.lumen-comments .comment-body p a:hover {
+	color: var(--lumen-fg);
+}
+
+/* Inline code: mono, never overflows. (pre/code already styled globally.) */
+.lumen-comments .comment-body pre {
+	margin-bottom: 0.9rem;
+}
+.lumen-comments .comment-body pre:last-child {
+	margin-bottom: 0;
+}
+
+/* Reply link: sans UI, quiet, hover lifts to fg. */
+.lumen-comments .reply .comment-reply-link {
+	font-family: var(--lumen-sans);
+	font-size: 0.8rem;
+	color: var(--lumen-muted);
+	text-decoration: none;
+}
+.lumen-comments .reply .comment-reply-link:hover {
+	color: var(--lumen-fg);
+}
+
+/* Empty / closed state. */
+.lumen-comment-empty,
+.lumen-comments-closed {
+	font-family: var(--lumen-sans);
+	font-size: 0.95rem;
+	color: var(--lumen-muted);
+	margin: 0;
+}
+
+/* Nested threading: a left guide per level. No top border on nested items;
+   the <ul class="children"> supplies the guide. Each level indents a modest
+   amount so 3-4 deep replies stay readable (no infinite indentation). */
+.lumen-comments li > ul.children,
+.lumen-comments li > ol.children {
+	list-style: none;
+	margin: 0.6rem 0 0 1.25rem;
+	padding: 0;
+	padding-left: 1.25rem;
+	border-left: 1px solid var(--lumen-border);
+}
+.lumen-comments ul.children > li,
+.lumen-comments ol.children > li {
+	margin: 0;
+	padding: 0.5rem 0;
+}
+@media (max-width: 480px) {
+	.lumen-comments li > ul.children,
+	.lumen-comments li > ol.children {
+		margin: 0.4rem 0 0 0.6rem;
+		padding-left: 0.85rem;
+	}
+	.lumen-comments ul.children > li,
+	.lumen-comments ol.children > li {
+		padding: 0.5rem 0;
+	}
+}
+
+/* Comment form: sans UI throughout, no card. */
+.lumen-comment-form-wrap {
+	margin-top: 2.5rem;
+}
+.lumen-comments .comment-reply-title {
+	font-family: var(--lumen-font-reading);
+	font-size: 1.3rem;
+	font-weight: 400;
+	line-height: 1.5;
+	margin: 0 0 1.25rem;
+}
+.lumen-comments .comment-reply-title small {
+	font-size: 0.75rem;
+	font-weight: 400;
+}
+.lumen-comments .cancel-comment-reply-link {
+	font-family: var(--lumen-sans);
+	font-size: 0.8rem;
+	color: var(--lumen-muted);
+	text-decoration: none;
+}
+.lumen-comments .cancel-comment-reply-link:hover {
+	color: var(--lumen-fg);
+}
+
+.lumen-comments .comment-notes,
+.lumen-comments .comment-notes .required-field-message {
+	font-size: 0.8rem;
+	color: var(--lumen-muted);
+	margin: 0 0 0.75rem;
+}
+.lumen-comments #commentform p {
+	margin: 0 0 1rem;
+}
+.lumen-comments #commentform label {
+	display: block;
+	font-family: var(--lumen-sans);
+	font-size: 0.9rem;
+	font-weight: 500;
+	color: var(--lumen-fg);
+	margin-bottom: 0.35rem;
+}
+.lumen-comments #commentform .cookies-consent-text,
+.lumen-comments .comment-form-cookies-consent label {
+	font-weight: 400;
+}
+
+.lumen-comments #commentform input[type="checkbox"] {
+	flex: 0 0 auto;
+	vertical-align: baseline;
+}
+
+.lumen-comments .comment-form-cookies-consent {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin: 0 0 1rem;
+	font-size: 0.8rem;
+	color: var(--lumen-fg);
+}
+.lumen-comments .comment-form-cookies-consent label {
+	margin-bottom: 0;
+}
+
+/* Submit button reuses the theme's primary-button language. */
+.lumen-comments .form-submit {
+	margin: 0;
+}
+.lumen-comments .form-submit input,
+.lumen-comments .form-submit button {
+	font: inherit;
+	font-family: var(--lumen-sans);
+	font-size: 0.9rem;
+	font-weight: 500;
+	padding: 0.5em 1.1em;
+	border: 1px solid var(--lumen-fg);
+	border-radius: var(--lumen-radius);
+	background: var(--lumen-fg);
+	color: #fff;
+	cursor: pointer;
+}
+.lumen-comments .form-submit input:hover,
+.lumen-comments .form-submit button:hover {
+	opacity: 0.9;
+}
+.lumen-comments .form-submit input:focus-visible {
+	outline-offset: 2px;
 }
 
 /* ============================================================

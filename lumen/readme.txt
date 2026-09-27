@@ -4,7 +4,7 @@ Contributor URI: https://lumen.example/
 Author: Lumen Team
 Author URI: https://lumen.example/
 Homepage URL: https://lumen.example/
-Version: 1.1.0-dev.7
+Version: 1.1.0-dev.8
 Requires at least: 6.3
 Tested up to: 6.7
 Requires PHP: 8.2
@@ -51,6 +51,13 @@ A minimalist, SEO-friendly content blog theme built for a bilingual (English + C
 At 0.1.0 the plugin is a thin bootstrap: plugin header, LBN_VERSION constant, and a text-domain load (lumen-blog) so future extensions are i18n-ready. It ships no features, no UI, no REST endpoints, and no hooks beyond the text-domain load. Concrete features (CPTs, forms, REST API) are added in later phases only when a concrete need exists (YAGNI).
 
 == Changelog ==
+* 1.1.0-dev.8 (Single post content typography, phase 2)
+  * EN — Single post body content (.lumen-post-body) refines long-form typography: an H2–H6 reading-serif size scale, list spacing, a minimal left-rule blockquote, a subtle persistent link underline, true non-wrapping code blocks (horizontal scroll confined to the block), compact tables, quiet captions, and generous separators. Global typography and the 720px content column are unchanged.
+  * EN — Zero-JS: no new scripts; code-block scrolling uses CSS overflow only.
+  * EN — Homepage, archive, search, page, header, footer, comments, and the dev.7 single header / Previous-Next navigation are unchanged; stable v1.0.0 untouched.
+  * 中文 — 单篇文章正文排版（第二阶段，仅 .lumen-post-body）：H2–H6 阅读衬线字号阶梯、列表间距、极简引言块、微妙持久的链接下划线、真正不折行的代码块（仅在代码块内部横向滚动）、紧凑表格、安静图注、宽松分隔线。全局排版与 720px 内容栏保持不变。
+  * 中文 — 零 JavaScript：无新增脚本；代码块横向滚动仅用 CSS overflow 实现。
+  * 中文 — 首页、分类、搜索、页面、页头、页脚、评论，以及 dev.7 单篇页头 / 上一篇-下一篇导航保持不变；稳定版 v1.0.0 未改动。
 * 1.1.0-dev.7 (Single post reading layout)
   * EN — Single post title now sits above the featured image, tuned to the reading scale (clamp 1.75–2.5rem, FangSong, line-height 1.5); default single meta shows only "Date · Category" (no author) in the FangSong reading typeface with a middle-dot separator and a tabular-nums date.
   * EN — Previous/Next post navigation reworked as a two-layer link (small sans "← Previous" / "Next →" label + FangSong title), with a top border, generous spacing, and a full-width stacked layout on mobile.

@@ -18,7 +18,7 @@ no framework, and no custom font files — just pure CSS on a small set of desig
 | Version | Status | Intended for |
 |---|---|---|
 | **1.0.0** | **Stable — `Latest`** | Production. The current recommended release. |
-| **1.1.0-dev.6** | **Development preview** (pre-release) | Trying upcoming typography / interaction work. Not for production. |
+| **1.1.0-dev.x** | **Development preview** (pre-release) | Trying upcoming typography / interaction work. Not for production. |
 
 > The **stable** line (`1.0.0`) and the **development preview** line (`1.1.0-dev.x`) are separate.
 > 1.0.0 remains the *Latest* release; every dev build is published as a **pre-release** and is never marked Latest.
@@ -56,14 +56,18 @@ no framework, and no custom font files — just pure CSS on a small set of desig
 5. **Settings → Reading**: choose *Your latest posts* for the homepage.
 6. **Settings → Appearance → Menus**: assign the **Primary** menu (header) and **Footer** menu.
 
-## What the dev preview (1.1.0-dev.6) adds
+## What the development preview adds
 
-Compared with stable **1.0.0**, the current development preview (`1.1.0-dev.6`) refines two areas only:
+The `1.1.0-dev.x` line is a continuous pre-release workstream toward Lumen 1.1.0,
+refining the reading experience without touching the stable line. Recent builds have
+added (among other things):
 
 - **Homepage metadata typography** — the date / category line is set in the FangSong reading font
   (small, muted, secondary; no layout change).
 - **Header / footer interaction feedback** — soft‑background hover on header nav and footer
   RSS/menu links, a persistent current‑page/category active state, and a subtle site‑title hover.
+
+The current build and full changelog: [GitHub Releases](https://github.com/wwintj/lumen/releases).
 
 Stable **1.0.0** is unchanged and remains the production "Latest" release.
 
@@ -103,7 +107,7 @@ Lumen 是一个极简、SEO 友好的 **WordPress 主题**，面向中英文双�
 | 版本 | 状态 | 用途 |
 |---|---|---|
 | **1.0.0** | **稳定版 — `Latest`** | 生产环境。当前推荐发布。 |
-| **1.1.0-dev.6** | **开发预览版**（预发布） | 试用正在进行的排版 / 交互优化。不面向生产。 |
+| **1.1.0-dev.x** | **开发预览版**（预发布） | 试用正在进行的排版 / 交互优化。不面向生产。 |
 
 > **稳定版**（`1.0.0`）与**开发预览版**（`1.1.0-dev.x`）是两条独立的版本线。
 > 1.0.0 始终为 *Latest*；每个 dev 构建均作为**预发布**发布，从不标记为 Latest。
@@ -141,12 +145,14 @@ Lumen 是一个极简、SEO 友好的 **WordPress 主题**，面向中英文双�
 5. **设置 → 阅读**：首页选择 *你的最新文章*。
 6. **设置 → 外观 → 菜单**：分别指定 **Primary**（页头）与 **Footer**（页脚）菜单。
 
-## 开发预览（1.1.0-dev.6）新增了什么
+## 开发预览版新增了什么
 
-相较于稳定版 **1.0.0**，当前开发预览（`1.1.0-dev.6`）仅优化两处：
+**1.1.0-dev.x** 是迈向 Lumen 1.1.0 的连续预发布开发线，在不改动稳定线的前提下持续优化阅读体验。近期版本新增（包括但不限于）：
 
 - **首页元数据排版** — 日期 / 分类行改用仿宋阅读字体（小号、柔和、辅助级；无布局变化）。
 - **页头 / 页脚交互反馈** — 页头导航与页脚 RSS/菜单链接悬停柔和背景、当前页/分类常驻高亮、站点标题轻微悬停。
+
+当前版本与完整变更列表见 [Releases](https://github.com/wwintj/lumen/releases)。
 
 稳定版 **1.0.0** 保持不变，仍为生产 "Latest" 发布。
 

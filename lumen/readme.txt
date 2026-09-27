@@ -4,7 +4,7 @@ Contributor URI: https://lumen.example/
 Author: Lumen Team
 Author URI: https://lumen.example/
 Homepage URL: https://lumen.example/
-Version: 1.1.0-dev.9
+Version: 1.1.0-dev.10
 Requires at least: 6.3
 Tested up to: 6.7
 Requires PHP: 8.2
@@ -51,6 +51,13 @@ A minimalist, SEO-friendly content blog theme built for a bilingual (English + C
 At 0.1.0 the plugin is a thin bootstrap: plugin header, LBN_VERSION constant, and a text-domain load (lumen-blog) so future extensions are i18n-ready. It ships no features, no UI, no REST endpoints, and no hooks beyond the text-domain load. Concrete features (CPTs, forms, REST API) are added in later phases only when a concrete need exists (YAGNI).
 
 == Changelog ==
+* 1.1.0-dev.10 (Page reading typography unification)
+  * EN — The Single-Post long-form reading system (H2–H6 scale, paragraph/list/blockquote spacing, inline link/strong/em/code, pre/code internal scroll, compact tables, figures + captions, separators, Gutenberg blocks) now also styles regular Pages (.lumen-page-body) via grouped `.lumen-post-body, .lumen-page-body` selectors; `.lumen-page-title` matches the Single-Post title scale. Single Post output stays byte-identical across desktop/tablet/mobile.
+  * EN — Pages stay structurally simpler than posts: no date/category/author/featured-image/Previous-Next/comments output. UI (buttons, `.wp-block-button__link`, form controls) remains sans; no document horizontal overflow on any viewport.
+  * EN — i18n: regenerated languages/lumen.pot (fixed stale "No comments yet." string); validated with msgfmt.
+  * 中文 — 单篇正文阅读系统（H2–H6 字号阶梯、段落/列表/引言间距、行内链接/加粗/斜体/代码、pre/code 内部滚动、紧凑表格、图片与图注、分隔线、Gutenberg 块）现同时应用于普通页面（.lumen-page-body），采用分组选择器 `.lumen-post-body, .lumen-page-body`；`.lumen-page-title` 与单篇标题字号比例一致。单篇输出在桌面/平板/移动端保持逐字节一致。
+  * 中文 — 页面比文章更简洁：不输出日期/分类/作者/特色图/上一篇-下一篇/评论。界面元素（按钮、`.wp-block-button__link`、表单控件）保持无衬线；任意视口均无水平溢出。
+  * 中文 — 国际化：重新生成 languages/lumen.pot（修正过时的 "No comments yet." 字符串），并以 msgfmt 验证。
 * 1.1.0-dev.9 (Comments — reading + interaction refinement)
   * EN — Comments section now wraps in a semantic <section id="comments" class="lumen-comments"> (a single landmark). Top-level comments are wrapped in an <ol class="lumen-comment-list"> so the document is valid HTML while the nested <ul class="children"> remain valid Core child lists.
   * EN — Core args corrected: wp_list_comments() now passes only valid args (avatar_size); the former 'class'/'time_on' args were no-ops and are removed. comment_form() is left untouched (no new class/form args).

@@ -32,7 +32,7 @@ no framework, and no custom font files — just pure CSS on a small set of desig
 - Gutenberg‑ready via `theme.json` (palette, typography, spacing, block styles).
 - Responsive, mobile‑first (desktop / tablet / mobile).
 - Accessible: landmarks, skip link, `:focus‑visible` styles, reduced‑motion awareness, lazy‑loaded thumbnails.
-- Core Web Vitals friendly: **zero JavaScript**, single CSS file.
+- Core Web Vitals friendly: zero JavaScript and minimal CSS.
 - Nav menus: **Primary** (header) + **Footer**.
 - Post thumbnails (lazy), automatic feed links, RSS in the footer.
 - Previous/next post navigation on single posts; comments, search, 404, and archives included.
@@ -54,7 +54,7 @@ no framework, and no custom font files — just pure CSS on a small set of desig
 3. Activate the theme.
 4. *(Optional)* Install and activate the **Lumen Blog** companion plugin.
 5. **Settings → Reading**: choose *Your latest posts* for the homepage.
-6. **Settings → Appearance → Menus**: assign the **Primary** menu (header) and **Footer** menu.
+6. **Appearance → Menus**: assign the **Primary** menu (header) and **Footer** menu.
 
 ## What the development preview adds
 
@@ -121,7 +121,7 @@ Lumen 是一个极简、SEO 友好的 **WordPress 主题**，面向中英文双�
 - 通过 `theme.json` 就绪 Gutenberg（配色、排版、间距、块样式）。
 - 响应式、移动端优先（桌面 / 平板 / 移动）。
 - 可访问性：地标、跳转链接、`:focus-visible` 样式、reduced‑motion 感知、懒加载缩略图。
-- Core Web Vitals 友好：**零 JavaScript**，单个 CSS 文件。
+- Core Web Vitals 友好：零 JavaScript，CSS 保持轻量。
 - 导航菜单：**Primary**（页头）+ **Footer**（页脚）。
 - 文章缩略图（懒加载）、自动 feed 链接、页脚 RSS。
 - 单篇文章上/下一篇导航；自带评论、搜索、404、归档。
@@ -143,7 +143,7 @@ Lumen 是一个极简、SEO 友好的 **WordPress 主题**，面向中英文双�
 3. 启用主题。
 4. *(可选)* 安装并启用 **Lumen Blog** 配套插件。
 5. **设置 → 阅读**：首页选择 *你的最新文章*。
-6. **设置 → 外观 → 菜单**：分别指定 **Primary**（页头）与 **Footer**（页脚）菜单。
+6. **外观 → 菜单**：分别指定 **Primary**（页头）与 **Footer**（页脚）菜单。
 
 ## 开发预览版新增了什么
 
@@ -160,5 +160,5 @@ Lumen 是一个极简、SEO 友好的 **WordPress 主题**，面向中英文双�
 
 - GitHub Releases: [wwintj/lumen/releases](https://github.com/wwintj/lumen/releases)
 - **1.0.0** 为 `Latest` 发布。
-- 开发预览（`1.1.0-dev.x`）均为**预发布**，从不止为 "Latest"。
+- 开发预览（`1.1.0-dev.x`）均为预发布，从不标记为 `Latest`。
 - 完整版本历史见 [lumen/readme.txt](lumen/readme.txt#changelog)。

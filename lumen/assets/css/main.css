@@ -412,7 +412,8 @@ body.admin-bar .lumen-site-header {
 	color: var(--lumen-fg);
 }
 
-.lumen-post-body {
+.lumen-post-body,
+.lumen-page-body {
 	max-width: var(--lumen-content-max);
 	margin-inline: auto;
 	font-family: var(--lumen-font-reading);
@@ -420,35 +421,41 @@ body.admin-bar .lumen-site-header {
 	line-height: 1.9;
 }
 
-.lumen-post-body img {
+.lumen-post-body img,
+.lumen-page-body img {
 	max-width: 100%;
 	height: auto;
 	margin-block: 1rem 1.5rem;
 	border-radius: var(--lumen-radius);
 }
-.lumen-post-body img:first-child {
+.lumen-post-body img:first-child,
+.lumen-page-body img:first-child {
 	margin-top: 0;
 }
-.lumen-post-body img:last-child {
+.lumen-post-body img:last-child,
+.lumen-page-body img:last-child {
 	margin-bottom: 0;
 }
 
-.lumen-post-body p {
+.lumen-post-body p,
+.lumen-page-body p {
 	margin-bottom: 1.5rem;
 }
 
 /* ================================================================
-   Single Post body content typography — Phase 2 (long-form reading)
-   Scoped to .lumen-post-body only. Does NOT touch the global reset,
-   homepage, archive, search, page, comments, header/footer, or the
-   frozen dev.7 single header / Previous-Next navigation.
-   Headings keep the reading font (inherited from .lumen-post-body);
-   weight is 400 to stay coherent with the dev.7 title and the FangSong
-   reading-serif convention (see FINAL REPORT for the weight caveat).
+   Body content typography — long-form reading. Grouped so regular Pages
+   (.lumen-page-body) inherit the exact Single Post system without altering
+   any .lumen-post-body rule (byte-identical Single output; zero regression).
+   Does NOT touch the global reset, homepage, archive, search, comments,
+   header/footer, or the frozen dev.7 single header / Previous-Next nav.
+   Headings keep the reading font; weight is 400 to stay coherent with the
+   dev.7 title and the FangSong reading-serif convention (see FINAL REPORT
+   for the weight caveat).
    ================================================================ */
 
 /* H2 — primary article section: clearly above body, below a page title. */
-.lumen-post-body h2 {
+.lumen-post-body h2,
+.lumen-page-body h2 {
 	font-family: var(--lumen-font-reading);
 	font-size: clamp(1.5rem, 2.2vw, 1.75rem);
 	font-weight: 400;
@@ -457,7 +464,8 @@ body.admin-bar .lumen-site-header {
 	margin-bottom: 0.8em;
 }
 /* H3 — sub-section: below H2, above body. */
-.lumen-post-body h3 {
+.lumen-post-body h3,
+.lumen-page-body h3 {
 	font-family: var(--lumen-font-reading);
 	font-size: 1.35rem;
 	font-weight: 400;
@@ -466,7 +474,8 @@ body.admin-bar .lumen-site-header {
 	margin-bottom: 0.7em;
 }
 /* H4 — slightly above body. */
-.lumen-post-body h4 {
+.lumen-post-body h4,
+.lumen-page-body h4 {
 	font-family: var(--lumen-font-reading);
 	font-size: 1.125rem;
 	font-weight: 400;
@@ -476,7 +485,9 @@ body.admin-bar .lumen-site-header {
 }
 /* H5 / H6 — near body; distinguished by spacing, not size. */
 .lumen-post-body h5,
-.lumen-post-body h6 {
+.lumen-page-body h5,
+.lumen-post-body h6,
+.lumen-page-body h6 {
 	font-family: var(--lumen-font-reading);
 	font-size: 1.05rem;
 	font-weight: 400;
@@ -486,32 +497,43 @@ body.admin-bar .lumen-site-header {
 }
 /* Avoid a large gap above the first heading (header already supplies padding). */
 .lumen-post-body > h2:first-child,
+.lumen-page-body > h2:first-child,
 .lumen-post-body > h3:first-child,
+.lumen-page-body > h3:first-child,
 .lumen-post-body > h4:first-child,
+.lumen-page-body > h4:first-child,
 .lumen-post-body > h5:first-child,
-.lumen-post-body > h6:first-child {
+.lumen-page-body > h5:first-child,
+.lumen-post-body > h6:first-child,
+.lumen-page-body > h6:first-child {
 	margin-top: 0;
 }
 
 /* Lists — scoped to the single post body; native markers kept. */
 .lumen-post-body ul,
-.lumen-post-body ol {
+.lumen-page-body ul,
+.lumen-post-body ol,
+.lumen-page-body ol {
 	padding-left: 1.5em;
 	margin-top: 1.4rem;
 	margin-bottom: 1.4rem;
 }
-.lumen-post-body li {
+.lumen-post-body li,
+.lumen-page-body li {
 	margin-bottom: 0.45em;
 }
 .lumen-post-body li ul,
-.lumen-post-body li ol {
+.lumen-page-body li ul,
+.lumen-post-body li ol,
+.lumen-page-body li ol {
 	padding-left: 1.2em;
 	margin-top: 0.25em;
 	margin-bottom: 0.5em;
 }
 
 /* Blockquote — minimal left rule, soft text, no card/shadow/background. */
-.lumen-post-body blockquote {
+.lumen-post-body blockquote,
+.lumen-page-body blockquote {
 	margin: 1.75rem 0;
 	padding-left: 1.4rem;
 	border-left: 2px solid var(--lumen-fg-soft);
@@ -519,7 +541,8 @@ body.admin-bar .lumen-site-header {
 	font-size: 1em;
 	line-height: 1.88;
 }
-.lumen-post-body blockquote p:last-child {
+.lumen-post-body blockquote p:last-child,
+.lumen-page-body blockquote p:last-child {
 	margin-bottom: 0;
 }
 
@@ -527,24 +550,28 @@ body.admin-bar .lumen-site-header {
    discoverable without relying on colour alone. Excludes Gutenberg buttons so
    they keep the sans UI style. Hover deepens the colour; the underline stays
    (no font-weight change, no layout shift). */
-.lumen-post-body a:not(.wp-block-button__link) {
+.lumen-post-body a:not(.wp-block-button__link),
+.lumen-page-body a:not(.wp-block-button__link) {
 	text-decoration: underline;
 	text-decoration-thickness: 1px;
 	text-underline-offset: 0.18em;
 	text-decoration-color: var(--lumen-muted);
 }
-.lumen-post-body a:not(.wp-block-button__link):hover {
+.lumen-post-body a:not(.wp-block-button__link):hover,
+.lumen-page-body a:not(.wp-block-button__link):hover {
 	color: var(--lumen-fg-soft);
 }
 
 /* Inline code — keep the mono token; keep the existing 0.9em size. */
-.lumen-post-body code {
+.lumen-post-body code,
+.lumen-page-body code {
 	font-size: 0.9em;
 }
 
 /* Code blocks — real code reading: no forced wrap. The block scrolls
    horizontally on its own, so the page never overflows horizontally. */
-.lumen-post-body pre {
+.lumen-post-body pre,
+.lumen-page-body pre {
 	white-space: pre;
 	overflow-wrap: normal;
 	word-break: normal;
@@ -554,24 +581,29 @@ body.admin-bar .lumen-site-header {
 	font-size: 0.875rem;
 	line-height: 1.6;
 }
-.lumen-post-body pre code {
+.lumen-post-body pre code,
+.lumen-page-body pre code {
 	font-size: 100%;
 	padding: 0;
 }
 
 /* Tables — compact and readable; horizontal scroll on mobile via the
    media query below. Preserves user/Gutenberg alignment (no zebra/sticky). */
-.lumen-post-body table {
+.lumen-post-body table,
+.lumen-page-body table {
 	font-size: 0.95em;
 	line-height: 1.5;
 }
-.lumen-post-body th {
+.lumen-post-body th,
+.lumen-page-body th {
 	font-weight: 600;
 }
 
 /* Image captions / figure captions — reading font, quiet. */
 .lumen-post-body figcaption,
-.lumen-post-body .wp-caption-text {
+.lumen-page-body figcaption,
+.lumen-post-body .wp-caption-text,
+.lumen-page-body .wp-caption-text {
 	font-family: var(--lumen-font-reading);
 	font-size: 0.875rem;
 	line-height: 1.6;
@@ -581,13 +613,15 @@ body.admin-bar .lumen-site-header {
 }
 
 /* Horizontal rule / separator — more breathing room. Respects block styles. */
-.lumen-post-body hr {
+.lumen-post-body hr,
+.lumen-page-body hr {
 	margin: 2.75rem 0;
 }
 
 /* Wide tables on narrow screens scroll horizontally. */
 @media (max-width: 767px) {
-	.lumen-post-body table {
+	.lumen-post-body table,
+	.lumen-page-body table {
 		display: block;
 		width: 100%;
 		overflow-x: auto;
@@ -685,7 +719,10 @@ body.admin-bar .lumen-site-header {
 
 .lumen-page-title {
 	font-family: var(--lumen-font-reading);
-	font-weight: 500;
+	font-size: clamp(1.75rem, 3vw, 2.5rem);
+	font-weight: 400;
+	line-height: 1.5;
+	margin-bottom: 0.75rem;
 }
 
 .lumen-page-wrap {

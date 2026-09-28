@@ -20,8 +20,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 			get_template_part( 'template-parts/post-list-item' );
 		endwhile;
 		?>
-		<?php lumen_pagination(); ?>
 	</ul>
+	<?php lumen_pagination(); ?>
 <?php else : ?>
 	<p class="lumen-archive-empty">
 		<?php echo esc_html__( 'No posts found.', 'lumen' ); ?>

@@ -283,18 +283,31 @@ body.admin-bar .lumen-site-header {
 	border-bottom: 0;
 }
 
-.lumen-post-thumb {
-	margin-bottom: 1rem;
+.lumen-archive-context {
+	font-family: var(--lumen-sans);
+	font-size: 0.875rem;
+	font-weight: 400;
+	color: var(--lumen-muted);
+	margin: 0 0 var(--lumen-space-1);
 }
-.lumen-post-thumb a {
-	display: block;
+
+.lumen-archive-description {
+	font-family: var(--lumen-font-reading);
+	font-size: 0.9375rem;
+	color: var(--lumen-fg-soft);
+	line-height: 1.6;
+	margin: 0 0 var(--lumen-space-3);
 }
-.lumen-post-thumb img {
-	width: 100%;
-	height: auto;
-	display: block;
-	aspect-ratio: 16 / 9;
-	object-fit: cover;
+
+.lumen-search-page {
+}
+
+.lumen-post-excerpt {
+	font-family: var(--lumen-font-reading);
+	font-size: 0.9375rem;
+	color: var(--lumen-fg-soft);
+	line-height: 1.6;
+	margin: 0.5rem 0 0;
 }
 
 .lumen-post-card .lumen-post-title {

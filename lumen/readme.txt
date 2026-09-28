@@ -4,7 +4,7 @@ Contributor URI: https://lumen.example/
 Author: Lumen Team
 Author URI: https://lumen.example/
 Homepage URL: https://lumen.example/
-Version: 1.1.0-dev.10
+Version: 1.1.0-dev.11
 Requires at least: 6.3
 Tested up to: 6.7
 Requires PHP: 8.2
@@ -51,6 +51,27 @@ A minimalist, SEO-friendly content blog theme built for a bilingual (English + C
 At 0.1.0 the plugin is a thin bootstrap: plugin header, LBN_VERSION constant, and a text-domain load (lumen-blog) so future extensions are i18n-ready. It ships no features, no UI, no REST endpoints, and no hooks beyond the text-domain load. Concrete features (CPTs, forms, REST API) are added in later phases only when a concrete need exists (YAGNI).
 
 == Changelog ==
+* 1.1.0-dev.11 (Archive / category / tag / search — browsing + retrieval experience)
+  * EN — Archive and search pages get a distinct, text-first browsing experience: archive pages (category, tag, author, year, month, day) render via a rewritten `index.php`; search gets its own `search.php`. Each shows an H1 from `lumen_archive_title()` (single_term_title / author display_name / `wp_date()` date), a context label (e.g. "Category · 14 posts"), and an optional term/author description (guarded, non-empty only).
+  * EN — `template-parts/post-list-item.php` is shared across archives and search; context-aware order (archive: meta → title → excerpt; search: title → meta → excerpt), no thumbnail, and a shared excerpt helper `lumen_list_excerpt($context)` (archive CJK68/Latin22; search CJK92/Latin28; homepage frozen CJK80/Latin24).
+  * EN — `get_the_posts_pagination()` now renders outside `<ul class="lumen-post-list">` via a `'class' => 'lumen-pagination'` arg and a `lumen-pagination` wrapper; empty state shows "No posts found."
+  * EN — `lumen_search_form()` action changed from `/?s=` to `home_url('/')`.
+  * EN — `lumen_archive_term_description()` added (guarded; `get_quered_terms()` only for category/tag). Date archives detected via `year`/`monthnum`/`day` query-var tests (`> 0`), not `is_*_archive()` fns (non-standard WP install missing those).
+  * EN — i18n: new strings (Category, Tag, Author, Year, Month, Day, posts, results, Search, No posts found); `languages/lumen.pot` regenerated (37 msgids), validated with `msgfmt --check`.
+  * EN — CSS: removed dead `.lumen-post-thumb` rules; added `.lumen-archive-context` (sans, muted), `.lumen-archive-description` (FangSong, fg-soft), `.lumen-search-page`, `.lumen-post-excerpt` (FangSong, fg-soft).
+  * EN — Zero theme-JS; text-first, no cards/shadows/hero; mobile-first; 720px content column.
+  * EN — QA: 15 runtime pages (archive cat/tag/author/year/month/day/empty, search/search-empty, homepage, single) pass on 1440/768/390/320 — no overflow, 0 console errors, 0 failed network requests; 14 screenshots + computed JSON saved. Admin-bar QA (logged-in temp admin): 5 pages (home, category, search at 1440; category at 390/320) pass — admin bar visible, no overflow, 0 console errors.
+  * EN — Frozen/unchanged: home.php, home-post-item.php, single.php, page.php, comments.php, header.php, footer.php; stable v1.0.0 (`b36d4dce`) and dev.10/tag `v1.1.0-dev.10` untouched.
+  * 中文 — 归档与搜索页面获得独立、文本优先的浏览体验：归档页（分类、标签、作者、年、月、日）经由重写的 `index.php` 渲染；搜索拥有独立的 `search.php`。每页显示由 `lumen_archive_title()` 给出的 H1（single_term_title / 作者显示名 / `wp_date()` 日期）、上下文标签（例如 "Category · 14 posts"），以及可选的分类/作者描述（有守卫，仅非空时显示）。
+  * 中文 — `template-parts/post-list-item.php` 在归档与搜索间共享；上下文相关顺序（归档：元数据 → 标题 → 摘要；搜索：标题 → 元数据 → 摘要），无缩略图，共享摘要辅助函数 `lumen_list_excerpt($context)`（归档 CJK68/Latin22；搜索 CJK92/Latin28；首页冻结 CJK80/Latin24）。
+  * 中文 — `get_the_posts_pagination()` 现渲染于 `<ul class="lumen-post-list">` 之外，通过 `'class' => 'lumen-pagination'` 参数与 `lumen-pagination` 包裹；空态显示 "No posts found."
+  * 中文 — `lumen_search_form()` action 由 `/?s=` 改为 `home_url('/')`。
+  * 中文 — 新增 `lumen_archive_term_description()`（有守卫；仅分类/标签使用 `get_quered_terms()`）。日期归档通过 `year`/`monthnum`/`day` 查询变量的 `> 0` 测试检测，而非 `is_*_archive()` 函数（非标准 WP 安装缺失这些函数）。
+  * 中文 — 国际化：新增字符串（Category、Tag、Author、Year、Month、Day、posts、results、Search、No posts found）；重新生成 `languages/lumen.pot`（37 个 msgid），并以 `msgfmt --check` 验证。
+  * 中文 — CSS：移除失效的 `.lumen-post-thumb` 规则；新增 `.lumen-archive-context`（无衬线、弱化色）、`.lumen-archive-description`（仿宋、fg-soft）、`.lumen-search-page`、`.lumen-post-excerpt`（仿宋、fg-soft）。
+  * 中文 — 零主题 JS；文本优先，无卡片/阴影/英雄区；移动端优先；720px 内容栏。
+  * 中文 — QA：15 个运行时页面（归档 分类/标签/作者/年/月/日/空、搜索/搜索空、首页、单篇）在 1440/768/390/320 通过 — 无溢出、0 控制台错误、0 网络失败请求；已保存 14 张截图 + computed JSON。Admin-bar QA（以临时管理员登录）：5 个页面（1440 下 home、category、search；390/320 下 category）通过 — admin bar 可见、无溢出、0 控制台错误。
+  * 中文 — 冻结/未改动：home.php、home-post-item.php、single.php、page.php、comments.php、header.php、footer.php；稳定版 v1.0.0（`b36d4dce`）与 dev.10/标签 `v1.1.0-dev.10` 未动。
 * 1.1.0-dev.10 (Page reading typography unification)
   * EN — The Single-Post long-form reading system (H2–H6 scale, paragraph/list/blockquote spacing, inline link/strong/em/code, pre/code internal scroll, compact tables, figures + captions, separators, Gutenberg blocks) now also styles regular Pages (.lumen-page-body) via grouped `.lumen-post-body, .lumen-page-body` selectors; `.lumen-page-title` matches the Single-Post title scale. Single Post output stays byte-identical across desktop/tablet/mobile.
   * EN — Pages stay structurally simpler than posts: no date/category/author/featured-image/Previous-Next/comments output. UI (buttons, `.wp-block-button__link`, form controls) remains sans; no document horizontal overflow on any viewport.

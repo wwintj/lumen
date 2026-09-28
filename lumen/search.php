@@ -11,14 +11,27 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 <?php get_header(); ?>
 
-<section class="lumen-archive-wrap">
+<section class="lumen-archive-wrap lumen-search-page">
 	<header class="lumen-archive-header">
 		<h1 class="lumen-archive-title">
-			<?php printf(
-				esc_html__( 'Search results for “%1$s”', 'lumen' ),
-				esc_html( get_search_query() )
-			); ?>
+			<?php echo esc_html__( 'Search', 'lumen' ); ?>
 		</h1>
+		<?php
+		$found_posts = (int) $GLOBALS['wp_query']->found_posts;
+		if ( $found_posts > 0 ) :
+			?>
+			<p class="lumen-archive-context">
+				<?php
+				printf(
+					'%s %s',
+					number_format_i18n( $found_posts ),
+					esc_html__( 'results', 'lumen' )
+				);
+				?>
+			</p>
+			<?php
+		endif;
+		?>
 		<?php lumen_search_form(); ?>
 	</header>
 

@@ -1,12 +1,13 @@
 <?php
 /**
- * Lumen — single post list item.
+ * Lumen — one post list item (shared by Archive and Search).
  *
- * Intended to be included inside a `while ( have_posts() ) : the_post();` loop
- * (the main query). No-op outside a post context.
+ * Text-first item: no thumbnail.
  *
- * Note: `have_posts()` must NOT be called here — it fires `loop_end` /
- * `rewind_posts()` on the last post and would restart the parent loop.
+ * Archive: meta → title → excerpt.
+ * Search:  title → meta → excerpt.
+ *
+ * Excerpt uses lumen_list_excerpt($context) for context-aware length.
  *
  * @package lumen
  */
@@ -14,31 +15,28 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-?>
-<?php
-if ( ! is_main_query() || empty( get_the_ID() ) ) {
-	return;
-}
-$permalink = esc_url( get_the_permalink() );
+
+$context    = is_search() ? 'search' : 'archive';
+$meta_first = ( 'archive' === $context );
+$excerpt    = lumen_list_excerpt( $context );
 ?>
 <li class="lumen-post-item">
 	<article class="lumen-post-card">
-		<?php if ( has_post_thumbnail() ) : ?>
-			<a href="<?php echo $permalink; ?>" class="lumen-post-thumb">
-				<?php the_post_thumbnail( 'lumen-card', array( 'loading' => 'lazy' ) ); ?>
-			</a>
+		<?php if ( $meta_first ) : ?>
+			<?php lumen_post_meta(); ?>
 		<?php endif; ?>
 		<h2 class="lumen-post-title">
-			<a href="<?php echo $permalink; ?>">
-				<?php echo esc_html( get_the_title() ); ?>
+			<a href="<?php the_permalink(); ?>">
+				<?php the_title(); ?>
 			</a>
 		</h2>
-		<p class="lumen-post-meta">
-			<?php lumen_post_date(); ?>
-			<?php lumen_post_categories(); ?>
-		</p>
-		<?php
-		the_excerpt();
-		?>
+		<?php if ( ! $meta_first ) : ?>
+			<?php lumen_post_meta(); ?>
+		<?php endif; ?>
+		<?php if ( '' !== $excerpt ) : ?>
+			<p class="lumen-post-excerpt">
+				<?php echo esc_html( $excerpt ); ?>
+			</p>
+		<?php endif; ?>
 	</article>
 </li>

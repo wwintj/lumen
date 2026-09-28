@@ -148,3 +148,137 @@ if ( ! function_exists( 'lumen_home_excerpt' ) ) {
 		return wp_trim_words( $text, 24, '…' );
 	}
 }
+
+if ( ! function_exists( 'lumen_list_excerpt' ) ) {
+	/**
+	 * Returns a trimmed excerpt for archive/search lists.
+	 *
+	 * Archive: CJK 68 chars / Latin 22 words.
+	 * Search:  CJK 92 chars / Latin 28 words.
+	 * Ellipsis: U+2026.
+	 *
+	 * @param string $context 'archive' | 'search'.
+	 * @return string
+	 */
+	function lumen_list_excerpt( $context = 'archive' ) {
+		$raw  = (string) get_the_excerpt();
+		$text = trim( wp_strip_all_tags( $raw ) );
+		if ( '' === $text ) {
+			return '';
+		}
+		if ( preg_match( '/[\p{Han}]/u', $text ) ) {
+			$max   = ( 'search' === $context ) ? 92 : 68;
+			$chars = preg_split( '//u', $text, -1, PREG_SPLIT_NO_EMPTY );
+			$kept  = array_slice( $chars, 0, $max );
+			$out   = implode( '', $kept );
+			if ( count( $chars ) > $max ) {
+				$out .= '…';
+			}
+			return $out;
+		}
+		// Latin: word count.
+		return wp_trim_words( $text, ( 'search' === $context ) ? 28 : 22, '…' );
+	}
+}
+
+if ( ! function_exists( 'lumen_archive_title' ) ) {
+	/**
+	 * Returns the clean archive H1 title (no "Category:" / "Tag:" prefix).
+	 *
+	 * Uses core term/author/date APIs; falls back to get_the_archive_title()
+	 * for any other archive type.
+	 *
+	 * @return string
+	 */
+	function lumen_archive_title() {
+		if ( is_category() || is_tag() ) {
+			$title = single_term_title();
+			if ( '' !== $title ) {
+				return esc_html( $title );
+			}
+		}
+		if ( is_author() ) {
+			$author_id = ( int ) ( $GLOBALS['wp_query']->query_vars['author'] ?? 0 );
+			if ( $author_id ) {
+				$user = get_user_by( 'ID', $author_id );
+				if ( $user instanceof WP_User ) {
+					$name = (string) $user->display_name;
+					if ( $name && '0' !== $name ) {
+						return esc_html( $name );
+					}
+				}
+			}
+		}
+		if ( is_date() ) {
+			$year     = ( int ) ( $GLOBALS['wp_query']->query_vars['year'] ?? 0 );
+			$monthnum = ( int ) ( $GLOBALS['wp_query']->query_vars['monthnum'] ?? 0 );
+			$day      = ( int ) ( $GLOBALS['wp_query']->query_vars['day'] ?? 0 );
+			if ( $year > 0 && $monthnum === 0 && $day === 0 ) {
+				return esc_html( $year );
+			}
+			if ( $year > 0 && $monthnum > 0 && $day === 0 ) {
+				$ts = mktime( 12, 0, 0, $monthnum, 1, $year );
+				return esc_html( wp_date( 'F Y', $ts ) );
+			}
+			if ( $year > 0 && $monthnum > 0 && $day > 0 ) {
+				$ts = mktime( 12, 0, 0, $monthnum, $day, $year );
+				return esc_html( wp_date( 'F j, Y', $ts ) );
+			}
+		}
+		return esc_html( (string) get_the_archive_title() );
+	}
+}
+
+if ( ! function_exists( 'lumen_archive_context_label' ) ) {
+	/**
+	 * Returns the localized archive type label.
+	 *
+	 * @return string
+	 */
+	function lumen_archive_context_label() {
+		if ( is_category() ) {
+			return __( 'Category', 'lumen' );
+		}
+		if ( is_tag() ) {
+			return __( 'Tag', 'lumen' );
+		}
+		if ( is_author() ) {
+			return __( 'Author', 'lumen' );
+		}
+		$year     = ( int ) ( $GLOBALS['wp_query']->query_vars['year'] ?? 0 );
+		$monthnum = ( int ) ( $GLOBALS['wp_query']->query_vars['monthnum'] ?? 0 );
+		$day      = ( int ) ( $GLOBALS['wp_query']->query_vars['day'] ?? 0 );
+		if ( $year > 0 && $monthnum === 0 && $day === 0 ) {
+			return __( 'Year', 'lumen' );
+		}
+		if ( $year > 0 && $monthnum > 0 && $day === 0 ) {
+			return __( 'Month', 'lumen' );
+		}
+		if ( $year > 0 && $monthnum > 0 && $day > 0 ) {
+			return __( 'Day', 'lumen' );
+		}
+		return '';
+	}
+}
+
+if ( ! function_exists( 'lumen_archive_term_description' ) ) {
+	/**
+	 * Returns the queried term description, empty when absent.
+	 *
+	 * @return string
+	 */
+	function lumen_archive_term_description() {
+		// Only term archives (category / tag) carry a term description.
+		if ( ! ( is_category() || is_tag() ) ) {
+			return '';
+		}
+		$terms = $GLOBALS['wp_query']->get_quered_terms();
+		if ( is_array( $terms ) && ! empty( $terms ) ) {
+			$term = (object) $terms[0];
+			if ( ! empty( $term->description ) ) {
+				return $term->description;
+			}
+		}
+		return '';
+	}
+}

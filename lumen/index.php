@@ -34,16 +34,42 @@ if ( ! defined( 'ABSPATH' ) ) {
 				$archive_title  = __( 'Latest posts', 'lumen' );
 			elseif ( is_archive() ) :
 				// category / tag / author / date / taxonomy archives.
-				$archive_title  = get_the_archive_title();
-			else :
-				$archive_title  = __( 'Latest posts', 'lumen' );
+				// Clean context title via core term/author/date APIs.
+				$archive_title  = lumen_archive_title();
 			endif;
 
-			// get_the_archive_title() returns markup (e.g. <span>); emit it
-			// verbatim so the term name renders as intended.
-			echo ( string ) $archive_title;
+			if ( '' !== $archive_title ) {
+				echo ( string ) $archive_title;
+			}
 			?>
 		</h1>
+		<?php
+		$found_posts = 0;
+		$context     = '';
+		$description = '';
+
+		if ( is_archive() ) {
+			$found_posts   = (int) $GLOBALS['wp_query']->found_posts;
+			$context       = lumen_archive_context_label();
+			$description   = lumen_archive_term_description();
+		}
+		?>
+		<?php if ( '' !== $context ) : ?>
+			<p class="lumen-archive-context">
+				<?php
+				$label = esc_html( $context );
+				if ( $found_posts > 0 ) {
+					$label .= ' · ' . number_format_i18n( $found_posts ) . ' ' . esc_html__( 'posts', 'lumen' );
+				}
+				echo $label;
+				?>
+			</p>
+		<?php endif; ?>
+		<?php if ( '' !== $description ) : ?>
+			<p class="lumen-archive-description">
+				<?php echo esc_html( $description ); ?>
+			</p>
+		<?php endif; ?>
 	</header>
 
 	<?php get_template_part( 'template-parts/post-list' ); ?>

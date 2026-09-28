@@ -38,15 +38,14 @@ if ( ! function_exists( 'lumen_pagination' ) ) {
 			'mid_size'  => 2,
 			'prev_text' => esc_html__( 'Previous', 'lumen' ),
 			'next_text' => esc_html__( 'Next', 'lumen' ),
-			'add_class' => 'lumen-pagination',
+			'class'     => 'lumen-pagination',
 		) );
 	}
 }
 
 if ( ! function_exists( 'lumen_search_form' ) ) {
 	function lumen_search_form() {
-		$home_url = home_url( '/' );
-		$query_arg = $home_url . '/?s=';
+		$query_arg = home_url( '/' );
 		echo '<form role="search" method="get" action="' . esc_url( $query_arg ) . '" class="lumen-search-form">';
 		echo '<label for="lumen-search" class="visually-hidden">' . esc_html__( 'Search', 'lumen' ) . '</label>';
 		echo '<input id="lumen-search" name="s" type="search" class="lumen-search-input" value="' . esc_attr( get_query_var( 's' ) ) . '" autocomplete="off">';

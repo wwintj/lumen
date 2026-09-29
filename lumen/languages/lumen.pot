@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the Lumen theme.
 msgid ""
 msgstr ""
-"Project-Id-Version: Lumen 1.1.0-dev.11\n"
+"Project-Id-Version: Lumen 1.1.0-beta.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/theme/lumen\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-27T23:43:59+00:00\n"
+"POT-Creation-Date: 2026-09-29T14:40:15+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: lumen\n"
@@ -96,7 +96,7 @@ msgid "Next"
 msgstr ""
 
 #: home.php:41
-#: template-parts/post-list.php:27
+#: template-parts/post-list.php:66
 msgid "No posts found."
 msgstr ""
 
@@ -106,41 +106,42 @@ msgstr ""
 msgid "Search"
 msgstr ""
 
-#: inc/template-tags.php:240
+#: inc/template-tags.php:280
 msgid "Category"
 msgstr ""
 
-#: inc/template-tags.php:243
+#: inc/template-tags.php:283
 msgid "Tag"
 msgstr ""
 
-#: inc/template-tags.php:246
+#: inc/template-tags.php:290
 msgid "Author"
 msgstr ""
 
-#: inc/template-tags.php:252
-msgid "Year"
-msgstr ""
+#: inc/template-tags.php:342
+msgid "post"
+msgid_plural "posts"
+msgstr[0] ""
+msgstr[1] ""
 
-#: inc/template-tags.php:255
-msgid "Month"
-msgstr ""
-
-#: inc/template-tags.php:258
-msgid "Day"
-msgstr ""
+#: inc/template-tags.php:361
+msgid "result"
+msgid_plural "results"
+msgstr[0] ""
+msgstr[1] ""
 
 #: index.php:31
 #: index.php:34
 msgid "Latest posts"
 msgstr ""
 
-#: index.php:62
-msgid "posts"
+#: template-parts/post-list.php:60
+#, php-format
+msgid "No results for %s"
 msgstr ""
 
-#: search.php:28
-msgid "results"
+#: template-parts/post-list.php:62
+msgid "No results found."
 msgstr ""
 
 #: theme.json

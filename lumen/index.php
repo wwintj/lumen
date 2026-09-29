@@ -50,29 +50,27 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		if ( is_archive() ) {
 			$found_posts   = (int) $GLOBALS['wp_query']->found_posts;
-			$context       = lumen_archive_context_label();
+			$context       = lumen_archive_context_label( $found_posts );
 			$description   = lumen_archive_term_description();
 		}
 		?>
 		<?php if ( '' !== $context ) : ?>
 			<p class="lumen-archive-context">
-				<?php
-				$label = esc_html( $context );
-				if ( $found_posts > 0 ) {
-					$label .= ' · ' . number_format_i18n( $found_posts ) . ' ' . esc_html__( 'posts', 'lumen' );
-				}
-				echo $label;
-				?>
+				<?php echo esc_html( $context ); ?>
 			</p>
 		<?php endif; ?>
 		<?php if ( '' !== $description ) : ?>
 			<p class="lumen-archive-description">
-				<?php echo esc_html( $description ); ?>
+				<?php
+				// lumen_archive_term_description() already returns wp_kses_post()
+				// output; echo it directly (no extra escaping).
+				echo $description;
+				?>
 			</p>
 		<?php endif; ?>
 	</header>
 
-	<?php get_template_part( 'template-parts/post-list' ); ?>
+	<?php get_template_part( 'template-parts/post-list', null, array( 'context' => 'archive' ) ); ?>
 </section>
 
 <?php get_footer(); ?>

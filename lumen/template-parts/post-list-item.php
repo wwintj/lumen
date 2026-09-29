@@ -1,13 +1,10 @@
 <?php
 /**
- * Lumen — one post list item (shared by Archive and Search).
+ * Lumen — single list item (archive / search).
  *
- * Text-first item: no thumbnail.
- *
- * Archive: meta → title → excerpt.
- * Search:  title → meta → excerpt.
- *
- * Excerpt uses lumen_list_excerpt($context) for context-aware length.
+ * Receives the explicit context via $args (third arg of the parent
+ * get_template_part() call), e.g. array( 'context' => 'archive' | 'search' ).
+ * Unknown or missing context normalizes to 'archive'.
  *
  * @package lumen
  */
@@ -16,27 +13,45 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$context    = is_search() ? 'search' : 'archive';
-$meta_first = ( 'archive' === $context );
-$excerpt    = lumen_list_excerpt( $context );
+// Read the explicit context from $args (third arg of the parent call).
+$context = 'archive';
+if ( isset( $args ) && is_array( $args ) && isset( $args['context'] ) ) {
+	$context = (string) $args['context'];
+}
+if ( '' !== $context && ! in_array( $context, array( 'archive', 'search' ), true ) ) {
+	$context = 'archive';
+}
+
+$search = ( 'search' === $context );
+$card_class = $search ? 'lumen-post-card lumen-list-search' : 'lumen-post-card';
 ?>
-<li class="lumen-post-item">
-	<article class="lumen-post-card">
-		<?php if ( $meta_first ) : ?>
-			<?php lumen_post_meta(); ?>
-		<?php endif; ?>
+<div class="<?php echo esc_attr( $card_class ); ?>">
+	<?php if ( $search ) : ?>
+		<!-- search order: title -> meta -> excerpt -->
 		<h2 class="lumen-post-title">
-			<a href="<?php the_permalink(); ?>">
-				<?php the_title(); ?>
+			<a href="<?php echo esc_url( get_permalink() ); ?>">
+				<?php echo get_the_title(); ?>
 			</a>
 		</h2>
-		<?php if ( ! $meta_first ) : ?>
-			<?php lumen_post_meta(); ?>
-		<?php endif; ?>
-		<?php if ( '' !== $excerpt ) : ?>
-			<p class="lumen-post-excerpt">
-				<?php echo esc_html( $excerpt ); ?>
-			</p>
-		<?php endif; ?>
-	</article>
-</li>
+		<?php lumen_list_meta(); ?>
+		<?php
+		if ( $excerpt = lumen_list_excerpt( $context ) ) {
+			echo '<p class="lumen-post-excerpt">' . $excerpt . '</p>';
+		}
+		?>
+	<?php else : ?>
+		<!-- archive order: meta -> title -> excerpt -->
+		<?php lumen_list_meta(); ?>
+		<h2 class="lumen-post-title">
+			<a href="<?php echo esc_url( get_permalink() ); ?>">
+				<?php echo get_the_title(); ?>
+			</a>
+		</h2>
+		<?php
+		if ( $excerpt = lumen_list_excerpt( $context ) ) {
+			echo '<p class="lumen-post-excerpt">' . $excerpt . '</p>';
+		}
+		?>
+	<?php endif; ?>
+</div>
+<?php

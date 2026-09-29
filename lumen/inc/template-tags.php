@@ -185,100 +185,201 @@ if ( ! function_exists( 'lumen_archive_title' ) ) {
 	/**
 	 * Returns the clean archive H1 title (no "Category:" / "Tag:" prefix).
 	 *
-	 * Uses core term/author/date APIs; falls back to get_the_archive_title()
-	 * for any other archive type.
+	 * Derived from the queried object, so every standard archive type is
+	 * covered by core APIs:
+	 *   - WP_Term     → term name (category / tag / any public custom taxonomy)
+	 *   - WP_User     → display name (author archive)
+	 *   - WP_Post_Type → post-type label (post-type archive)
+	 *   - date archive → localized year / month / day via wp_date()
+	 * Falls back to core get_the_archive_title() (string return, no echo
+	 * side-effect) for any other archive type.
 	 *
 	 * @return string
 	 */
 	function lumen_archive_title() {
-		if ( is_category() || is_tag() ) {
-			$title = single_term_title();
-			if ( '' !== $title ) {
-				return esc_html( $title );
+		$object = get_queried_object();
+
+		// Term archives (category / tag / any public custom taxonomy).
+		if ( $object instanceof WP_Term ) {
+			$name = (string) $object->name;
+			if ( '' !== $name ) {
+				return esc_html( $name );
 			}
 		}
-		if ( is_author() ) {
-			$author_id = ( int ) ( $GLOBALS['wp_query']->query_vars['author'] ?? 0 );
-			if ( $author_id ) {
-				$user = get_user_by( 'ID', $author_id );
-				if ( $user instanceof WP_User ) {
-					$name = (string) $user->display_name;
-					if ( $name && '0' !== $name ) {
-						return esc_html( $name );
-					}
-				}
+
+		// Author archives.
+		if ( is_author() && $object instanceof WP_User ) {
+			$name = (string) $object->display_name;
+			if ( '' !== $name && '0' !== $name ) {
+				return esc_html( $name );
 			}
 		}
+
+		// Post-type archives.
+		if ( is_post_type_archive() && $object instanceof WP_Post_Type ) {
+			$label = (string) $object->label;
+			if ( '' !== $label ) {
+				return esc_html( $label );
+			}
+		}
+
+		// Date archives (year / month / day), localized via wp_date().
 		if ( is_date() ) {
-			$year     = ( int ) ( $GLOBALS['wp_query']->query_vars['year'] ?? 0 );
-			$monthnum = ( int ) ( $GLOBALS['wp_query']->query_vars['monthnum'] ?? 0 );
-			$day      = ( int ) ( $GLOBALS['wp_query']->query_vars['day'] ?? 0 );
+			$year     = (int) ( $GLOBALS['wp_query']->query_vars['year'] ?? 0 );
+			$monthnum = (int) ( $GLOBALS['wp_query']->query_vars['monthnum'] ?? 0 );
+			$day      = (int) ( $GLOBALS['wp_query']->query_vars['day'] ?? 0 );
 			if ( $year > 0 && $monthnum === 0 && $day === 0 ) {
-				return esc_html( $year );
+				return esc_html( wp_date( 'Y', mktime( 12, 0, 0, 1, 1, $year ) ) );
 			}
 			if ( $year > 0 && $monthnum > 0 && $day === 0 ) {
-				$ts = mktime( 12, 0, 0, $monthnum, 1, $year );
-				return esc_html( wp_date( 'F Y', $ts ) );
+				return esc_html( wp_date( 'F Y', mktime( 12, 0, 0, $monthnum, 1, $year ) ) );
 			}
 			if ( $year > 0 && $monthnum > 0 && $day > 0 ) {
-				$ts = mktime( 12, 0, 0, $monthnum, $day, $year );
-				return esc_html( wp_date( 'F j, Y', $ts ) );
+				return esc_html( wp_date( 'F j, Y', mktime( 12, 0, 0, $monthnum, $day, $year ) ) );
 			}
 		}
-		return esc_html( (string) get_the_archive_title() );
+
+		// Fallback: core archive title (returns a string; no echo side effect).
+		$title = get_the_archive_title();
+		if ( '' !== (string) $title ) {
+			return esc_html( (string) $title );
+		}
+
+		return '';
 	}
 }
 
 if ( ! function_exists( 'lumen_archive_context_label' ) ) {
 	/**
-	 * Returns the localized archive type label.
+	 * Returns the localized archive context line, e.g. "Category · 14 posts",
+	 * "Author · 3 posts", "0 posts", etc. Always shows the post count
+	 * (localized plural) even when it is 0.
 	 *
+	 * @param int $count Number of found posts (defaults to current $wp_query count).
 	 * @return string
 	 */
-	function lumen_archive_context_label() {
-		if ( is_category() ) {
-			return __( 'Category', 'lumen' );
+	function lumen_archive_context_label( $count = null ) {
+		$found = (int) ( $GLOBALS['wp_query']->found_posts ?? 0 );
+		$count = null !== $count ? (int) $count : $found;
+		$count_text = lumen_posts_count_label( $count );
+
+		$object = get_queried_object();
+
+		// Term archives (category / tag / any public custom taxonomy).
+		if ( $object instanceof WP_Term && ! empty( $object->taxonomy ) ) {
+			$singular = '';
+			$tax      = get_taxonomy( $object->taxonomy );
+			if ( is_object( $tax ) && ! empty( $tax->labels->singular_name ) ) {
+				$singular = (string) $tax->labels->singular_name;
+			}
+			if ( '' !== $singular ) {
+				return $singular . ' · ' . $count_text;
+			}
+			// Fallback to core category / tag labels (localized).
+			if ( is_category() ) {
+				return __( 'Category', 'lumen' ) . ' · ' . $count_text;
+			}
+			if ( is_tag() ) {
+				return __( 'Tag', 'lumen' ) . ' · ' . $count_text;
+			}
+			return $count_text;
 		}
-		if ( is_tag() ) {
-			return __( 'Tag', 'lumen' );
-		}
+
+		// Author archives.
 		if ( is_author() ) {
-			return __( 'Author', 'lumen' );
+			return __( 'Author', 'lumen' ) . ' · ' . $count_text;
 		}
-		$year     = ( int ) ( $GLOBALS['wp_query']->query_vars['year'] ?? 0 );
-		$monthnum = ( int ) ( $GLOBALS['wp_query']->query_vars['monthnum'] ?? 0 );
-		$day      = ( int ) ( $GLOBALS['wp_query']->query_vars['day'] ?? 0 );
-		if ( $year > 0 && $monthnum === 0 && $day === 0 ) {
-			return __( 'Year', 'lumen' );
+
+		// Date archives: only the localized count ("N posts").
+		if ( is_date() ) {
+			return $count_text;
 		}
-		if ( $year > 0 && $monthnum > 0 && $day === 0 ) {
-			return __( 'Month', 'lumen' );
+
+		// Post-type archives: only the localized count ("N posts").
+		if ( is_post_type_archive() ) {
+			return $count_text;
 		}
-		if ( $year > 0 && $monthnum > 0 && $day > 0 ) {
-			return __( 'Day', 'lumen' );
-		}
+
 		return '';
 	}
 }
 
 if ( ! function_exists( 'lumen_archive_term_description' ) ) {
 	/**
-	 * Returns the queried term description, empty when absent.
+	 * Returns the queried term description (escaped with wp_kses_post()),
+	 * empty when absent.
+	 *
+	 * Works for any public term archive (category / tag / custom taxonomy)
+	 * by reading the description from the queried object, which is a
+	 * standard WordPress Core API.
 	 *
 	 * @return string
 	 */
 	function lumen_archive_term_description() {
-		// Only term archives (category / tag) carry a term description.
-		if ( ! ( is_category() || is_tag() ) ) {
+		$object = get_queried_object();
+		if ( ! ( $object instanceof WP_Term ) ) {
 			return '';
 		}
-		$terms = $GLOBALS['wp_query']->get_quered_terms();
-		if ( is_array( $terms ) && ! empty( $terms ) ) {
-			$term = (object) $terms[0];
-			if ( ! empty( $term->description ) ) {
-				return $term->description;
-			}
+		$description = (string) $object->description;
+		if ( '' === $description ) {
+			return '';
 		}
-		return '';
+		return wp_kses_post( $description );
+	}
+}
+
+if ( ! function_exists( 'lumen_posts_count_label' ) ) {
+	/**
+	 * Returns the localized post count label, e.g. "1 post", "0 posts", "14 posts".
+	 *
+	 * Built with _n() + number_format_i18n() — never a hardcoded "posts".
+	 *
+	 * @param int $count
+	 * @return string
+	 */
+	function lumen_posts_count_label( $count ) {
+		$count = (int) $count;
+		$posts = (string) _n( 'post', 'posts', $count, 'lumen' );
+		return number_format_i18n( $count ) . ' ' . $posts;
+	}
+}
+
+if ( ! function_exists( 'lumen_search_results_label' ) ) {
+	/**
+	 * Returns the localized search results count, e.g.
+	 * "0 results for 'query'", "1 result for 'query'", "14 results for 'query'".
+	 *
+	 * Always shows the count (including 0). The query value is escaped
+	 * exactly once (esc_html) — no double-escape.
+	 *
+	 * @param int    $count Number of results.
+	 * @param string $query The search query string.
+	 * @return string
+	 */
+	function lumen_search_results_label( $count, $query ) {
+		$count   = (int) $count;
+		$results = (string) _n( 'result', 'results', $count, 'lumen' );
+		return number_format_i18n( $count ) . ' ' . $results . " for '" . esc_html( $query ) . "'";
+	}
+}
+
+if ( ! function_exists( 'lumen_list_meta' ) ) {
+	/**
+	 * Outputs the list meta for archive / search items: post date + categories.
+	 *
+	 * Uses the shared lumen_post_date() and lumen_post_categories() helpers
+	 * (date + categories, no author). The "·" separator is rendered by CSS
+	 * ::before on the categories span, so it appears only when categories
+	 * render (never an orphan dot).
+	 *
+	 * @return void
+	 */
+	function lumen_list_meta() {
+		// Wrap the date + categories in one meta block so the list-item meta
+		// styles apply in both archive and search contexts.
+		echo '<p class="lumen-post-meta">';
+		lumen_post_date();
+		lumen_post_categories();
+		echo '</p>';
 	}
 }

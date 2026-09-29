@@ -248,10 +248,13 @@ body.admin-bar .lumen-site-header {
 	margin-bottom: var(--lumen-space-3);
 }
 
-.lumen-archive-title {
-	font-size: clamp(2.25rem, 2rem + 1.2vw, 2.625rem);
-	font-weight: 500;
-	letter-spacing: -0.025em;
+/* Archive H1: reading serif, 400, lh 1.5, normal letter-spacing. */
+.lumen-archive-wrap .lumen-archive-title {
+	font-family: var(--lumen-font-reading);
+	font-size: clamp(1.75rem, 3vw, 2.5rem);
+	font-weight: 400;
+	line-height: 1.5;
+	letter-spacing: normal;
 	margin-bottom: var(--lumen-space-3);
 }
 
@@ -259,102 +262,144 @@ body.admin-bar .lumen-site-header {
 	margin-top: 1rem;
 }
 
-.lumen-post-list {
-	list-style: none;
-	margin: 0;
-	padding: 0;
-	display: grid;
-	gap: 2.5rem;
-	grid-template-columns: 1fr;
-}
-
-.lumen-post-item {
-	margin: 0;
-	min-width: 0;
-}
-
-.lumen-post-card {
-	border-bottom: 1px solid var(--lumen-border);
-	min-width: 0;
-	overflow-wrap: anywhere;
-}
-
-.lumen-post-list > :last-child {
-	border-bottom: 0;
+/* Search H1: sans-serif, 400, lh 1.4 (1.75rem – 2rem). */
+.lumen-search-page .lumen-archive-title {
+	font-family: var(--lumen-sans);
+	font-size: clamp(1.75rem, 1.7rem + 0.6vw, 2rem);
+	font-weight: 400;
+	line-height: 1.4;
+	letter-spacing: normal;
+	margin-bottom: var(--lumen-space-3);
 }
 
 .lumen-archive-context {
 	font-family: var(--lumen-sans);
-	font-size: 0.875rem;
+	font-size: 0.85rem;
 	font-weight: 400;
+	line-height: 1.6;
 	color: var(--lumen-muted);
 	margin: 0 0 var(--lumen-space-1);
 }
 
 .lumen-archive-description {
 	font-family: var(--lumen-font-reading);
-	font-size: 0.9375rem;
+	font-size: 1rem;
+	font-weight: 400;
 	color: var(--lumen-fg-soft);
-	line-height: 1.6;
+	line-height: 1.8;
 	margin: 0 0 var(--lumen-space-3);
 }
 
-.lumen-search-page {
+/* ============================================================
+   Post list (archive / search)
+   ============================================================ */
+
+.lumen-post-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 0;
 }
 
-.lumen-post-excerpt {
-	font-family: var(--lumen-font-reading);
-	font-size: 0.9375rem;
-	color: var(--lumen-fg-soft);
-	line-height: 1.6;
-	margin: 0.5rem 0 0;
+.lumen-post-list > li {
+	min-width: 0;
 }
 
+/* Subtle divider below each item; 1.75rem rhythm. Last item has no divider. */
+.lumen-post-card {
+	padding-bottom: 1.75rem;
+	border-bottom: 1px solid var(--lumen-border);
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+
+.lumen-post-list > li:last-child .lumen-post-card {
+	padding-bottom: 0;
+	border-bottom: 0;
+}
+
+/* Archive list title: reading serif, 400, lh 1.5, normal ls
+   (desktop ~1.35rem–1.4rem / mobile ~1.2rem–1.3rem). */
 .lumen-post-card .lumen-post-title {
-	font-size: 1.5rem;
-	line-height: 1.3;
-	margin-bottom: 0.5rem;
+	font-family: var(--lumen-font-reading);
+	font-size: clamp(1.2rem, 1.2rem + 0.5vw, 1.4rem);
+	font-weight: 400;
+	line-height: 1.5;
+	letter-spacing: normal;
+	margin: 0 0 0.5rem;
 }
 
 .lumen-post-card .lumen-post-title a {
-	font-weight: 500;
+	font-weight: 400;
+	text-decoration: none;
 }
 
+.lumen-post-card .lumen-post-title a:hover {
+	color: var(--lumen-fg);
+}
+
+/* Search list title: reading serif, 400, lh 1.5, smaller
+   (desktop ~1.375rem / mobile ~1.25rem). */
+.lumen-post-card.lumen-list-search .lumen-post-title {
+	font-size: clamp(1.125rem, 1.05rem + 0.4vw, 1.375rem);
+	font-weight: 400;
+	line-height: 1.5;
+	letter-spacing: normal;
+}
+
+/* List meta: reading serif, 400, 0.85rem, lh 1.6 (date + categories). */
 .lumen-post-meta {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 0.5rem;
-	align-items: center;
+	align-items: flex-start;
 	margin: 0 0 0.75rem;
+	font-family: var(--lumen-font-reading);
+	font-size: 0.85rem;
+	font-weight: 400;
+	line-height: 1.6;
+	color: var(--lumen-muted);
 }
 
-.lumen-post-meta * {
+.lumen-post-meta .lumen-post-date {
+	font-variant-numeric: tabular-nums;
+}
+
+.lumen-post-meta .lumen-post-cats {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	margin-left: 0.5rem;
+}
+
+/* Middle dot between date and categories; only appears when categories render. */
+.lumen-post-meta .lumen-post-cats::before {
+	content: '\00B7';
+}
+
+.lumen-post-meta .lumen-post-cat {
 	font-size: 0.85rem;
 	color: var(--lumen-muted);
 }
 
 .lumen-post-meta a {
-	color: var(--lumen-muted);
+	color: inherit;
 }
+
 .lumen-post-meta a:hover {
 	color: var(--lumen-fg);
 }
 
-.lumen-post-date {
-	font-variant-numeric: tabular-nums;
+/* Excerpt: reading serif, 400, lh 1.75 (~1rem). */
+.lumen-post-excerpt {
+	font-family: var(--lumen-font-reading);
+	font-size: 1rem;
+	font-weight: 400;
+	line-height: 1.75;
+	color: var(--lumen-fg-soft);
+	margin: 0.5rem 0 0;
 }
-
-.lumen-post-cats {
-	display: inline-flex;
-	gap: 0.5rem;
-}
-
-.lumen-post-cat {
-	font-size: 0.8rem;
-	color: var(--lumen-muted);
-}
-
-/* Post-list gap is a constant 2.5rem at all widths. */
 
 /* ============================================================
    Single post

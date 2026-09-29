@@ -18,24 +18,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</h1>
 		<?php
 		$found_posts = (int) $GLOBALS['wp_query']->found_posts;
-		if ( $found_posts > 0 ) :
-			?>
+		$query       = (string) get_search_query();
+		?>
+		<?php if ( '' !== $query ) : ?>
 			<p class="lumen-archive-context">
 				<?php
-				printf(
-					'%s %s',
-					number_format_i18n( $found_posts ),
-					esc_html__( 'results', 'lumen' )
-				);
+				// Always shown (even 0 hits). lumen_search_results_label()
+				// returns "N result(s) for 'query'", escaped exactly once.
+				echo lumen_search_results_label( $found_posts, $query );
 				?>
 			</p>
-			<?php
-		endif;
-		?>
+		<?php endif; ?>
 		<?php lumen_search_form(); ?>
 	</header>
 
-	<?php get_template_part( 'template-parts/post-list' ); ?>
+	<?php get_template_part( 'template-parts/post-list', null, array( 'context' => 'search' ) ); ?>
 </section>
 
 <?php get_footer(); ?>

@@ -4,7 +4,7 @@ Contributor URI: https://lumen.example/
 Author: Lumen Team
 Author URI: https://lumen.example/
 Homepage URL: https://lumen.example/
-Version: 1.1.0-dev.11
+Version: 1.1.0-beta.1
 Requires at least: 6.3
 Tested up to: 6.7
 Requires PHP: 8.2
@@ -51,12 +51,35 @@ A minimalist, SEO-friendly content blog theme built for a bilingual (English + C
 At 0.1.0 the plugin is a thin bootstrap: plugin header, LBN_VERSION constant, and a text-domain load (lumen-blog) so future extensions are i18n-ready. It ships no features, no UI, no REST endpoints, and no hooks beyond the text-domain load. Concrete features (CPTs, forms, REST API) are added in later phases only when a concrete need exists (YAGNI).
 
 == Changelog ==
+* 1.1.0-beta.1 (Archive/Search Core correctness + consolidation)
+  * EN — Release strategy shift: Commit ≠ Release. Multiple normal commits on main; no per-change tag/ZIP/Release. Historical v1.1.0-dev.1…dev.11 tags/ZIPs preserved immutable. Route: 1.1.0-dev.11 → 1.1.0-beta.1 → (if needed) beta.2 → rc.1 → 1.1.0 → 1.1.1+ patch releases.
+  * EN — Core bug fixed: archive H1 title now derived from get_queried_object() (WP_Term→name, WP_User→display_name, WP_Post_Type→label, date archives via is_date() + year/monthnum/day query vars + wp_date()), replacing single_term_title() which defaults display=true and echoes (double-display bug).
+  * EN — Invented WP APIs removed: lumen_archive_term_description() now reads get_queried_object()->description (standard Core API) and outputs via wp_kses_post(), replacing the non-core invented term-API call.
+  * EN — Archive context rewritten: lumen_archive_context_label( $count ) → "Category · N posts" / "Tag · N posts" (singular via get_taxonomy()->labels->singular_name), "Author · N posts", "N posts" for date/post-type archives; always shown even at 0; localized with _n() + number_format_i18n().
+  * EN — Search count rewritten: lumen_search_results_label( $count, $query ) → "N result(s) for 'query'" (localized, query escaped exactly once), always shown even at 0 hits; replaced the >0-gated, hardcoded-plural "results" and added the "for 'query'" reference.
+  * EN — List meta rewritten: new lumen_list_meta() (date + categories, no author, CSS ::before "·" separator only when categories render), replacing lumen_post_meta() (author + date) in archive/search list items; shared with the frozen home meta style.
+  * EN — List order: archive meta→title→excerpt; search title→meta→excerpt (explicit context passed via get_template_part() third $args array, read as $args['context']).
+  * EN — Empty states: archive "No posts found."; search "No results for 'query'".
+  * EN — CSS: archive H1 reading/400/lh1.5/normal (clamp 1.75–2.5rem), search H1 sans/400/lh1.4 (1.75–2rem); list titles reading/400/lh1.5 (archive larger, search smaller 1.125–1.375rem); meta reading 0.85rem 400 lh1.6 with "·" separator; excerpt reading 1rem 400 lh1.75; list rhythm 1.75rem subtle divider, last item no divider.
+  * EN — i18n: regenerated languages/lumen.pot; validated with msgfmt --check (exit 0).
+  * EN — No new features; zero theme-JS; home/single/page/comments/header/footer frozen unchanged.
+  * 中文 — 版本策略：Commit ≠ Release。主分支多次正常提交，不再逐次打标签/ZIP/Release。历史 v1.1.0-dev.1…dev.11 标签/ZIP 保持不可变。
+  * 中文 — 核心缺陷修复：归档 H1 标题改用 get_queried_object() 派生（WP_Term→名称、WP_User→display_name、WP_Post_Type→label、日期归档经 is_date()+year/monthnum/day 查询变量+wp_date()），替换默认 display=true 会回显的 single_term_title()（双重显示缺陷）。
+  * 中文 — 移除虚构 WP API：lumen_archive_term_description() 改用 get_queried_object()->description（标准 Core API）并经 wp_kses_post() 输出，替代非核心虚构 API 调用。
+  * 中文 — 归档上下文重写：lumen_archive_context_label( $count ) → "Category · N posts" / "Tag · N posts"（singular 经 get_taxonomy()->labels->singular_name）、"Author · N posts"、日期/文章类型归档仅 "N posts"；即使 0 也显示；经 _n()+number_format_i18n() 本地化。
+  * 中文 — 搜索结果重写：lumen_search_results_label( $count, $query ) → "N result(s) for 'query'"（本地化、查询精确一次转义）；即使 0 命中也始终显示；替换 >0 门控的硬编码复数 "results" 并加入 "for 'query'" 引用。
+  * 中文 — 列表元数据重写：新增 lumen_list_meta()（日期 + 分类、无作者、CSS ::before "·" 仅在分类存在时渲染），替换归档/搜索列表项中的 lumen_post_meta()（作者 + 日期）；与冻结首页元数据样式一致。
+  * 中文 — 列表顺序：归档 元数据→标题→摘要；搜索 标题→元数据→摘要（经 get_template_part() 第三个 $args 数组显式传上下文，以 $args['context'] 读取）。
+  * 中文 — 空态：归档 "No posts found."；搜索 "No results for 'query'"。
+  * 中文 — CSS：归档 H1 reading/400/lh1.5/normal（clamp 1.75–2.5rem）、搜索 H1 sans/400/lh1.4（1.75–2rem）；列表标题 reading/400/lh1.5（归档更大、搜索更小 1.125–1.375rem）；元数据 reading 0.85rem 400 lh1.6 带 "·"；摘要 reading 1rem 400 lh1.75；列表节奏 1.75rem 微妙分隔、末项无分隔。
+  * 中文 — 国际化：重新生成 languages/lumen.pot；msgfmt --check 验证通过（exit 0）。
+  * 中文 — 无新功能；零主题 JS；首页/单篇/页面/评论/页头/页脚冻结未动。
 * 1.1.0-dev.11 (Archive / category / tag / search — browsing + retrieval experience)
   * EN — Archive and search pages get a distinct, text-first browsing experience: archive pages (category, tag, author, year, month, day) render via a rewritten `index.php`; search gets its own `search.php`. Each shows an H1 from `lumen_archive_title()` (single_term_title / author display_name / `wp_date()` date), a context label (e.g. "Category · 14 posts"), and an optional term/author description (guarded, non-empty only).
   * EN — `template-parts/post-list-item.php` is shared across archives and search; context-aware order (archive: meta → title → excerpt; search: title → meta → excerpt), no thumbnail, and a shared excerpt helper `lumen_list_excerpt($context)` (archive CJK68/Latin22; search CJK92/Latin28; homepage frozen CJK80/Latin24).
   * EN — `get_the_posts_pagination()` now renders outside `<ul class="lumen-post-list">` via a `'class' => 'lumen-pagination'` arg and a `lumen-pagination` wrapper; empty state shows "No posts found."
   * EN — `lumen_search_form()` action changed from `/?s=` to `home_url('/')`.
-  * EN — `lumen_archive_term_description()` added (guarded; `get_quered_terms()` only for category/tag). Date archives detected via `year`/`monthnum`/`day` query-var tests (`> 0`), not `is_*_archive()` fns (non-standard WP install missing those).
+  * EN — `lumen_archive_term_description()` added (guarded; category/tag only, via Core get_queried_object()). Date archives detected via `year`/`monthnum`/`day` query-var tests (`> 0`), not `is_*_archive()` fns (non-standard WP install missing those).
   * EN — i18n: new strings (Category, Tag, Author, Year, Month, Day, posts, results, Search, No posts found); `languages/lumen.pot` regenerated (37 msgids), validated with `msgfmt --check`.
   * EN — CSS: removed dead `.lumen-post-thumb` rules; added `.lumen-archive-context` (sans, muted), `.lumen-archive-description` (FangSong, fg-soft), `.lumen-search-page`, `.lumen-post-excerpt` (FangSong, fg-soft).
   * EN — Zero theme-JS; text-first, no cards/shadows/hero; mobile-first; 720px content column.
@@ -66,7 +89,7 @@ At 0.1.0 the plugin is a thin bootstrap: plugin header, LBN_VERSION constant, an
   * 中文 — `template-parts/post-list-item.php` 在归档与搜索间共享；上下文相关顺序（归档：元数据 → 标题 → 摘要；搜索：标题 → 元数据 → 摘要），无缩略图，共享摘要辅助函数 `lumen_list_excerpt($context)`（归档 CJK68/Latin22；搜索 CJK92/Latin28；首页冻结 CJK80/Latin24）。
   * 中文 — `get_the_posts_pagination()` 现渲染于 `<ul class="lumen-post-list">` 之外，通过 `'class' => 'lumen-pagination'` 参数与 `lumen-pagination` 包裹；空态显示 "No posts found."
   * 中文 — `lumen_search_form()` action 由 `/?s=` 改为 `home_url('/')`。
-  * 中文 — 新增 `lumen_archive_term_description()`（有守卫；仅分类/标签使用 `get_quered_terms()`）。日期归档通过 `year`/`monthnum`/`day` 查询变量的 `> 0` 测试检测，而非 `is_*_archive()` 函数（非标准 WP 安装缺失这些函数）。
+  * 中文 — 新增 `lumen_archive_term_description()`（有守卫；仅分类/标签，基于 Core get_queried_object()）。日期归档通过 `year`/`monthnum`/`day` 查询变量的 `> 0` 测试检测，而非 `is_*_archive()` 函数（非标准 WP 安装缺失这些函数）。
   * 中文 — 国际化：新增字符串（Category、Tag、Author、Year、Month、Day、posts、results、Search、No posts found）；重新生成 `languages/lumen.pot`（37 个 msgid），并以 `msgfmt --check` 验证。
   * 中文 — CSS：移除失效的 `.lumen-post-thumb` 规则；新增 `.lumen-archive-context`（无衬线、弱化色）、`.lumen-archive-description`（仿宋、fg-soft）、`.lumen-search-page`、`.lumen-post-excerpt`（仿宋、fg-soft）。
   * 中文 — 零主题 JS；文本优先，无卡片/阴影/英雄区；移动端优先；720px 内容栏。

@@ -18,11 +18,16 @@ no framework, and no custom font files — just pure CSS on a small set of desig
 | Version | Status | Intended for |
 |---|---|---|
 | **1.0.0** | **Stable — `Latest`** | Production. The current recommended release. |
-| **1.1.0-dev.x** | **Development preview** (pre-release) | Trying upcoming typography / interaction work. Not for production. |
+| **1.1.0-beta.1** | **Beta** (pre-release) | Consolidated pre-release of Lumen 1.1.0 (Archive/Search core correctness + text-first design). Not for production. |
+| **1.1.0** | Planned | Final stable release. |
 
-> The **stable** line (`1.0.0`) and the **development preview** line (`1.1.0-dev.x`) are separate.
-> 1.0.0 remains the *Latest* release; every dev build is published as a **pre-release** and is never marked Latest.
-> See [Releases](#releases) for the authoritative list.
+> **Commit ≠ Release.** Normal commits land on `main`; intermediate commits create **no** tag, ZIP, or
+> GitHub Release. Releases follow the phase route: `1.1.0-dev.11` (final development build, immutable)
+> → `1.1.0-beta.1` → (if needed) `beta.2` → `rc.1` → `1.1.0` → `1.1.1+` patch releases.
+>
+> The **stable** line (`1.0.0`) and the **1.1.0 pre-release** line are separate: 1.0.0 remains the
+> *Latest* release until 1.1.0 stabilizes, and every 1.1.0 pre-release (dev, beta, rc) is published
+> as a **pre-release** and is never marked Latest. See [Releases](#releases) for the authoritative list.
 
 ## Features
 
@@ -56,12 +61,20 @@ no framework, and no custom font files — just pure CSS on a small set of desig
 5. **Settings → Reading**: choose *Your latest posts* for the homepage.
 6. **Appearance → Menus**: assign the **Primary** menu (header) and **Footer** menu.
 
-## What the development preview adds
+## What the 1.1.0 pre-releases add
 
-The `1.1.0-dev.x` line is a continuous pre-release workstream toward Lumen 1.1.0,
-refining the reading experience without touching the stable line. Recent builds have
-added (among other things):
+The `1.1.0-dev.x` line (final development build: **1.1.0-dev.11**, immutable) and the
+consolidated pre-release **1.1.0-beta.1** refine the reading experience toward Lumen 1.1.0
+without touching the stable line. Recent builds have added (among other things):
 
+- **Archive/Search core correctness** — archive H1 titles derived from Core
+  `get_queried_object()` (category / tag / any public custom taxonomy / author / date archives
+  via `wp_date()`), localized context labels ("Category · N posts", "Tag · N posts",
+  "Author · N posts", "N posts" — singular/plural via `_n()`), term/author descriptions,
+  and context-aware list order (archive: meta → title → excerpt; search: title → meta →
+  excerpt).
+- **Search page** — dedicated `search.php` with "N result(s) for 'query'" counts (localized,
+  always shown even at 0 hits) and a form that submits to `home_url('/')`.
 - **Homepage metadata typography** — the date / category line is set in the FangSong reading font
   (small, muted, secondary; no layout change).
 - **Header / footer interaction feedback** — soft‑background hover on header nav and footer
@@ -90,7 +103,7 @@ lumen-blog/             # optional thin companion plugin (0.1.0)
 
 - GitHub Releases: [wwintj/lumen/releases](https://github.com/wwintj/lumen/releases)
 - **1.0.0** is the `Latest` release.
-- Development previews (`1.1.0-dev.x`) are **pre-releases** — never the "Latest" release.
+- All 1.1.0 pre-releases (`1.1.0-dev.11`, `1.1.0-beta.1`, `rc.1`, …) are **pre-releases** — never the "Latest" release. No tag/ZIP/Release per commit; commits land on `main` and releases are phase-gated (`1.1.0-dev.11` → `1.1.0-beta.1` → (if needed) `beta.2` → `rc.1` → `1.1.0` → `1.1.1+`).
 - For the full version‑by‑version history, see [lumen/readme.txt](lumen/readme.txt#changelog).
 
 ---
@@ -107,10 +120,12 @@ Lumen 是一个极简、SEO 友好的 **WordPress 主题**，面向中英文双�
 | 版本 | 状态 | 用途 |
 |---|---|---|
 | **1.0.0** | **稳定版 — `Latest`** | 生产环境。当前推荐发布。 |
-| **1.1.0-dev.x** | **开发预览版**（预发布） | 试用正在进行的排版 / 交互优化。不面向生产。 |
+| **1.1.0-beta.1** | **Beta**（预发布） | Lumen 1.1.0 整合预发布（归档/搜索核心正确性 + 文本优先设计）。不面向生产。 |
+| **1.1.0** | 计划中 | 最终稳定版本。 |
 
-> **稳定版**（`1.0.0`）与**开发预览版**（`1.1.0-dev.x`）是两条独立的版本线。
-> 1.0.0 始终为 *Latest*；每个 dev 构建均作为**预发布**发布，从不标记为 Latest。
+> **Commit ≠ Release。** 正常提交合入 `main`；中间提交不产生 tag、ZIP 或 GitHub Release。
+> 发布遵循阶段路线：`1.1.0-dev.11`（最终开发构建，不可变）→ `1.1.0-beta.1` →（如需）`beta.2` → `rc.1` → `1.1.0` → `1.1.1+`。
+> **稳定版**（`1.0.0`）与 **1.1.0 预发布**是两条独立的版本线：1.0.0 保持 *Latest* 直到 1.1.0 稳定；每个 1.1.0 预发布（dev、beta、rc）均作为**预发布**发布，从不标记为 Latest。
 > 权威版本列表见 [Releases](#releases)。
 
 ## 特性
@@ -145,10 +160,17 @@ Lumen 是一个极简、SEO 友好的 **WordPress 主题**，面向中英文双�
 5. **设置 → 阅读**：首页选择 *你的最新文章*。
 6. **外观 → 菜单**：分别指定 **Primary**（页头）与 **Footer**（页脚）菜单。
 
-## 开发预览版新增了什么
+## 1.1.0 预发布新增了什么
 
-**1.1.0-dev.x** 是迈向 Lumen 1.1.0 的连续预发布开发线，在不改动稳定线的前提下持续优化阅读体验。近期版本新增（包括但不限于）：
+`1.1.0-dev.x` 线（最终开发构建：**1.1.0-dev.11**，不可变）与整合预发布 **1.1.0-beta.1**
+在不改动稳定线的前提下持续完善 Lumen 1.1.0 的阅读体验。近期版本新增（包括但不限于）：
 
+- **归档/搜索核心正确性** — 归档 H1 标题基于 Core `get_queried_object()` 派生（分类 / 标签 /
+  任意公开自定义分类法 / 作者 / 日期归档经 `wp_date()`），本地化上下文标签（"Category · N posts"、
+  "Tag · N posts"、"Author · N posts"、"N posts"，单复数经 `_n()`），分类/作者描述，
+  以及上下文感知列表顺序（归档：元数据 → 标题 → 摘要；搜索：标题 → 元数据 → 摘要）。
+- **搜索页** — 独立 `search.php`，"N result(s) for 'query'" 计数（本地化，0 命中也显示），
+  表单提交至 `home_url('/')`。
 - **首页元数据排版** — 日期 / 分类行改用仿宋阅读字体（小号、柔和、辅助级；无布局变化）。
 - **页头 / 页脚交互反馈** — 页头导航与页脚 RSS/菜单链接悬停柔和背景、当前页/分类常驻高亮、站点标题轻微悬停。
 
@@ -159,6 +181,6 @@ Lumen 是一个极简、SEO 友好的 **WordPress 主题**，面向中英文双�
 ## Releases
 
 - GitHub Releases: [wwintj/lumen/releases](https://github.com/wwintj/lumen/releases)
-- **1.0.0** 为 `Latest` 发布。
-- 开发预览（`1.1.0-dev.x`）均为预发布，从不标记为 `Latest`。
+- **1.0.0** 为 `Latest` 发布（直至 1.1.0 稳定）。
+- 所有 1.1.0 预发布（`1.1.0-dev.11`、`1.1.0-beta.1`、`rc.1`…）均为**预发布**，从不标记为 `Latest`。无逐提交 tag/ZIP/Release；提交合入 `main`，发布按阶段门控。
 - 完整版本历史见 [lumen/readme.txt](lumen/readme.txt#changelog)。

@@ -1,0 +1,97 @@
+<p>这是一段很长的中文正文，用于验证单篇文章正文（.lumen-post-body）在第二阶段排版后的阅读体验。它需要足够长，才能让行高、段间距、行内代码、链接下划线、强调体与斜体这些细节都真正显现出来。中文长文本对阅读衬线字体（FangSong / 仿宋）的依赖最强，因此这一节主要检验字号阶梯、行距、段间留白与列表缩进在纯文字段落中的表现，同时保证没有改变全局 body 的字号、行高，也没有改变 720px 内容栏的宽度。</p>
+
+<p>Mixed CJK / Latin technical paragraph. This paragraph deliberately mixes Chinese and English, includes inline code like <code>wp --path=.runtime/wordpress</code>, <strong>bold text</strong>, <em>italic text</em>, a <a href="https://example.com/normal-link">normal link</a>, and a very long link <a href="https://github.com/wwintj/lumen/releases/tag/v1.1.0-dev.8">a very long release URL</a> to check that link styling (color, thin underline, underline offset) stays readable even for long text nodes that wrap across several lines.</p>
+
+<h2>一级章节 H2 — primary section</h2>
+<p>H2 是正文中最常见的章节标题。它需要明显大于正文（17px / 1.9 行高），但小于页面主标题（.lumen-post-title，clamp 1.75–2.5rem）。这里检验字号 clamp(1.5rem, 2.2vw, 1.75rem)、行高 1.45、字重 400，以及上边距 2.25em、下边距 0.8em 的呼吸感。H2 与上一段之间、以及 H2 与正文之间的距离，应该形成清晰的层次。</p>
+
+<h3>二级章节 H3 — sub-section</h3>
+<p>H3 介于 H2 与正文之间：字号 1.35rem、行高 1.5、字重 400、上边距 2em、下边距 0.7em。它通常出现在一个 H2 章节内部，用来划分主题。</p>
+
+<h4>三级章节 H4</h4>
+<p>H4 只略大于正文：1.125rem、行高 1.5、字重 400。</p>
+
+<h5>四级章节 H5</h5>
+<p>H5 接近正文大小：1.05rem，主要靠间距（而非字号）与正文区分。</p>
+
+<h6>五级章节 H6</h6>
+<p>H6 也接近正文大小：1.05rem，靠间距与正文区分。H5/H6 不应使用更大字号，避免在长文里显得杂乱。</p>
+
+<h2>列表（含嵌套）</h2>
+<ul>
+  <li>无序列表第一项。缩进为 1.5em，每项之间留 0.45em。</li>
+  <li>无序列表第二项，下面有嵌套：
+    <ul>
+      <li>嵌套的无序列表项一（缩进 1.2em）。</li>
+      <li>嵌套的无序列表项二。</li>
+    </ul>
+  </li>
+  <li>无序列表第三项。</li>
+</ul>
+
+<ol>
+  <li>有序列表第一项，编号保持原生样式，不要自定义数字样式。</li>
+  <li>有序列表第二项，下面再嵌套一个有序列表：
+    <ol>
+      <li>嵌套有序项一。</li>
+      <li>嵌套有序项二。</li>
+    </ol>
+  </li>
+  <li>有序列表第三项。</li>
+</ol>
+
+<h2>引言块 Blockquote</h2>
+<blockquote>
+  引言块用于引用或强调。它采用左侧 2px 竖线（--lumen-fg-soft）、柔和文本色（--lumen-fg-soft）、行高 1.88，并且不使用卡片、阴影或背景色。它内部可以有多个段落。
+</blockquote>
+<blockquote>
+  <p>这是一个双段落引言块的第一段，用于检验 .lumen-post-body blockquote p:last-child 的 margin-bottom:0 是否生效。</p>
+  <p>第二段。</p>
+</blockquote>
+
+<hr>
+
+<h2>代码块（不折行，仅块内横向滚动）</h2>
+<p>下面的代码块故意包含超长行，用于验证：代码块自身不强制换行（white-space: pre; overflow-wrap: normal），页面整体不会横向滚动，只有代码块内部出现横向滚动条。这是零 JavaScript 实现，纯 CSS overflow 控制。</p>
+<pre>server {
+    listen 80 default_server;
+    server_name example.com www.example.com;
+    access_log /var/log/nginx/access.log;
+    error_log /var/log/nginx/error.log warn;
+    root /var/www/lumen;
+    index index.php index.html;
+    client_max_body_size 20m;
+    add_header X-Frame-Options SAMEORIGIN always;
+    add_header Content-Security-Policy "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline' 'unsafe-eval'; script-src 'self'; font-src 'self'; connect-src 'self';" always;
+    location / { try_files $uri $uri/ /index.php?$query_string; }
+    location /wp-content { limit_rate 1m; }
+    location ~* \.(jpg|jpeg|png|gif|webp|svg)$ { expires 30d; add_header Cache-Control "public, immutable"; }
+}</pre>
+
+<h2>表格 Table</h2>
+<p>表格在桌面端保持紧凑（0.95em、行高 1.5），表头加粗（font-weight 600）。移动端通过 media query 变为 display:block + overflow-x:auto 横向滚动，而页面本身不溢出。表格不使用斑马纹或粘性表头，尊重用户与 Gutenberg 的对齐方式。</p>
+<table>
+  <thead>
+    <tr><th>项目</th><th>桌面端</th><th>移动端</th><th>说明</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>字号</td><td>0.95em</td><td>0.95em</td><td>紧凑但可读</td></tr>
+    <tr><td>行高</td><td>1.5</td><td>1.5</td><td>略小于正文行高</td></tr>
+    <tr><td>表头</td><td>600</td><td>600</td><td>仅加粗，不加背景</td></tr>
+    <tr><td>滚动</td><td>无</td><td>块内横向</td><td>页面不溢出</td></tr>
+  </tbody>
+</table>
+
+<h2>图片与图注 Figure</h2>
+<figure>
+  <img src="http://127.0.0.1:4242/wp-content/uploads/2026/09/img.png" alt="Lumen QA 富内容测试图" loading="lazy" width="900" height="540">
+  <figcaption>图注测试：阅读衬线字体（--lumen-font-reading）、0.875rem、行高 1.6、--lumen-muted 色、顶部 margin 0.5rem，且 text-align 跟随图片（继承左对齐）。</figcaption>
+</figure>
+
+<hr class="wp-block-separator">
+
+<h2>强调与内联代码</h2>
+<p>这段检验 <strong>加粗</strong>、<em>斜体</em> 以及内联 <code>code</code>（0.9em、等宽 --lumen-mono）之间的区分度。内联代码在中文长句中不应突兀，字号应略小于正文但保持等宽可读。</p>
+
+<p><code>wp --path=.runtime/wordpress</code> 这类命令、<code>--flag=value</code> 这类带等号的参数，以及 <a href="https://github.com/wwintj/lumen/tree/main/lumen">GitHub 仓库路径链接</a>，都应该在正文中保持自然节奏。</p>
+</content>

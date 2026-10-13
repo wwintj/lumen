@@ -17,3 +17,8 @@ lumen-*-dev*.zip
 .lumen-qa/report.json
 .lumen-qa/report-release.json
 .lumen-qa/report-home.json
+.lumen-qa/report-beta1.json
+
+# Generated QA stdout artifacts
+.lumen-qa/.qa-stdout.txt
+.lumen-qa/qa-stdout.txt

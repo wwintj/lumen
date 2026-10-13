@@ -1,14 +1,14 @@
 <?php
 /**
  * Plugin Name:       Lumen Blog
- * Plugin URI:        https://lumen.example/
+ * Plugin URI:        https://github.com/wwintj/lumen
  * Description:       Thin companion bootstrap for the Lumen theme. Ships no features;
  *                    future Lumen Blog extensions (CPTs, forms, REST API) plug in here.
  * Version:           0.1.0
  * Requires at least: 6.3
  * Requires PHP:      8.2
  * Author:            Lumen Team
- * Author URI:        https://lumen.example/
+ * Author URI:        https://github.com/wwintj
  * Text Domain:       lumen-blog
  * Domain Path:       /
  * License:           GPL v2 or later

@@ -40,8 +40,9 @@ Lumen 是一層輕量的**呈現層**：版面、排版、色彩、導覽，以�
 - **Git Tag（標籤）**：指向特定提交的版本標記，一經發布即不可變更。
 - **GitHub Release（發布）**：正式的發布紀錄，附帶發布說明與 ZIP 等相關資產。
 
-> **現況說明**：`1.1.0-beta.1` 的原始碼已在 `main` 分支完成開發與 QA 驗證，
-> 但**尚未建立對應的 GitHub Beta Release**。原始碼存在於 `main`，不等於已正式發布。
+> **發布狀態**：Lumen 的開發版本可能先提交至 `main` 分支，再依發布流程建立版本標籤與
+> GitHub Release。**原始碼提交不代表正式發布。** 最新發布狀態、版本說明及下載檔案，
+> 請以 [GitHub Releases](https://github.com/wwintj/lumen/releases) 頁面為準。
 
 ## 主要功能
 

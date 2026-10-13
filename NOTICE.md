@@ -80,8 +80,6 @@ Lumen 專案中由權利人持有、並依專案授權宣告提供之原創程�
 - 正式發布的版本、版本說明與下載檔案，一律以 **GitHub Releases** 頁面為準：
   <https://github.com/wwintj/lumen/releases>
 - **Lumen Theme 1.1.0-beta.1 為預發布（pre-release）版本**，不建議用於正式營運環境。
-- 正式穩定版仍為 **1.0.0**。
-- 目前**尚未**建立 `v1.1.0-beta.1` 標籤或對應的 GitHub Release；本文件不宣稱 Beta.1 已公開發布。
 
 ---
 

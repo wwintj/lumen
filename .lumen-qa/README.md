@@ -1,175 +1,181 @@
-# Lumen QA — beta.1 runtime suite
+# Lumen QA —— beta.1 執行階段測試套件
 
-## A. Purpose
+## A. 測試目的
 
-`qa-beta1.js` is the runtime QA suite for the **Lumen 1.1.0-beta.1** theme. It drives a
-real WordPress install with a headless browser and WordPress Core APIs, then asserts
-theme behaviour: typography per viewport, archive/search headers and ordering, single
-post rendering, comments, admin bar, and security/edge cases.
+`qa-beta1.js` 是 **Lumen 1.1.0-beta.1** 佈景主題的執行階段 QA 測試套件。它會以真實的
+WordPress 網站搭配無頭瀏覽器與 WordPress Core API 進行驗證，並檢查佈景主題行為：
+各視窗尺寸的排版、彙整頁／搜尋頁標題與排序、單篇文章呈現、留言、管理列，以及安全性與
+邊界情境。
 
-Structure:
+組成：
 
-- `qa-beta1.js` — the QA driver (Node.js). Creates the fixture, runs assertions,
-  writes a report, then tears the fixture down.
-- `wp_cli_bootstrap.php` — loads the real WordPress Core (`wp-load.php`) so helpers
-  operate through Core rather than hand-written SQL.
-- `wp_comment_helper.php`, `wp_term_helper.php`, `wp_user_helper.php` — Core-native
-  helpers for comments, terms and users, invoked over stdin/stdout JSON.
+- `qa-beta1.js` —— QA 驅動程式（Node.js）。負責建立 fixture、執行斷言、寫出報告，最後拆除 fixture。
+- `wp_cli_bootstrap.php` —— 載入真實的 WordPress Core（`wp-load.php`），讓各 helper 透過
+  Core 運作，而非手寫 SQL。
+- `wp_comment_helper.php`、`wp_term_helper.php`、`wp_user_helper.php` —— 分別處理留言、分類法
+  與使用者的 Core 原生 helper，透過 stdin／stdout 以 JSON 溝通。
 
-**The suite creates and deletes temporary test content** (posts, terms, comments, one
-temp administrator, a temp MU plugin) and temporarily changes a few WordPress options,
-restoring them during teardown.
+**本測試套件會建立並刪除暫時性的測試內容**（文章、分類法、留言、一個暫時管理員、一個暫時
+MU 外掛），並暫時變更少數 WordPress 設定值，於 teardown 時還原。
 
-> **Never run this against a production WordPress install.** A mandatory safety gate
-> refuses to proceed unless the target is provably the local isolated test install.
+> **嚴禁對正式營運中的 WordPress 網站執行本測試套件。**
+> 強制性安全門禁（safety gate）會先確認目標確實是本機隔離測試環境，否則拒絕繼續執行。
 
-## B. Prerequisites
+## B. 前置軟體需求
 
-Use whatever versions your platform provides; the suite does not pin exact versions.
-It has been exercised with:
+請使用你的平台所提供的版本即可，測試套件不鎖定特定版本。已知可運作的組合為：
 
-- **Node.js** (tested on v24) and **npm**
-- **Playwright** with **Chromium** installed (`playwright` is declared in `package.json`)
-- **PHP** CLI (tested on 8.5)
-- **WP-CLI** (tested on 2.12)
-- **WordPress** Core (tested on 7.1.1)
-- **MariaDB / MySQL** (tested on MariaDB 13)
-- The **Lumen theme** present and activatable
+- **Node.js**（已於 v24 驗證）與 **npm**
+- **Playwright** 與已安裝的 **Chromium**（`playwright` 已宣告於 `package.json`）
+- **PHP** CLI（已於 8.5 驗證）
+- **WP-CLI**（已於 2.12 驗證）
+- **WordPress** Core（已於 7.1.1 驗證）
+- **MariaDB / MySQL**（已於 MariaDB 13 驗證）
+- 已存在且可啟用的 **Lumen 佈景主題**
 
-`node`, `php` and `wp` must be resolvable on `PATH` (override with `LUMEN_QA_PHP` /
-`LUMEN_QA_WPCLI` if needed).
+`node`、`php`、`wp` 必須可於 `PATH` 中解析（必要時可用 `LUMEN_QA_PHP` / `LUMEN_QA_WPCLI` 覆寫）。
 
-## C. Repository assets
+## C. Fixture 資產位置
 
-The two fixture inputs are **version-controlled** and ship with the repository:
+兩個 fixture 輸入檔**已納入版本控制**，隨儲存庫一併提供：
 
 ```
-.lumen-qa/fixtures/content.html   # long-form post body (Gutenberg/blocks fixture)
-.lumen-qa/fixtures/img.png        # 900x540 image used as the featured-image fixture
+.lumen-qa/fixtures/content.html   # 長文文章內文（Gutenberg／區塊 fixture）
+.lumen-qa/fixtures/img.png        # 900x540 圖片，作為精選圖片 fixture
 ```
 
-They are test inputs — **do not recreate or hand-edit them**. The driver reads them
-from `.lumen-qa/fixtures/` and intentionally has **no fallback** to any machine-local
-copy: if an asset is missing, the run fails with an explicit error rather than silently
-using something else.
+它們是測試輸入 —— **請勿重新製作或手動編輯**。驅動程式會從 `.lumen-qa/fixtures/` 讀取，
+且刻意**不設任何回退機制**：若資產缺失，執行會以明確錯誤中止，而不會悄悄改用其他來源。
 
-## D. Isolated runtime setup
+## D. 隔離測試環境設定
 
-The driver expects this layout:
+驅動程式預期以下目錄結構：
 
 ```
-<project root>/
-  lumen/                     # the theme under test
-  .lumen-qa/                 # this suite
-  .runtime/wordpress/        # the WordPress install used for QA
+<專案根目錄>/
+  lumen/                     # 受測佈景主題
+  .lumen-qa/                 # 本測試套件
+  .runtime/wordpress/        # 供 QA 使用的 WordPress 安裝
 ```
 
-The safety gate enforces all of the following before any fixture write:
+安全門禁會在任何 fixture 寫入之前，強制驗證下列所有條件：
 
-| Requirement | Expected value |
+| 要求項目 | 預期值 |
 | --- | --- |
-| Database actually connected | `lumen_test` |
-| Database host | local (`localhost` / `127.0.0.1` / local socket) |
-| `siteurl` and `home` | `http://127.0.0.1:4242` |
-| WordPress root (`ABSPATH`, symlinks resolved) | `<project root>/.runtime/wordpress` |
-| `WP-CLI` root vs PHP-helper root | must resolve to the same install |
+| 實際連線的資料庫 | `lumen_test` |
+| 資料庫主機 | 本機（`localhost` / `127.0.0.1` / 本機 socket） |
+| `siteurl` 與 `home` | `http://127.0.0.1:4242` |
+| WordPress 根目錄（`ABSPATH`，已解析符號連結） | `<專案根目錄>/.runtime/wordpress` |
+| `WP-CLI` 根目錄 與 PHP helper 根目錄 | 必須解析為同一個安裝 |
 
-WordPress must also have:
+WordPress 另需具備：
 
-- test administrator login **`admin`** with the **administrator** role — its numeric
-  **ID is resolved dynamically** at runtime, so any ID is fine;
-- the **Lumen theme active**;
-- permalink structure `/%year%/%monthnum%/%day%/%postname%/`;
-- `comments_per_page = 10`, `page_comments = 1`, `default_comments_page = oldest`.
+- 測試管理員帳號 **`admin`**，且具備 **administrator** 角色 —— 其數字 **ID 於執行階段動態解析**，
+  因此任何 ID 皆可；
+- 已啟用 **Lumen 佈景主題**；
+- 固定網址結構為 `/%year%/%monthnum%/%day%/%postname%/`；
+- `comments_per_page = 10`、`page_comments = 1`、`default_comments_page = oldest`。
 
-Setting up WordPress in `.runtime/wordpress` and creating/initialising `lumen_test`
-is a **manual, environment-specific step** — this repository does not ship an
-automated installer for it. Do not run destructive database commands (`wp db reset`,
-`wp db clean`, `DROP DATABASE`) as a casual one-liner; take a backup first and confirm
-which database you are pointing at.
+在 `.runtime/wordpress` 中架設 WordPress，以及建立／初始化 `lumen_test`，屬於**依環境而異的
+手動步驟** —— 本儲存庫並未提供自動化安裝程式。請勿將破壞性資料庫指令（`wp db reset`、
+`wp db clean`、`DROP DATABASE`）當作隨手一行指令執行；請先備份，並確認你正指向哪個資料庫。
 
-## E. Start the web server
+### 資料庫安全門禁
 
-The suite talks to `http://127.0.0.1:4242`. **The driver does not start a server** —
-start it yourself and leave it running:
+驅動程式在建立任何 fixture 之前，會執行 `assertQaEnvironment()`。它會查詢實際載入的
+WordPress 處理程序（而非設定檔文字），並驗證資料庫名稱、資料庫主機的區域性、`siteurl`／`home`、
+解析後的 WordPress 根目錄，以及 `wp` 與 PHP helper 指向同一個安裝。任一項不符即**立即拒絕執行**
+（fail closed），且不會寫入資料庫。
+
+常數 `WP_HOME` / `WP_SITEURL` 允許存在（本安裝即以它們鎖定本機網址），但**僅在指向預期網址時**
+才被接受；若指向其他位置則會被拒絕。
+
+門禁通過後會設定 `ENV_VERIFIED` 旗標。若門禁失敗，該旗標維持為 false，`teardown()` 與後續的
+乾淨狀態檢查**全部跳過**，並改寫出一份 `status: aborted` 的報告。
+
+### 管理員 ID 動態解析
+
+fixture 內容的作者身分，來自執行階段以登入帳號 `admin` 動態解析出的真實管理員 ID
+（`resolveSiteAdminId()`），程式碼中**不硬編碼**任何使用者 ID。若該帳號不存在或角色不正確，
+執行會明確失敗，而非以猜測值繼續。
+
+## E. 啟動 Web Server
+
+測試套件會連線至 `http://127.0.0.1:4242`。**驅動程式不會自行啟動伺服器** —— 請自行啟動並保持運作：
 
 ```bash
 wp --path=.runtime/wordpress server --host=127.0.0.1 --port=4242
 ```
 
-It binds to loopback only. Confirm it is up before running QA:
+它僅監聽 loopback。執行 QA 前請先確認狀態：
 
 ```bash
 curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:4242/
 curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:4242/wp-login.php
 ```
 
-Both should return `200`. Override the target with `LUMEN_QA_BASE` only if you know
-what you are doing — the safety gate still requires the `siteurl`/`home` above.
+兩者皆應回傳 `200`。僅在你確知後果時才以 `LUMEN_QA_BASE` 覆寫目標 —— 安全門禁仍會要求上述
+`siteurl`／`home`。
 
-## F. Install dependencies
+## F. 安裝依賴
 
-From `.lumen-qa/`, install exactly what the lockfile pins:
+在 `.lumen-qa/` 中，依 lockfile 精確安裝：
 
 ```bash
 cd .lumen-qa
 npm ci
 ```
 
-Then ensure the Chromium browser binary is present:
+接著確認 Chromium 瀏覽器執行檔已存在：
 
 ```bash
 npx playwright install chromium
 ```
 
-## G. Run the QA
+## G. 執行 QA
 
-With the server running and the environment prepared:
+在伺服器運行且環境就緒後：
 
 ```bash
 cd .lumen-qa
 node qa-beta1.js
 ```
 
-Expected behaviour:
+預期行為：
 
-1. The **safety gate** verifies the database, host, URLs and WordPress root, plus that
-   `wp` and the PHP helpers agree on the same install. If anything mismatches, the run
-   aborts **before creating fixtures and without touching the database**.
-2. The fixture is created (15 posts, categories, tags, a custom-taxonomy topic,
-   12 comments, a featured image, a temporary administrator).
-3. Assertions run across viewports; screenshots are written under `.runtime/`.
-4. Teardown removes the fixture and **restores the original option values**.
-5. A report is written to `.lumen-qa/report-beta1.json` with `runId`, timestamps,
-   `status`, per-check results and a `clean` flag.
+1. **安全門禁**會驗證資料庫、主機、網址與 WordPress 根目錄，並確認 `wp` 與 PHP helper 指向
+   同一個安裝。任一項不符即在**建立 fixture 之前、且不觸碰資料庫**的情況下中止。
+2. 建立 fixture（15 篇文章、分類、標籤、一個自訂分類法主題、12 則留言、一張精選圖片、
+   一個暫時管理員）。
+3. 於各視窗尺寸執行斷言；截圖寫入 `.runtime/` 之下。
+4. Teardown 移除 fixture，並**還原原本的設定值**。
+5. 報告寫入 `.lumen-qa/report-beta1.json`，內含 `runId`、時間戳記、`status`、各項檢查結果
+   與 `clean` 旗標。
 
-The process exit code is `0` only on a full pass.
+只有在完全通過時，行程結束碼才會是 `0`。
 
-Reports, logs and screenshots are **generated artefacts, not source** — they are
-git-ignored.
+報告、日誌與截圖屬於**產生物，而非原始碼** —— 已被 git 忽略。
 
-**On failure:** read the current report and the run output first, then check for
-leftover QA content before re-running. Do not blindly re-run the suite, and do not
-"fix" failures by weakening assertions.
+**失敗時**：請先閱讀目前報告與執行輸出，再檢查是否有殘留的 QA 內容，然後才考慮重新執行。
+請勿盲目重跑測試套件，也請勿以弱化斷言的方式「修正」失敗。
 
-## H. Troubleshooting
+## H. 失敗處理與故障排除
 
-| Symptom | Likely cause / action |
+| 症狀 | 可能原因／處置 |
 | --- | --- |
-| Connection refused / HTTP 000 | Web server not running — see **E**. |
-| `QA ENVIRONMENT REFUSED — database is ...` | You are pointed at a different database. The gate requires `lumen_test`. |
-| `... database host is not local` | The configured DB host is remote. QA will not run against it. |
-| `... siteurl/home are ...` | `siteurl`/`home` are not `http://127.0.0.1:4242`. |
-| `... WordPress root resolves to ...` | `.runtime/wordpress` is a symlink/environment pointing at another install. |
-| `... WP-CLI targets ...` | `wp` and the PHP helpers resolve to different installs. |
-| `missing QA fixture ...` | `.lumen-qa/fixtures/` is incomplete — restore the tracked assets. |
-| `wp: command not found` / PHP errors | `wp` or `php` not on `PATH`; set `LUMEN_QA_WPCLI` / `LUMEN_QA_PHP`. |
-| Browser launch failure | Chromium missing — `npx playwright install chromium`. |
-| `site admin "admin" does not exist` | The test admin login/role is missing or wrong — see **D**. |
-| `... lacks the administrator role` | The `admin` user is not an administrator. |
+| 連線被拒／HTTP 000 | Web Server 未執行 —— 請見 **E**。 |
+| `QA ENVIRONMENT REFUSED — database is ...` | 指向了不同的資料庫。門禁要求 `lumen_test`。 |
+| `... database host is not local` | 設定的資料庫主機為遠端。QA 不會對其執行。 |
+| `... siteurl/home are ...` | `siteurl`／`home` 並非 `http://127.0.0.1:4242`。 |
+| `... WordPress root resolves to ...` | `.runtime/wordpress` 是符號連結／環境變數指向了其他安裝。 |
+| `... WP-CLI targets ...` | `wp` 與 PHP helper 解析到不同的安裝。 |
+| `missing QA fixture ...` | `.lumen-qa/fixtures/` 不完整 —— 請還原已納入版本控制的資產。 |
+| `wp: command not found`／PHP 錯誤 | `wp` 或 `php` 不在 `PATH` 中；請設定 `LUMEN_QA_WPCLI` / `LUMEN_QA_PHP`。 |
+| 瀏覽器啟動失敗 | 缺少 Chromium —— 執行 `npx playwright install chromium`。 |
+| `site admin "admin" does not exist` | 測試管理員帳號或角色缺失／不正確 —— 請見 **D**。 |
+| `... lacks the administrator role` | `admin` 使用者不具備 administrator 角色。 |
 
-### Scope of validation
+## I. Clean Checkout 可重現性限制
 
-A successful local run means the suite passed **in that environment**. It does **not**
-by itself prove that a clean `git clone` reproduces end-to-end on a fresh machine —
-that requires a separate, independent verification.
+在本機成功執行，僅代表測試套件**在該環境中**通過。這本身**不**證明在全新機器上以
+`git clone` 能端到端重現 —— 那需要另一次獨立的驗證。

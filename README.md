@@ -20,19 +20,14 @@ Lumen 是一層輕量的**呈現層**：版面、排版、色彩、導覽，以�
 
 ## 版本與發布政策
 
-| 版本 | 狀態 | 用途 |
-|---|---|---|
-| **1.0.0** | **穩定版 —— `Latest`** | 正式營運環境。目前推薦的發布版本。 |
-| **1.1.0-beta.1** | **Beta**（預發布） | Lumen 1.1.0 的整合預發布（歸檔／搜尋核心正確性 ＋ 文字優先設計）。不適用於正式營運環境。 |
-| **1.1.0** | 規劃中 | 最終穩定版本。 |
+目前原始碼版本為 **1.1.0**。實際發布版本、下載檔案及 `Latest` 狀態，一律以
+[GitHub Releases](https://github.com/wwintj/lumen/releases) 頁面為準。
 
-> **Commit ≠ Release（提交不等於發布）。** 一般提交合入 `main`；中途提交**不會**產生
-> tag、ZIP 或 GitHub Release。發布依階段推進：`1.1.0-dev.11`（最終開發建置，不可變更）
-> → `1.1.0-beta.1` →（如需）`beta.2` → `rc.1` → `1.1.0` → `1.1.1+` 修補版本。
+> **Commit ≠ Release（提交不等於發布）。** 一般提交合入 `main` 分支；**原始碼提交不代表正式發布**。
+> 並非每個提交都會建立 tag、ZIP 或 GitHub Release。
 >
-> **穩定版**（`1.0.0`）與 **1.1.0 預發布**是兩條獨立的版本線：在 1.1.0 穩定之前，1.0.0 持續
-> 作為 *Latest* 發布；每個 1.1.0 預發布（dev、beta、rc）一律以**預發布**形式發布，永不標記為
-> Latest。權威清單請見 [GitHub Releases](#github-releases)。
+> 目前不建立 Beta、RC 或 Dev 形式的 Release。發布一律先在 Private 狀態下完成驗證，
+> 再對外提供正式版。權威清單請見 [GitHub Releases](#github-releases)。
 
 三種 Git 概念務必區分：
 
@@ -40,8 +35,7 @@ Lumen 是一層輕量的**呈現層**：版面、排版、色彩、導覽，以�
 - **Git Tag（標籤）**：指向特定提交的版本標記，一經發布即不可變更。
 - **GitHub Release（發布）**：正式的發布紀錄，附帶發布說明與 ZIP 等相關資產。
 
-> **發布狀態**：Lumen 的開發版本可能先提交至 `main` 分支，再依發布流程建立版本標籤與
-> GitHub Release。**原始碼提交不代表正式發布。** 最新發布狀態、版本說明及下載檔案，
+> **發布狀態**：最新發布狀態、版本說明及下載檔案，
 > 請以 [GitHub Releases](https://github.com/wwintj/lumen/releases) 頁面為準。
 
 ## 主要功能
@@ -76,11 +70,10 @@ Lumen 是一層輕量的**呈現層**：版面、排版、色彩、導覽，以�
 5. **設定 → 閱讀**：首頁選擇 *你的最新文章*。
 6. **外觀 → 選單**：分別指定 **Primary**（頁首）與 **Footer**（頁尾）選單。
 
-## Lumen 1.1.0 開發進度
+## Lumen 1.1.0 版本重點
 
-`1.1.0-dev.x` 系列（最終開發建置：**1.1.0-dev.11**，不可變更）與整合預發布
-**1.1.0-beta.1**，在不更動穩定線的前提下持續精進 Lumen 1.1.0 的閱讀體驗。
-近期建置新增（包括但不限於）：
+1.1.0 為 Lumen 的正式穩定版本，彙整 `1.1.0-dev.x` 開發系列與整合預發布期間的閱讀體驗改進。
+本版本包含（包括但不限於）：
 
 - **歸檔／搜尋核心正確性** —— 歸檔 H1 標題衍生自 Core `get_queried_object()`
   （分類／標籤／任意公開自訂分類法／作者／日期歸檔，經 `wp_date()`），本地化上下文標籤
@@ -93,9 +86,8 @@ Lumen 是一層輕量的**呈現層**：版面、排版、色彩、導覽，以�
 - **頁首／頁尾互動回饋** —— 頁首導覽與頁尾 RSS／選單連結的柔和背景懸停效果、目前頁面／分類的
   常駐作用中狀態，以及網站標題的細緻懸停效果。
 
-目前建置與完整變更紀錄：[GitHub Releases](https://github.com/wwintj/lumen/releases)。
-
-穩定版 **1.0.0** 維持不變，仍為正式營運的 "Latest" 發布。
+目前原始碼版本：**1.1.0**。完整變更紀錄：[lumen/readme.txt](lumen/readme.txt#changelog)。
+實際發布版本與下載檔案，請以 [GitHub Releases](https://github.com/wwintj/lumen/releases) 為準。
 
 ## 專案目錄結構
 
@@ -109,17 +101,16 @@ lumen/                  # 佈景主題（wp-content/themes/lumen）
   inc/                  # 設定、資源載入、樣板函式／標籤
   assets/css/main.css   # 元件／版面樣式
   languages/lumen.pot   # 翻譯字串範本
-lumen-blog/             # 選用的薄殼配套外掛（0.1.0）
+  LICENSE               # GPL v2 授權全文（隨佈景主題提供）
+lumen-blog/             # 選用的薄殼配套外掛（0.1.0；不包含於 Theme ZIP）
 ```
 
 ## GitHub Releases
 
-- GitHub Releases：[wwintj/lumen/releases](https://github.com/wwintj/lumen/releases)
+- GitHub Releases（發布狀態的權威來源）：[wwintj/lumen/releases](https://github.com/wwintj/lumen/releases)
 - [lumen/readme.txt](lumen/readme.txt#changelog)：完整版本沿革。
-- **1.0.0** 為 `Latest` 發布（在 1.1.0 穩定之前維持）。
-- 所有 1.1.0 預發布（`1.1.0-dev.11`、`1.1.0-beta.1`、`rc.1`…）皆為**預發布**，永不標記為
-  `Latest`。沒有逐提交的 tag／ZIP／Release；提交合入 `main`，發布依階段門控
-  （`1.1.0-dev.11` → `1.1.0-beta.1` →（如需）`beta.2` → `rc.1` → `1.1.0` → `1.1.1+`）。
+- 請使用正式 Release 所附的 **Theme ZIP** 進行安裝；該 ZIP **不包含** Lumen Blog 外掛。
+- 普通 Git Commit 不是正式發布；原始碼中的開發版本不代表對外提供多個正式下載包。
 
 ## 相關文件與資源
 

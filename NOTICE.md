@@ -79,7 +79,6 @@ Lumen 專案中由權利人持有、並依專案授權宣告提供之原創程�
 - **Git Commit 不等於 GitHub Release。** 原始碼提交至 `main` 分支，不代表已正式發布。
 - 正式發布的版本、版本說明與下載檔案，一律以 **GitHub Releases** 頁面為準：
   <https://github.com/wwintj/lumen/releases>
-- **Lumen Theme 1.1.0-beta.1 為預發布（pre-release）版本**，不建議用於正式營運環境。
 
 ---
 

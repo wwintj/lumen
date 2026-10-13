@@ -4,7 +4,7 @@ Contributor URI: https://github.com/wwintj
 Author: Lumen Team
 Author URI: https://github.com/wwintj
 Homepage URL: https://github.com/wwintj/lumen
-Version: 1.1.0-beta.1
+Version: 1.1.0
 Requires at least: 6.3
 Tested up to: 6.7
 Requires PHP: 8.2
@@ -14,7 +14,7 @@ Text Domain: lumen
 Domain Path: /
 Tags: blog, content, minimalist, responsive-layout, custom-menu, translation-ready, rss-icons
 
-極簡、對 SEO 友善的內容部落格佈景主題，專為中英雙語網站設計。此為 1.1.0 版本的開發預覽版。
+極簡、對 SEO 友善的內容部落格佈景主題，專為中英雙語網站設計。1.1.0 為 Lumen 的正式穩定版本，提供歸檔與搜尋核心正確性、文字優先的閱讀排版，以及零 Theme JavaScript 的設計。
 
 == Features ==
 * 語意化 HTML5 結構（header、nav、main、article、section、footer）。
@@ -53,6 +53,12 @@ Tags: blog, content, minimalist, responsive-layout, custom-menu, translation-rea
 具體功能（自訂內容類型、表單、REST API）僅在出現明確需求時，才於後續階段加入（YAGNI）。
 
 == Changelog ==
+* 1.1.0 (Stable release)
+  * 版本識別自 1.1.0-beta.1 調整為正式穩定版 1.1.0（`style.css` 標頭、`LUMEN_VERSION` 常數、本文件一致）。
+  * 保留既有功能：歸檔／分類／標籤／搜尋核心正確性、單篇文章與頁面的文字優先閱讀排版，
+    以及零 Theme JavaScript 的極簡設計。
+  * GPL 授權全文已隨佈景主題提供（`lumen/LICENSE`）。
+  * 本版本未新增功能、未變更任何 PHP 行為、未變更 CSS 樣式規則與佈景主題資產。
 * 1.1.0-beta.1 (Archive/Search Core correctness + consolidation)
   * 發布策略調整：Commit ≠ Release。`main` 上可有多個一般提交，不再逐次產生 tag／ZIP／Release。
     歷史 `v1.1.0-dev.1`…`dev.11` 的 tag／ZIP 保持不可變更。

@@ -356,7 +356,11 @@ body.admin-bar .lumen-site-header {
    gradient, no background image. */
 .lumen-category-intro {
 	--lumen-cat-intro-pad-x: 32px;
-	--lumen-cat-intro-pad-y: 28px;
+	/* 8J-R1: vertical padding is now half the previous value, so the
+	   panel reads compact while the top and bottom insets stay exactly
+	   equal to each other. The horizontal value keeps feeding the
+	   left-edge alignment bleed and must NOT shrink with it. */
+	--lumen-cat-intro-pad-y: 14px;
 	/* Free space the panel may bleed into: whatever the centred
 	   reading column leaves on wide screens, plus (on narrow screens)
 	   the gutter declared on the archive wrap below. */
@@ -508,7 +512,7 @@ body.category .lumen-site-main {
 	}
 	body.category .lumen-category-intro {
 		--lumen-cat-intro-pad-x: 20px;
-		--lumen-cat-intro-pad-y: 20px;
+		--lumen-cat-intro-pad-y: 10px;
 		border-radius: 14px;
 	}
 	/* Top side keeps the A3 symmetry value. */
@@ -536,7 +540,7 @@ body.category .lumen-site-main {
 	}
 	body.category .lumen-category-intro {
 		--lumen-cat-intro-pad-x: 18px;
-		--lumen-cat-intro-pad-y: 18px;
+		--lumen-cat-intro-pad-y: 9px;
 	}
 	/* Top side only — the bottom side keeps the homepage 1.75rem. */
 	body.category .lumen-category-intro-divider {

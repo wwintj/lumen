@@ -1277,7 +1277,15 @@ body.admin-bar .lumen-site-header {
    position, width, sticky behaviour or right edge.
    ------------------------------------------------------------ */
 
+/* Soft green focus hue for global search ONLY. Defined as a component-local
+   custom property so --lumen-accent and every other control in the theme are
+   left untouched. Derived from the category pill green (#176d39 / #e0f3e5)
+   so the search field joins the same visual family without becoming a solid
+   green button. */
 .lumen-search-popover {
+	--lumen-search-focus: #176d39;
+	--lumen-search-focus-soft: rgba(23, 109, 57, 0.35);
+
 	position: fixed;
 	inset: 0;
 	width: min(26.25rem, calc(100vw - 2rem)); /* ~420px, minus 16px each side */
@@ -1286,9 +1294,15 @@ body.admin-bar .lumen-site-header {
 	margin: auto;      /* centres the fixed box in the viewport */
 	padding: 0;
 	overflow: visible;
-	background: var(--lumen-bg);
+
+	/* Neutral, near-page background with a soft edge. The field reads as one
+	   quiet capsule rather than a boxed widget. */
+	background: var(--lumen-bg-soft);
 	border: 1px solid var(--lumen-border);
-	border-radius: 8px;
+
+	/* Full capsule, matching the date/category pills and the arrow pager. */
+	border-radius: 999px;
+
 	box-shadow: none;
 }
 
@@ -1297,28 +1311,83 @@ body.admin-bar .lumen-site-header {
 .lumen-search-popover .lumen-search-form {
 	display: block;
 	margin: 0;
+	/* The form sits between the popover and the input, so `inherit` on the
+	   input would resolve against THIS box, not the popover. Carry the
+	   capsule radius down explicitly. */
+	border-radius: 999px;
 }
 
 .lumen-search-popover .lumen-search-input {
 	display: block;
 	width: 100%;
 	height: 3rem; /* ~48px */
-	padding: 0 0.875rem;
+	padding: 0 1.25rem;
 	font-size: 1rem;
+	color: var(--lumen-fg);
 	background: transparent;
 	border: 0;
-	border-radius: inherit;
+
+	/* Not `inherit`: the direct parent is the form, so inherit would have to
+	   be correct on two levels to land here. Stating the radius outright
+	   removes that dependency entirely. Written longhand so no engine has to
+	   expand the shorthand before painting the capsule. */
+	border-top-left-radius: 999px;
+	border-top-right-radius: 999px;
+	border-bottom-right-radius: 999px;
+	border-bottom-left-radius: 999px;
 }
 
+/* Placeholder in the muted tone; the real <label> remains the field's
+   accessible name, so this is presentational only. */
+.lumen-search-popover .lumen-search-input::placeholder {
+	color: var(--lumen-muted);
+	opacity: 1;
+}
+
+/* Focus: a calm, clearly visible green. The offset is POSITIVE so the ring
+   sits just outside the field and can never read as a heavy inner border —
+   that negative offset against --lumen-accent was the "harsh dark border"
+   the user reported. The capsule is not reshaped and no size changes, so
+   there is no layout shift. */
 .lumen-search-popover .lumen-search-input:focus-visible {
-	outline: 2px solid var(--lumen-accent);
-	outline-offset: -2px;
+	outline: 2px solid var(--lumen-search-focus);
+	outline-offset: 2px;
 }
 
-/* Dimming layer — the popover's own ::backdrop, painted by the browser in
-   the top layer. Nothing has to be positioned or z-indexed for it. */
+/* Keeping the ring on the field itself is deliberate: the ring follows the
+   capsule and there is exactly one ring. A .lumen-search-popover:focus-within
+   ring as well would double it, so none is added. */
+
+/* Soft mist backdrop. The translucent near-white wash alone already drops
+   background legibility; the blur then removes text sharpness so the search
+   capsule is the only crisp thing on screen. Both prefixes are required:
+   Chromium ignores -webkit-backdrop-filter, older Safari ignores the
+   unprefixed form. */
 .lumen-search-popover::backdrop {
-	background: rgba(0, 0, 0, 0.1);
+	background: rgba(248, 249, 248, 0.68);
+	-webkit-backdrop-filter: blur(6px) saturate(0.9);
+	backdrop-filter: blur(6px) saturate(0.9);
+}
+
+/* Forced-colors / High Contrast: an author background is discarded by the
+   UA, and a knocked-out outline can vanish. Pin the focus indicator to a
+   system colour that the mode guarantees is visible, and drop the wash so
+   it cannot fight the user's own palette. */
+@media (forced-colors: active) {
+	.lumen-search-popover::backdrop {
+		background: transparent;
+		-webkit-backdrop-filter: none;
+		backdrop-filter: none;
+	}
+
+	.lumen-search-popover {
+		border: 1px solid CanvasText;
+	}
+
+	.lumen-search-popover .lumen-search-input:focus-visible {
+		outline: 2px solid Highlight;
+		outline-offset: 2px;
+	}
 }
 
 /* Where the Popover API is unavailable, [popover] content is not hidden by the

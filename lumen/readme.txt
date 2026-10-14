@@ -4,7 +4,7 @@ Contributor URI: https://github.com/wwintj
 Author: Lumen Team
 Author URI: https://github.com/wwintj
 Homepage URL: https://github.com/wwintj/lumen
-Version: 1.1.3
+Version: 1.1.4
 Requires at least: 6.3
 Tested up to: 6.7
 Requires PHP: 8.2
@@ -53,6 +53,31 @@ Tags: blog, content, minimalist, responsive-layout, custom-menu, translation-rea
 具體功能（自訂內容類型、表單、REST API）僅在出現明確需求時，才於後續階段加入（YAGNI）。
 
 == Changelog ==
+* 1.1.4 (Stable release)
+  * 全域搜尋改為完整膠囊造型：彈出視窗與內部輸入框統一使用 border-radius: 999px，
+    與首頁日期、分類膠囊及箭頭分頁的既有視覺語彙一致。
+    （1.1.3 的輸入框因 border-radius: inherit 實際解析為 0px，外觀仍為小圓角矩形。）
+  * 搜尋輸入框背景改為中性淺灰（--lumen-bg-soft），維持 1px 低對比淺色邊框與
+    單一邊界，不再出現黑色粗框、陰影或第二層輸入框邊界。
+  * 聚焦指示改為柔和的綠色（#176d39，與分類膠囊同一色系），並改為向外偏移 2px。
+    1.1.3 的聚焦外框為 --lumen-accent（#1b1b1b，接近黑色）且向內偏移 -2px，
+    因而在彈出瞬間被誤認為突兀的黑色邊框。
+    綠色僅以元件層級 CSS 變數套用於全域搜尋，全站 --lumen-accent 與其他表單元件不受影響。
+  * 背景遮罩改為柔和霧化：半透明淺色底（rgba(248, 249, 248, 0.68)）搭配
+    blur(6px) 與 saturate(0.9)，使後方標題與正文明顯失焦，搜尋框成為唯一清晰焦點；
+    整體仍保持輕量，不會變成深黑色模態遮罩。
+    同時提供 -webkit-backdrop-filter 供 Safari 使用。
+  * 不支援 backdrop-filter 的瀏覽器仍可透過半透明底色大幅降低背景可讀性
+    （實測對比度下降約 68%，支援模糊時約 93%）。
+  * 支援 forced-colors / 高對比模式：改以系統 Highlight 色繪製焦點外框，
+    不因顏色覆寫而失去鍵盤焦點提示。
+  * 搜尋行為完全未變更：仍為原生 popover="auto"、原生按鈕觸發、
+    Esc 關閉、點擊外部關閉、再次點擊關閉、自動聚焦、
+    WordPress 原生 GET 搜尋（method="get"、參數 s、type="search"）。
+  * 仍然維持零 JavaScript：主題內沒有任何 .js 檔案，未新增外掛、框架、
+    外部字體或外部圖示庫。
+  * 本次僅修改 lumen/assets/css/main.css 一個功能檔案，未更動任何 HTML 模板。
+
 * 1.1.3 (Stable release)
   * 桌面版頁首改為左右對齊：網站標題或 Custom Logo 貼齊容器左緣，搜尋圖示與主要導覽組成
     一個群組整組靠右，最後一個選單項目的右緣與頁尾 RSS 的右緣一致。取消先前用於強制置中

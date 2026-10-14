@@ -105,6 +105,14 @@ $lumen_form_args = array(
 		</ol>
 
 		<?php the_comments_pagination(); ?>
+
+		<?php
+		// v1.1.17 (B): dashed rule separating the last comment from the form
+		// below. Emitted only when there is a list to separate from, so the
+		// form-only state (comments open, none yet) does not open with a
+		// stray ruled edge. Decorative, hence aria-hidden.
+		?>
+		<hr class="lumen-comment-divider" aria-hidden="true" />
 	<?php endif; ?>
 
 	<?php if ( $lumen_comments_open ) : ?>

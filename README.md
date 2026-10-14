@@ -20,7 +20,7 @@ Lumen 是一層輕量的**呈現層**：版面、排版、色彩、導覽，以�
 
 ## 版本與發布政策
 
-目前**正式發布**版本為 **1.1.16**（GitHub `Latest`）。`main` 分支會持續整併尚未發布的開發內容，
+目前**正式發布**版本為 **1.1.17**（GitHub `Latest`）。`main` 分支會持續整併尚未發布的開發內容，
 因此 **`main` 的內容可能領先於正式版 ZIP**。實際發布版本、下載檔案及 `Latest` 狀態，
 一律以 [GitHub Releases](https://github.com/wwintj/lumen/releases) 頁面為準。
 
@@ -82,7 +82,7 @@ Lumen 是一層輕量的**呈現層**：版面、排版、色彩、導覽，以�
 ### 從正式 Release 安裝（建議）
 
 1. 至 [GitHub Releases](https://github.com/wwintj/lumen/releases) 下載最新正式版 ZIP
-   （目前為 `lumen-1.1.16.zip`）。
+   （目前為 `lumen-1.1.17.zip`）。
 2. 於 wp-admin：**外觀 → 佈景主題 → 安裝佈景主題 → 上傳佈景主題** → 選擇該 ZIP。
 3. 啟用佈景主題。
 4. *（選用）* 安裝並啟用 **Lumen Blog** 配套外掛。
@@ -99,7 +99,61 @@ Lumen 是一層輕量的**呈現層**：版面、排版、色彩、導覽，以�
 ### 歷史版本
 
 舊版 Release 保留於 [GitHub Releases](https://github.com/wwintj/lumen/releases) 頁面，
-可作為回退用途；`v1.1.15` 為 1.1.16 之前的穩定版本，`v1.1.14` 為 1.1.15 之前的穩定版本，`v1.1.13` 為 1.1.14 之前的穩定版本，`v1.1.12` 為 1.1.13 之前的穩定版本，`v1.1.11` 為 1.1.12 之前的穩定版本，`v1.1.10`，`v1.1.9`，`v1.1.8`，`v1.1.7`，`v1.1.6`、`v1.1.5`、`v1.1.4`、`v1.1.3`、`v1.1.2`、`v1.1.1`、`v1.1.0` 為更早的穩定版本。
+可作為回退用途；`v1.1.16` 為 1.1.17 之前的穩定版本，`v1.1.15` 為 1.1.16 之前的穩定版本，`v1.1.14` 為 1.1.15 之前的穩定版本，`v1.1.13` 為 1.1.14 之前的穩定版本，`v1.1.12` 為 1.1.13 之前的穩定版本，`v1.1.11` 為 1.1.12 之前的穩定版本，`v1.1.10`，`v1.1.9`，`v1.1.8`，`v1.1.7`，`v1.1.6`、`v1.1.5`、`v1.1.4`、`v1.1.3`、`v1.1.2`、`v1.1.1`、`v1.1.0` 為更早的穩定版本。
+
+## Lumen 1.1.17 版本重點
+
+1.1.17 為 **Single 文章頁留言區二次精修**：在 1.1.16 的基礎上只動單篇文章頁的留言區，
+其餘已凍結模組（首頁、分類、搜尋、404、Page、Header、Footer、分頁、分類介紹區、
+單篇正文與上／下一篇導覽）完全不變。
+
+### 1. 移除留言表單上方的登入提示
+
+**症狀**：已登入者於留言表單上方看到
+`Logged in as X. Edit your profile. Log out? Required fields are marked *`。
+
+**根因**：這段文字由 WordPress Core `comment_form()` 的 `logged_in_as` 預設值輸出
+（`.logged-in-as`），與主題的 `comment_notes_before` 無關，因此先前的
+`comment_notes_before => ''` 擋不住它。
+
+**修復**：`lumen_comment_form_defaults()` 將 `logged_in_as` 設為空字串。
+是**移除輸出**、不是用 CSS 遮住，所以不會留下空白佔位。
+
+### 2. 留言列表與表單之間的虛線分隔線
+
+沿用既有留言之間的虛線語言 `1px dashed rgb(230,230,230)`，由 `comments.php`
+在確實有留言時輸出一條 `<hr class="lumen-comment-divider" aria-hidden="true">`。
+
+### 3. 作者姓名膠囊放大為 2 倍
+
+實測 computed `font-size` 由 **13px → 26px**（正好 2 倍）。
+仍為單層靜態膠囊：`<cite class="fn">` 內無任何子元素與連結、`font-style: normal`、
+`box-shadow: none`、`cursor: auto`、無 `:hover` 變色，點擊不會跳轉。
+
+### 4. `(Edit)` 改為紫色膠囊 `Edit`
+
+Core 輸出的是純文字 `(Edit)`。改為站內**既有**的分類頁統計膠囊紫色系
+（`#D8CBEA` 底、`#49375F` 字，對比 6.84:1，與分類頁統計膠囊同一組顏色，
+不新增第二種紫色）。括號由 `edit_comment_link` 過濾器移除，因此顯示為 `Edit`，
+且與作者、日期維持同一行。
+
+### 5. `Reply` 移入留言氣泡內部
+
+`Reply` 由「標頭列最右側」改為該則留言**氣泡內部的右下角**，讓回覆對象一目了然。
+Core 的 DOM 無法重新掛載（`.reply` 與內容 `<p>` 是兄弟節點），因此以氣泡作為
+定位容器、把 `.reply` 疊入氣泡內，**沒有**改動或偽造 Core 的連結。
+仍完全使用 WordPress Core 的 `comment-reply`：表單搬移、`#comment_parent`、
+Cancel reply、送出後的層級全部照舊。仍為綠色膠囊。
+
+### 6. 巢狀回覆縱向間距再減半
+
+| 項目 | 1.1.16 | 1.1.17 |
+| --- | --- | --- |
+| 子層項目上下內距 | 6px | 3px |
+| 子層 children 上緣間距 | 6px | 3px |
+| 巢狀 reply meta 列 ↔ 氣泡間距 | 3px | 1px |
+
+**頂層留言不受影響**（仍為 12px 內距、3px 標頭↔氣泡間距）。
 
 ## Lumen 1.1.16 版本重點
 
@@ -736,7 +790,7 @@ dashed dividers、author/date/reply compact header row、green pill actions。
 - **頁首／頁尾互動回饋** —— 頁首導覽與頁尾 RSS／選單連結的柔和背景懸停效果、目前頁面／分類的
   常駐作用中狀態，以及網站標題的細緻懸停效果。
 
-目前原始碼版本：**1.1.16**。完整變更紀錄：[lumen/readme.txt](lumen/readme.txt#changelog)。
+目前原始碼版本：**1.1.17**。完整變更紀錄：[lumen/readme.txt](lumen/readme.txt#changelog)。
 實際發布版本與下載檔案，請以 [GitHub Releases](https://github.com/wwintj/lumen/releases) 為準。
 
 ## 專案目錄結構

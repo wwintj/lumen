@@ -152,6 +152,10 @@ if ( ! function_exists( 'lumen_comment_form_defaults' ) ) {
 	 *     settings (comment_registration / require_name_email). Nothing here
 	 *     overrides that.
 	 *
+	 * v1.1.17:
+	 *   - 'logged_in_as' is emptied, removing the "Logged in as …" paragraph
+	 *     (requirement A). See the note inside the function.
+	 *
 	 * @param array $defaults Core's comment form defaults.
 	 * @return array
 	 */
@@ -163,8 +167,20 @@ if ( ! function_exists( 'lumen_comment_form_defaults' ) ) {
 		$defaults['title_reply_before'] = '<h3 id="reply-title" class="comment-reply-title">';
 		$defaults['title_reply_after']  = '</h3>';
 
-		// The "Required fields are marked *" sentence is useful to guests, so it
-		// stays; only the redundant heading text is dropped.
+		// v1.1.17 (A): drop the whole "Logged in as X. Edit your profile.
+		// Log out? Required fields are marked *" paragraph for authenticated
+		// visitors. That sentence comes from Core's 'logged_in_as' default,
+		// and it bundles three unrelated things — an identity line, two
+		// account links and the required-field legend. The task is to remove
+		// the block outright, so it is emptied here rather than merely hidden:
+		// Core still emits its own markup and still validates the submission
+		// through wp-comments-post.php, but the string never reaches the page.
+		//
+		// 'comment_notes_before' (the guest email-privacy notice) is left at
+		// Core's default, so guests keep that reassurance; only the
+		// logged-in variant is removed.
+		$defaults['logged_in_as'] = '';
+
 		return $defaults;
 	}
 }
@@ -191,5 +207,41 @@ if ( ! function_exists( 'lumen_comment_form_field' ) ) {
 			'<textarea placeholder="' . esc_attr__( 'Write your comment...', 'lumen' ) . '" ',
 			$field
 		);
+	}
+}
+
+if ( ! function_exists( 'lumen_comment_edit_link' ) ) {
+	add_filter( 'edit_comment_link', 'lumen_comment_edit_link', 10, 3 );
+
+	/**
+	 * Comments (v1.1.17, D) — render the edit link as a bare "Edit" pill.
+	 *
+	 * Core prints "(Edit)" from a translatable string. The parentheses are
+	 * dropped from the rendered label while the link itself is kept exactly as
+	 * Core built it (same URL, same capability check, same nonce-bearing
+	 * target), so editing a comment is unchanged — only the label text differs.
+	 *
+	 * The bracket characters are stripped from the *output*, never from Core's
+	 * source string, so no translation is broken and no locale regresses to
+	 * a parenthesis-less mismatch.
+	 *
+	 * Scope: 'edit_comment_link' fires only where Core or the theme renders a
+	 * comment edit link. In this theme that is the comment list in
+	 * comments.php, because wp_list_comments() is what triggers it; wp-admin's
+	 * own comment tables call the link through different code paths and are
+	 * unaffected.
+	 *
+	 * @param string $link    Core's rendered edit link.
+	 * @param string $before  Markup Core puts before the link.
+	 * @param string $after   Markup Core puts after the link.
+	 * @return string
+	 */
+	function lumen_comment_edit_link( $link, $before = '', $after = '' ) {
+		// Strip the literal parentheses Core wraps the word in. Both the ASCII
+		// pair and the fullwidth pair are handled so a localised string such as
+		// "（編集）" reduces to "編集" rather than keeping its brackets.
+		$label = preg_replace( '/[（(]\s*|\s*[)）]/u', '', $link );
+
+		return false !== $label ? $label : $link;
 	}
 }

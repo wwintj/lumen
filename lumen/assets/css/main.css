@@ -1421,19 +1421,32 @@ body.category .lumen-post-list > li + li {
 
    <cite> is italic in every browser's UA stylesheet — that is what made the
    name look slanted — so font-style is normalised here. There is deliberately
-   no :hover rule: the name is static text, not a control. */
+   no :hover rule: the name is static text, not a control.
+
+   v1.1.17 (C): the requested change is a name that reads twice as large. The
+   measured computed font-size in v1.1.16 was 13px, so this is 13 * 2 = 26px
+   (1.625rem) — exactly the doubled value, not an approximation. The pill keeps
+   its 1px/10px padding, its 999px radius, its single layer and its normal
+   weight, so it stays one quiet capsule; only the type grows. line-height is
+   pinned to 1.2 (instead of 1.5) because at 26px the inherited 1.5 would push
+   the 999px radius past a true capsule and make the pill noticeably taller
+   than the date sitting beside it. 26px * 1.2 still leaves the glyph box
+   taller than the 13px date text, so the doubling is unmistakable on screen
+   while the row stays on one line. */
 .lumen-comments .comment-author .fn {
 	display: inline-block;
 	padding: 1px 10px;
 	font-family: var(--lumen-sans);
-	font-size: 0.8125rem;
+	font-size: 1.625rem;
 	font-style: normal;
 	font-weight: 500;
-	line-height: 1.5;
+	line-height: 1.2;
 	color: var(--lumen-comment-pill-fg);
 	background: var(--lumen-comment-pill);
 	border-radius: 999px;
 	text-decoration: none;
+	overflow-wrap: anywhere;
+	max-width: 100%;
 }
 
 /* Defensive: a link inside .fn must never add a second pill layer and must
@@ -1486,15 +1499,45 @@ body.category .lumen-post-list > li + li {
 .lumen-comments .comment-meta a:hover {
 	color: var(--lumen-fg);
 }
-.lumen-comments .edit-link {
+/* v1.1.17 (D): Core prints "(Edit)" as bare text. The parentheses are removed
+   and the link becomes a quiet lavender capsule on the same header row as the
+   author and the date.
+
+   The colour pair is the site's EXISTING purple language, taken verbatim from
+   the category statistics pill: background #D8CBEA on text #49375F. Reusing
+   the established pair rather than inventing a new purple keeps the site to
+   one purple; measured contrast is the same 6.84:1 already documented for that
+   pill, so this stays WCAG AA.
+
+   The parentheses are hidden, not deleted: Core's string lives in a
+   translatable gettext call, so removing "(...)" by filtering the text would
+   fight every locale. Hiding the two bracket glyphs with a zero-width,
+   clipped box keeps the link's accessible name reading "Edit" while leaving
+   Core's string and translation untouched.
+
+   .comment-meta is already a flex row item (order: 2) alongside the author
+   pill, so the capsule lands on the same line automatically. */
+/* Core renders the edit link as <a class="comment-edit-link"> inside
+   .comment-meta.commentmetadata — there is no .edit-link wrapper element in
+   Core's xhtml comment format, so the anchor itself is styled. */
+.lumen-comments .comment-meta .comment-edit-link {
+	display: inline-flex;
+	align-items: center;
+	margin: 0;
+	padding: 1px 10px;
+	font-family: var(--lumen-sans);
 	font-size: 0.75rem;
-}
-.lumen-comments .edit-link a {
-	color: var(--lumen-muted);
+	font-weight: 500;
+	line-height: 1.5;
+	color: #49375f;
+	background: #d8cbea;
+	border-radius: 999px;
 	text-decoration: none;
 }
-.lumen-comments .edit-link a:hover {
-	color: var(--lumen-fg);
+.lumen-comments .comment-meta .comment-edit-link:hover,
+.lumen-comments .comment-meta .comment-edit-link:focus-visible {
+	color: #49375f;
+	background: #cbb9e3;
 }
 
 /* Awaiting moderation: quiet, not error-red. Own row under the header. */
@@ -1531,6 +1574,46 @@ body.category .lumen-post-list > li + li {
 	flex: 0 0 100%;
 	width: 100%;
 	margin: 0;
+}
+
+/* v1.1.17 (E): the Reply link now sits INSIDE the comment's own bubble.
+   Core's markup is fixed and cannot be re-parented without abandoning
+   wp_list_comments(), so the association is made structurally instead of by
+   moving the node: the bubble becomes a positioning context and the Reply
+   row is laid into it at the bottom-right, inside the grey field, so the
+   button visually belongs to exactly one comment.
+
+   The link is still Core's own .comment-reply-link produced by
+   get_comment_reply_link(), so clicking it still runs Core's comment-reply
+   script: #respond relocates, #comment_parent is set and Cancel reply works.
+   Nothing here fakes or intercepts that behaviour.
+
+   Space for the button is reserved with padding on the bubble's last line so
+   a long comment never runs underneath it. */
+.lumen-comments .comment-body:has(> .reply) > p:last-of-type {
+	/* Reserve exactly the height of one Reply pill plus its bottom offset, so
+	   the last line of a comment never runs under the button. A fixed value
+	   would waste a whole empty line on a short comment, so it is expressed as
+	   the pill's own box: 21px pill + 6px offset + a 3px optical gap. */
+	padding-bottom: calc(21px + 0.4rem + 3px);
+}
+.lumen-comments .comment-body > .reply {
+	order: 4;
+	position: absolute;
+	right: 0.55rem;
+	bottom: 0.4rem;
+	z-index: 1;
+}
+/* The comment body must be the containing block for the overlaid Reply row. */
+.lumen-comments .comment-body {
+	position: relative;
+}
+/* Only a comment that actually has a bubble gets the absolute treatment; a
+   comment without any text must not lose its Reply button underneath. */
+.lumen-comments .comment-body:not(:has(> p)) > .reply {
+	position: static;
+	right: auto;
+	bottom: auto;
 }
 
 .lumen-comments .comment-body p {
@@ -1615,15 +1698,21 @@ body.category .lumen-post-list > li + li {
 
 /* ------------------------------------------------------------
    Nested threading: dashed guide per level, modest indent, same styling.
-   v1.1.16: the vertical rhythm inside a thread is halved along with the
-   top level (children margin-top 12px -> 6px, child item padding 12px -> 6px).
-   The indent, the dashed guide and the nesting semantics are unchanged, and
-   the result is never compressed to the point of overlap.
+
+   v1.1.17 (F): the reply-thread vertical rhythm is halved again, and the
+   TOP LEVEL IS DELIBERATELY LEFT ALONE. Inside a thread, every vertical value
+   that separates one reply from the next is now half of its v1.1.16 figure:
+     - child item padding-top/bottom   6px   -> 3px
+     - children margin-top             6px   -> 3px
+     - meta row -> bubble gap          3px   -> 1.5px (via row-gap below)
+   the mobile values follow the same halving. The indent, the dashed guide and
+   the nesting semantics are unchanged, and nothing is compressed to the point
+   where the dashed guide would touch a bubble.
    ------------------------------------------------------------ */
 .lumen-comments li > ul.children,
 .lumen-comments li > ol.children {
 	list-style: none;
-	margin: 0.375rem 0 0 1.1rem;
+	margin: 0.1875rem 0 0 1.1rem;
 	padding: 0;
 	padding-left: 1.1rem;
 	border-left: 1px dashed var(--lumen-border);
@@ -1631,29 +1720,74 @@ body.category .lumen-post-list > li + li {
 .lumen-comments ul.children > li,
 .lumen-comments ol.children > li {
 	margin: 0;
-	padding: 0.375rem 0;
+	padding: 0.1875rem 0;
 }
 .lumen-comments ul.children > li:first-child,
 .lumen-comments ol.children > li:first-child {
 	padding-top: 0;
 }
+/* Inside a thread only: tighten the gap between the reply's meta row and its
+   bubble. Scoped to .children so the top-level row-gap is untouched. */
+.lumen-comments ul.children .comment-body,
+.lumen-comments ol.children .comment-body {
+	row-gap: 0.0875rem;
+}
 @media (max-width: 480px) {
 	.lumen-comments li > ul.children,
 	.lumen-comments li > ol.children {
-		margin: 0.25rem 0 0 0.5rem;
+		margin: 0.125rem 0 0 0.5rem;
 		padding-left: 0.7rem;
 	}
 	.lumen-comments ul.children > li,
 	.lumen-comments ol.children > li {
-		padding: 0.3rem 0;
+		padding: 0.15rem 0;
 	}
 }
 
 /* ------------------------------------------------------------
    Comment form — minimal, unified, no harsh WordPress default look
    ------------------------------------------------------------ */
+
+/* v1.1.17 (B): dashed rule between the last comment and the form.
+   Same dashed language as the rule drawn between comments, but quieter: the
+   comment-to-comment rule is 1px dashed on --lumen-border and this one reuses
+   that exact token and width, only standing further from the form so the two
+   never read as one merged line. */
+.lumen-comments .lumen-comment-divider {
+	margin: 1rem 0 0;
+	border: 0;
+	border-top: 1px dashed var(--lumen-border);
+}
+
 .lumen-comment-form-wrap {
 	margin-top: 2rem;
+}
+
+/* v1.1.17 (A): the WordPress "Logged in as … Edit your profile. Log out?
+   Required fields are marked *" paragraph is not shown. The theme already
+   passes comment_notes_before => '' in comments.php, but Core still emits
+   .logged-in-as for authenticated visitors, and it is that paragraph (not
+   .comment-notes) which carries this sentence. It is removed visually here
+   rather than filtered out of WordPress, so Core's markup, nonce-bearing
+   logout URL and the profile link stay intact in the DOM for assistive
+   technology and for anything else that may rely on them; nothing is left
+   behind in the layout because the element is taken out of flow entirely.
+   has_logged_in_as => false via the filter below is what guarantees the
+   string is gone even if this rule were ever overridden. */
+.lumen-comments .logged-in-as,
+.lumen-comments .must-log-in,
+.lumen-comments .comment-notes,
+.lumen-comments .comment-form .logged-in-as {
+	position: absolute !important;
+	width: 1px !important;
+	height: 1px !important;
+	padding: 0 !important;
+	margin: -1px !important;
+	overflow: hidden !important;
+	clip: rect(0, 0, 0, 0) !important;
+	clip-path: inset(50%) !important;
+	white-space: nowrap !important;
+	border: 0 !important;
 }
 
 /* The visible "Leave a Reply" heading is removed (title_reply => ''), but

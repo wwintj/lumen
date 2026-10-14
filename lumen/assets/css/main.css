@@ -113,6 +113,13 @@ body.admin-bar .lumen-site-header {
 
 /* --- Navigation (always accessible, no JS) --- */
 
+/* Search toggle + nav share one wrapper so they can be centred as a unit on
+   desktop and split across two rows on mobile. This wrapper is the only
+   "group" element; it carries no styling that would change nav wrapping. */
+.lumen-header-nav-group {
+	display: contents;
+}
+
 .lumen-site-nav ul {
 	list-style: none;
 	display: flex;
@@ -407,6 +414,80 @@ body.admin-bar .lumen-site-header {
 
 .lumen-post-meta a:hover {
 	color: var(--lumen-fg);
+}
+
+/* ============================================================
+   Date / category pills — Blog Home, archive lists, search results
+
+   Scoped to the three list contexts only. Single post meta
+   (.lumen-single-meta) is deliberately NOT included and keeps its
+   original inline reading style.
+   ============================================================ */
+
+.lumen-home-meta,
+.lumen-post-meta {
+	align-items: center;
+	gap: 8px;
+}
+
+/* Remove the legacy middle-dot separator and the margin that spaced it,
+   in the list contexts only (Single keeps its own separator). */
+.lumen-home-meta .lumen-post-cats,
+.lumen-post-meta .lumen-post-cats {
+	margin-left: 0;
+	gap: 8px;
+}
+
+.lumen-home-meta .lumen-post-cats::before,
+.lumen-post-meta .lumen-post-cats::before {
+	content: none;
+}
+
+/* Date pill (grey). */
+.lumen-home-meta .lumen-post-date,
+.lumen-post-meta .lumen-post-date {
+	display: inline-block;
+	padding: 4px 10px;
+	font-size: 13px;
+	line-height: 1.4;
+	color: #52565c;
+	background: #f0f1f2;
+	border-radius: 999px;
+}
+
+/* Category pills (green), each one its own pill inside the wrapper.
+   The wrapper stays inline-flex + wrap so multiple categories never end up
+   inside one big pill. The `a` variants are listed explicitly because the
+   legacy `.lumen-post-meta a { color: inherit }` rule would otherwise pull
+   the pill text down to the muted body colour. */
+.lumen-home-meta .lumen-post-cats,
+.lumen-post-meta .lumen-post-cats {
+	display: inline-flex;
+	flex-wrap: wrap;
+	align-items: center;
+}
+
+.lumen-home-meta .lumen-post-cat,
+.lumen-home-meta a.lumen-post-cat,
+.lumen-post-meta .lumen-post-cat,
+.lumen-post-meta a.lumen-post-cat {
+	display: inline-block;
+	padding: 4px 10px;
+	font-size: 13px;
+	line-height: 1.4;
+	color: #176d39;
+	background: #e0f3e5;
+	border-radius: 999px;
+	text-decoration: none;
+}
+
+.lumen-home-meta a.lumen-post-cat:hover,
+.lumen-post-meta a.lumen-post-cat:hover,
+.lumen-home-meta .lumen-post-cat:hover,
+.lumen-post-meta .lumen-post-cat:hover {
+	color: #176d39;
+	background: #d3ebda;
+	opacity: 1;
 }
 
 /* Excerpt: reading serif, 400, lh 1.75 (~1rem). */
@@ -732,13 +813,12 @@ body.admin-bar .lumen-site-header {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 1rem;
-	align-items: baseline;
+	align-items: center;
 }
 .lumen-post-nav .post-navigation .nav-previous,
 .lumen-post-nav .post-navigation .nav-next {
 	margin: 0;
 	min-width: 0;
-	overflow-wrap: anywhere;
 }
 .lumen-post-nav .post-navigation .nav-previous {
 	margin-right: auto;
@@ -746,17 +826,22 @@ body.admin-bar .lumen-site-header {
 .lumen-post-nav .post-navigation .nav-next {
 	margin-left: auto;
 }
+/* Core emits an empty .nav-previous / .nav-next when there is no neighbour;
+   collapse it so a single-neighbour post shows one pill aligned to its side
+   rather than a gap or an empty box. */
+.lumen-post-nav .post-navigation .nav-previous:empty,
+.lumen-post-nav .post-navigation .nav-next:empty {
+	display: none;
+}
+
+/* Legacy label/title classes are no longer emitted by single.php, but the
+   rules are kept harmless in case a child theme or filter reintroduces them. */
 .lumen-post-nav a {
 	display: inline-flex;
-	flex-wrap: wrap;
-	align-items: baseline;
+	align-items: center;
 	gap: 0 0.5rem;
 	color: var(--lumen-fg-soft);
 	text-decoration: none;
-	overflow-wrap: anywhere;
-}
-.lumen-post-nav a:hover {
-	color: var(--lumen-fg);
 }
 .lumen-post-nav-label {
 	font-family: var(--lumen-sans);
@@ -764,29 +849,11 @@ body.admin-bar .lumen-site-header {
 	font-weight: 400;
 	color: var(--lumen-muted);
 }
-.lumen-post-nav a:hover .lumen-post-nav-label {
-	color: var(--lumen-fg-soft);
-}
 .lumen-post-nav-title {
 	font-family: var(--lumen-font-reading);
 	font-size: 1.05rem;
 	font-weight: 400;
 	line-height: 1.4;
-}
-
-/* Stack on mobile; keep each link full width so Previous / Next never
-   squeeze into two narrow columns. */
-@media (max-width: 480px) {
-	.lumen-post-nav .post-navigation .nav-links {
-		flex-direction: column;
-		gap: 1.25rem;
-	}
-	.lumen-post-nav .post-navigation .nav-previous {
-		margin-right: 0;
-	}
-	.lumen-post-nav .post-navigation .nav-next {
-		margin-left: 0;
-	}
 }
 
 /* ============================================================
@@ -1167,23 +1234,26 @@ body.admin-bar .lumen-site-header {
 .lumen-header-search {
 	/* details is display:block; keep it from stretching full width */
 	margin: 0;
+	position: relative; /* anchor for the floating panel (both breakpoints) */
 }
 
-/* The magnifier toggle. Sized to the header's existing control rhythm so it
-   does not add a separate tall row on mobile. */
+/* The magnifier toggle: a plain, borderless icon button — no grey box, no
+   border, no shadow. The click target is padded up to 36px (desktop) /
+   44px (mobile) while the glyph itself stays ~20px / 18px. */
 .lumen-header-search-toggle {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 2.25rem;
-	height: 2.25rem;
+	width: 2.25rem;  /* 36px  */
+	height: 2.25rem; /* 36px  */
 	padding: 0;
 	color: var(--lumen-fg-soft);
-	border: 1px solid transparent;
+	background: none;
+	border: 0;
 	border-radius: var(--lumen-radius);
 	cursor: pointer;
 	list-style: none; /* Firefox: drop the disclosure triangle */
-	transition: color var(--lumen-duration), background-color var(--lumen-duration);
+	transition: color var(--lumen-duration);
 }
 
 /* WebKit/Blink: drop the default marker */
@@ -1196,19 +1266,18 @@ body.admin-bar .lumen-site-header {
 
 .lumen-header-search-toggle:hover {
 	color: var(--lumen-fg);
-	background: var(--lumen-bg-soft);
 }
 
-/* The summary is a real focus stop; keep the theme's focus ring visible. */
+/* The summary is a real focus stop; keep the theme's focus ring visible.
+   The ring is the only visual affordance, so it must not be suppressed. */
 .lumen-header-search-toggle:focus-visible {
 	outline: 2px solid var(--lumen-accent);
 	outline-offset: 2px;
 }
 
-/* Open state: the toggle reads as active. */
+/* Open state: the icon reads as active without gaining a box. */
 .lumen-header-search[open] .lumen-header-search-toggle {
 	color: var(--lumen-fg);
-	background: var(--lumen-bg-soft);
 }
 
 /* --- Expanded panel --- */
@@ -1224,85 +1293,205 @@ body.admin-bar .lumen-site-header {
 	display: none;
 }
 
+/* Floating panel: absolutely positioned so it never reflows the header,
+   never pushes the navigation, and never changes the header height.
+
+   Anchoring: the panel is positioned against .lumen-header-inner (the
+   container), NOT against the toggle. Right-aligning to a toggle that sits
+   in the middle of a wide, centred navigation group would push the panel
+   past the LEFT viewport edge on narrow-but-desktop widths (e.g. 768px with
+   a long menu), leaving the input outside the window and unclickable.
+   Against the container, `right: 0` always resolves to the container's
+   right edge, so the panel stays fully on-screen. */
 .lumen-header-search[open] .lumen-header-search-panel {
-	display: flex;
-	flex-wrap: nowrap;
-	align-items: stretch;
-	gap: 0.35rem;
-	margin-top: 0.5rem;
+	display: block;
+	position: absolute;
+	top: calc(100% + 0.5rem);
+	right: 0;
+	z-index: 60;
+	width: 15.625rem; /* ~250px */
+	max-width: calc(100% - 1rem);
+	background: var(--lumen-bg);
+	border: 1px solid var(--lumen-border);
+	border-radius: var(--lumen-radius);
 }
 
 .lumen-header-search-panel .lumen-search-form {
-	display: flex;
-	flex-wrap: nowrap;
-	align-items: stretch;
-	gap: 0.35rem;
-	width: 100%;
-	max-width: 100%;
+	display: block;
 	margin: 0;
 }
 
+/* Single input, no second submit button, no inner frame. */
 .lumen-header-search-panel .lumen-search-input {
-	flex: 1 1 auto;
-	width: auto;
-	max-width: 100%;
-	min-width: 0;
-	padding: 0.35rem 0.6rem;
+	display: block;
+	width: 100%;
+	height: 2.5rem; /* ~40px */
+	padding: 0 0.7rem;
 	font-size: 0.9375rem;
-	background: var(--lumen-bg-soft);
-}
-
-/* Compact submit button that also carries the icon.
-   Overrides the global solid-dark button without changing it. */
-.lumen-header-search-panel .lumen-search-button {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	flex: 0 0 auto;
-	padding: 0.35rem 0.6rem;
-	background: transparent;
-	color: var(--lumen-fg-soft);
-	border: 1px solid var(--lumen-border);
-}
-
-.lumen-header-search-panel .lumen-search-button:hover {
-	background: var(--lumen-bg-soft);
-	color: var(--lumen-fg);
-	opacity: 1;
+	background: var(--lumen-bg);
+	border: 0;               /* the panel already draws the 1px border */
+	border-radius: inherit;
 }
 
 .lumen-search-icon {
 	display: block;
-	width: 1rem;
-	height: 1rem;
+	width: 1.25rem;  /* 20px */
+	height: 1.25rem;
 }
 
-@media (min-width: 768px) {
-	/* Desktop: Brand — Nav — Search icon.
-	   The nav shrinks and wraps instead of overflowing. */
-	.lumen-site-nav {
+/* ------------------------------------------------------------
+   Mobile M2 — two explicit rows:
+
+     row 1:  [ brand ............  magnifier ]
+     row 2:  [ navigation, wrapping freely ]
+
+   Implemented as a 2-column grid on .lumen-header-inner. The nav group
+   keeps display: contents, so its children (.lumen-header-search-wrap and
+   .lumen-site-nav) become grid items and can be placed on their own rows.
+   No negative margins and no absolute positioning, so a brand that wraps
+   to several lines can never push the magnifier off its row.
+   ------------------------------------------------------------ */
+@media (max-width: 767px) {
+	.lumen-header-inner {
+		display: grid;
+		grid-template-columns: 1fr auto;
+		align-items: center;
+		row-gap: 0.75rem;
+		column-gap: 0.5rem;
+	}
+
+	/* Row 1, column 1: brand. min-width:0 lets long titles wrap instead of
+	   forcing the grid wider than the viewport. */
+	.lumen-site-brand-wrap {
+		grid-column: 1;
+		grid-row: 1;
 		min-width: 0;
 	}
 
-	/* Expanded panel floats below the toggle so it never reflows the bar,
-	   is not clipped by the sticky header, and cannot cause overflow.
-	   Kept free of shadow / large overlay per the design constraints. */
+	/* Row 1, column 2: the magnifier, hard right. */
+	.lumen-header-search-wrap {
+		grid-column: 2;
+		grid-row: 1;
+		justify-self: end;
+	}
+
+	/* Row 2, spanning both columns. */
+	.lumen-site-nav {
+		grid-column: 1 / -1;
+		grid-row: 2;
+		min-width: 0;
+	}
+
+	/* The balancing spacers are desktop-only. */
+	.lumen-header-spacer-before,
+	.lumen-header-spacer {
+		display: none;
+	}
+
+	/* Comfortable touch target on small screens. */
+	.lumen-header-search-toggle {
+		width: 2.75rem;  /* 44px */
+		height: 2.75rem; /* 44px */
+	}
+
+	/* Panel position on mobile.
+
+	   Anchoring note: .lumen-header-search is position: relative globally, so
+	   the panel would normally open just under the magnifier — i.e. directly
+	   on top of the row-2 navigation. Here the anchor is moved up to the whole
+	   header instead, so the panel drops clear BELOW the navigation row while
+	   staying right-aligned with the magnifier. It is absolutely positioned,
+	   so it never pushes the navigation down and never changes the header
+	   height. */
 	.lumen-header-search {
-		position: relative;
+		position: static;
+	}
+
+	.lumen-header-inner {
+		position: relative; /* new anchor for the floating panel */
 	}
 
 	.lumen-header-search[open] .lumen-header-search-panel {
-		position: absolute;
-		top: calc(100% + 0.4rem);
+		top: calc(100% + 0.5rem);
 		right: 0;
-		z-index: 60;
-		width: 18rem;
-		max-width: calc(100vw - 2rem);
-		margin-top: 0;
-		padding: 0.5rem;
-		background: var(--lumen-bg);
-		border: 1px solid var(--lumen-border);
-		border-radius: var(--lumen-radius);
+	}
+
+	.lumen-search-icon {
+		width: 1.125rem; /* 18px */
+		height: 1.125rem;
+	}
+}
+
+@media (min-width: 768px) {
+	/* Desktop: brand left, search+nav centred as ONE group.
+
+	   Centring method: a 3-column grid whose outer columns are equal (1fr),
+	   so the middle column — the search + nav group — is centred in the
+	   container. The brand is placed in the first column and pushed left with
+	   justify-self, which also guarantees it can never overlap the group and
+	   keeps the markup order (spacer, brand, group, spacer) meaningful.
+
+	   Grid is used instead of flex auto-margins because the centring then
+	   does not depend on how many items exist or on their intrinsic widths. */
+	.lumen-header-inner {
+		display: grid;
+		grid-template-columns: 1fr auto 1fr;
+		align-items: center;
+		column-gap: 1rem;
+		position: relative; /* anchor for the floating search panel */
+	}
+
+	/* On desktop the panel anchors to the container (see the rule above), so
+	   the search wrapper must not be a positioning context.
+
+	   The panel must clear the WHOLE header row, not just the toggle: the
+	   navigation text box is taller than the 36px toggle and is vertically
+	   centred, so anchoring at the toggle's own height would put the panel
+	   across the lower half of the nav labels. `100%` is the container's full
+	   height, which ends below both the toggle and the nav. */
+	.lumen-header-search {
+		position: static;
+	}
+
+	.lumen-header-search[open] .lumen-header-search-panel {
+		top: calc(100% + 0.5rem);
+	}
+
+	/* The two balancing spacers are not needed in the grid layout; the equal
+	   1fr columns already provide the centring. */
+	.lumen-header-spacer-before,
+	.lumen-header-spacer {
+		display: none;
+	}
+
+	/* Column 1: brand, hard left. */
+	.lumen-site-brand-wrap {
+		grid-column: 1;
+		justify-self: start;
+		min-width: 0;
+	}
+
+	/* Column 2: the centred search + nav group. */
+	.lumen-header-nav-group {
+		grid-column: 2;
+		display: flex;
+		align-items: center;
+		min-width: 0;
+	}
+
+	.lumen-header-search-wrap {
+		flex: 0 0 auto;
+		min-width: 0;
+	}
+
+	.lumen-site-nav {
+		flex: 0 1 auto;
+		min-width: 0;
+	}
+
+	/* ~16px between the magnifier and the first navigation link. */
+	.lumen-site-nav ul {
+		margin-left: 1rem;
 	}
 }
 
@@ -1480,26 +1669,10 @@ figcaption,
 .lumen-home-meta .lumen-post-date {
 	font-variant-numeric: tabular-nums;
 }
-.lumen-home-meta .lumen-post-cats {
-	display: inline-flex;
-	align-items: center;
-	gap: 0.4rem;
-	margin-left: 0.5rem;
-}
-/* Middle dot between date and categories; only appears when categories render. */
-.lumen-home-meta .lumen-post-cats::before {
-	content: '\00B7';
-}
-/* Category links: quiet by default, strong-contrast on hover
-   (text color), smooth transition, no underline/pill/bold. */
-.lumen-home-meta .lumen-post-cat {
-	font-size: 0.8125rem;
-	color: var(--lumen-muted);
-	transition: color var(--lumen-duration);
-}
-.lumen-home-meta .lumen-post-cat:hover {
-	color: var(--lumen-fg);
-}
+/* The date/category pill rules in the shared block above now own the
+   appearance of .lumen-post-cats / .lumen-post-cat in this context. The
+   previous inline text rules (middle-dot separator, grey 0.8125rem links)
+   were removed here so they can no longer override the pills. */
 
 /* Title: FangSong-style reading serif, medium weight (not 600/700). */
 .lumen-home-title {
@@ -1534,27 +1707,76 @@ figcaption,
 	gap: 1rem;
 	margin-top: 3rem;
 }
-.lumen-home-pagination a {
-	font-size: 0.95rem;
-	color: var(--lumen-fg-soft);
+
+/* ============================================================
+   Arrow pills — Blog Home pagination + Single post navigation
+
+   Shared visual language: a 52x44 rounded pill whose only visible
+   content is a decorative arrow. The arrow is a pseudo-element on the
+   <a> itself, so the entire pill is the click target and the glyph is
+   never announced separately. The accessible name is supplied by a
+   visually-hidden string inside the link.
+
+   Scoped to .lumen-pager and .lumen-post-nav only: archive and search
+   numeric pagination, Gutenberg buttons, comment submit and footer
+   links are untouched.
+   ============================================================ */
+
+.lumen-pager {
+	display: flex;
+	align-items: center;
 }
-.lumen-home-pagination a:hover {
-	color: var(--lumen-fg);
+
+/* Both pager slots are always rendered; collapse the empty ones so a
+   missing target never leaves a ghost pill or an orphaned arrow. */
+.lumen-pager:empty {
+	display: none;
 }
-.lumen-home-pagination-left {
-	margin-right: auto;
-}
-.lumen-home-pagination-right {
+
+.lumen-pager-next {
 	margin-left: auto;
 }
-/* Decorative directional arrows kept out of the translatable string. */
-.lumen-home-pagination-left::before {
-	content: '\2190\00A0';
-	color: var(--lumen-muted);
+
+.lumen-pager a,
+.lumen-post-nav .post-navigation .nav-links a {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 52px;
+	height: 44px;
+	background: #f0f1f2;
+	color: #52565c;
+	border-radius: 999px;
+	text-decoration: none;
+	transition: background-color var(--lumen-duration), color var(--lumen-duration);
 }
-.lumen-home-pagination-right::after {
-	content: '\00A0\2192';
-	color: var(--lumen-muted);
+
+.lumen-pager a:hover,
+.lumen-post-nav .post-navigation .nav-links a:hover {
+	background: #e4e6e8;
+	color: #3b3f45;
+}
+
+.lumen-pager a:focus-visible,
+.lumen-post-nav .post-navigation .nav-links a:focus-visible {
+	outline: 2px solid var(--lumen-accent);
+	outline-offset: 2px;
+}
+
+/* Decorative arrows. They live on the link box, not on a wrapper, so they
+   can never sit outside the clickable area. */
+.lumen-pager-prev a::before,
+.lumen-post-nav .post-navigation .nav-previous a::before {
+	content: '\2190';
+	font-size: 1.125rem;
+	line-height: 1;
+}
+
+.lumen-pager-next a::after,
+.lumen-post-nav .post-navigation .nav-next a::after {
+	content: '\2192';
+	font-size: 1.125rem;
+	line-height: 1;
 }
 
 /* Mobile: slightly smaller titles.

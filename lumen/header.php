@@ -21,6 +21,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<header class="lumen-site-header">
 		<div class="lumen-container lumen-header-inner">
+			<?php
+			/*
+			 * Desktop-only balancing spacer (hidden on mobile). On desktop the
+			 * header is a 3-column grid whose outer columns are equal, so the
+			 * middle column — the search + nav group — is centred while the brand
+			 * stays hard left. Purely presentational.
+			 */
+			?>
+			<div class="lumen-header-spacer-before" aria-hidden="true"></div>
+
 			<div class="lumen-site-brand-wrap">
 				<?php if ( has_custom_logo() ) : ?>
 					<div class="lumen-site-logo">
@@ -33,42 +43,49 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<?php endif; ?>
 			</div>
 
-			<nav class="lumen-site-nav" aria-label="<?php echo esc_attr__( 'Primary menu', 'lumen' ); ?>">
-				<?php lumen_render_nav( 'primary' ); ?>
-			</nav>
-
 			<?php
 			/*
-			 * Header search — collapsed to a single icon by default.
+			 * Search + navigation form ONE group, so the magnifier sits directly
+			 * before the first nav link and the pair can be centred as a unit on
+			 * desktop or split across two rows on mobile (M2).
 			 *
-			 * <details>/<summary> gives the open/close behaviour natively:
-			 * the summary is focusable and toggles on Enter/Space with no
-			 * JavaScript and no hand-maintained aria-expanded. While closed,
-			 * the inner form is not rendered as visible content and its
-			 * controls stay out of the normal Tab order.
+			 * <details>/<summary> gives the open/close behaviour natively: the
+			 * summary is focusable and toggles on Enter/Space with no JavaScript
+			 * and no hand-maintained aria-expanded. While closed, the inner input
+			 * is not rendered and stays out of the normal Tab order.
 			 *
-			 * Deliberately a sibling of <nav>, never nested in its <ul>, so
-			 * the navigation list stays a single semantic list. The 'header'
-			 * context keeps the input id distinct from the one the search
-			 * results template emits on the same page.
+			 * There is deliberately ONE markup instance, repositioned purely with
+			 * CSS per breakpoint — not a duplicate desktop/mobile search form with
+			 * one of them hidden.
 			 *
-			 * Note: native <details> does NOT close on Escape. That behaviour
-			 * is intentionally not faked, since doing so would require JS.
+			 * The search toggle is never nested inside the navigation <ul>, so the
+			 * menu stays a single semantic list and cannot disturb its wrapping.
+			 *
+			 * Note: native <details> does NOT close on Escape. That behaviour is
+			 * intentionally not faked, since doing so would require JavaScript.
 			 */
 			?>
-			<div class="lumen-header-search-wrap">
-				<details class="lumen-header-search">
-					<summary class="lumen-header-search-toggle">
-						<?php
-						echo lumen_search_icon_svg(); // phpcs:ignore WordPress.Security.EscapeOutput -- static inline SVG.
-						?>
-						<span class="visually-hidden"><?php echo esc_html__( 'Search', 'lumen' ); ?></span>
-					</summary>
-					<div class="lumen-header-search-panel">
-						<?php lumen_search_form( 'header' ); ?>
-					</div>
-				</details>
+			<div class="lumen-header-nav-group">
+				<div class="lumen-header-search-wrap">
+					<details class="lumen-header-search">
+						<summary class="lumen-header-search-toggle">
+							<?php
+							echo lumen_search_icon_svg(); // phpcs:ignore WordPress.Security.EscapeOutput -- static inline SVG.
+							?>
+							<span class="visually-hidden"><?php echo esc_html__( 'Search', 'lumen' ); ?></span>
+						</summary>
+						<div class="lumen-header-search-panel">
+							<?php lumen_search_form( 'header' ); ?>
+						</div>
+					</details>
+				</div>
+
+				<nav class="lumen-site-nav" aria-label="<?php echo esc_attr__( 'Primary menu', 'lumen' ); ?>">
+					<?php lumen_render_nav( 'primary' ); ?>
+				</nav>
 			</div>
+
+			<div class="lumen-header-spacer" aria-hidden="true"></div>
 		</div>
 	</header>
 

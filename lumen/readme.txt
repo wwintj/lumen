@@ -4,7 +4,7 @@ Contributor URI: https://github.com/wwintj
 Author: Lumen Team
 Author URI: https://github.com/wwintj
 Homepage URL: https://github.com/wwintj/lumen
-Version: 1.1.1
+Version: 1.1.2
 Requires at least: 6.3
 Tested up to: 6.7
 Requires PHP: 8.2
@@ -14,7 +14,7 @@ Text Domain: lumen
 Domain Path: /
 Tags: blog, content, minimalist, responsive-layout, custom-menu, translation-ready, rss-icons
 
-極簡、對 SEO 友善的內容部落格佈景主題，專為中英雙語網站設計。1.1.1 為 Lumen 的正式穩定版本，在 1.1.0 的歸檔與搜尋核心正確性、文字優先閱讀排版，以及零 Theme JavaScript 設計之上，新增頁首圖示式可展開搜尋，並將 Header／Footer 字體統一為與正文相同的閱讀字體系統。
+極簡、對 SEO 友善的內容部落格佈景主題，專為中英雙語網站設計。1.1.2 為 Lumen 的正式穩定版本，在 1.1.0 的歸檔與搜尋核心正確性、文字優先閱讀排版，以及零 Theme JavaScript 設計之上，於 1.1.1 新增頁首圖示式可展開搜尋並統一 Header／Footer 閱讀字體，1.1.2 進一步調整頁首搜尋與導覽的版面、為列表加上日期與分類膠囊標籤，並將首頁分頁與單篇文章導覽改為純箭頭膠囊。
 
 == Features ==
 * 語意化 HTML5 結構（header、nav、main、article、section、footer）。
@@ -53,6 +53,47 @@ Tags: blog, content, minimalist, responsive-layout, custom-menu, translation-rea
 具體功能（自訂內容類型、表單、REST API）僅在出現明確需求時，才於後續階段加入（YAGNI）。
 
 == Changelog ==
+* 1.1.2 (Stable release)
+  * 頁首搜尋版面調整：搜尋圖示改與主要導覽視為同一個視覺群組，桌面版將兩者一起置中，
+    圖示緊接在第一個導覽連結之前（間距約 16px），不再被孤立推到頁首最右端；
+    網站標題或 Custom Logo 維持靠左，超長標題與長導覽文字會自然降級換行，不互相重疊。
+  * 行動版改為兩列配置（M2）：第一列為品牌與右側搜尋圖示，第二列為可自由換行的主要導覽；
+    搜尋面板改為對齊整個頁首區域下方浮出，因此展開時不會遮蓋第二列導覽，也不會推動導覽位移。
+  * 搜尋圖示外觀簡化：移除灰色矩形底色、明顯邊框與按鈕感，預設只保留簡潔線條放大鏡；
+    桌面點擊區域 36px、行動版 44px，鍵盤 focus-visible 焦點樣式維持清楚可見。
+  * 展開後的搜尋面板僅保留單一輸入框（約 250×40px、淺灰 1px 邊框、圓角 4px），
+    不再輸出第二個送出按鈕或獨立送出圖示；按 Enter 即沿用 WordPress 原生 GET 搜尋送出。
+     Header 高度不變、導覽不位移，面板以 CSS 定位浮出，全程仍為零 JavaScript。
+  * 日期與分類改為膠囊標籤：部落格首頁、分類／標籤／作者／日期等歸檔頁，
+    以及搜尋結果頁統一使用灰色日期膠囊（背景 `#F0F1F2`、文字 `#52565C`）與
+    綠色分類膠囊（背景 `#E0F3E5`、文字 `#176D39`），字級 13px、圓角 999px、
+    內距 `4px 10px`、間距 8px，無陰影、無漸層、無圖示；多個分類各自獨立成一個膠囊並可換行。
+  * 移除上述三個列表情境中日期與分類之間的中點（`·`）分隔符，並同步清除殘留的
+    `margin-left` 與間距，避免舊版面留下多餘空隙；**單篇文章頁 `.lumen-single-meta`
+    既有的分隔樣式與外觀完全未變**。
+  * 列表順序維持不變：部落格首頁與歸檔頁為「膠囊 → 標題 → 摘要」，
+    搜尋結果頁維持「標題 → 膠囊 → 摘要」，未為了樣式一致而重排任何 DOM。
+  * 部落格首頁分頁改為純箭頭膠囊：左側 `←` 對應 `previous_posts_link()`（較新的文章），
+    右側 `→` 對應 `next_posts_link()`（較舊的文章），方向語意與 WordPress Core 原生邏輯一致；
+    仍由 Core 產生連結與網址，未自行計算頁碼或修改 `WP_Query`。
+  * 單篇文章上／下一篇導覽同樣改為純箭頭膠囊，仍使用 Core `the_post_navigation()`，
+    未重寫文章查找邏輯、未變更排序或連結網址；箭頭方向依 Core 實際輸出的
+    `nav-previous`／`nav-next` 對應，未憑主觀「新舊」理解顛倒。
+  * 兩種箭頭膠囊共用同一套視覺規則（52×44px、背景 `#F0F1F2`、箭頭 `#52565C`、
+    圓角 999px、Hover 背景略深、無陰影），並以 `.lumen-pager` 與 `.lumen-post-nav`
+    限定作用範圍，不影響歸檔／搜尋的數字分頁、Gutenberg 按鈕、一般文章連結、
+    頁尾 RSS 或留言送出按鈕。
+  * 箭頭為連結自身的 CSS 裝飾（`aria-hidden` 性質），整個膠囊皆可點擊；
+    螢幕閱讀器名稱由視覺隱藏文字提供（`Previous page`／`Next page`、
+    `Previous post: <標題>`／`Next post: <標題>`），連結不會成為無名稱控制項。
+    缺少上一頁／下一頁或相鄰文章時，該側整顆膠囊收合為 `display: none`，
+    不會留下空膠囊、停用按鈕或孤立的偽元素箭頭。
+  * 行動版單篇文章導覽維持左右分佈（`← … →`），不再強制改為縱向堆疊；
+    頁面正文寬度、正文排版、留言區與其他 Single 模板結構均未變更。
+  * 新增 5 個可翻譯字串並同步更新 `languages/lumen.pot`
+    （`Previous page`、`Next page`、`Previous post`、`Next post`、`Site search`）。
+  * 本版本未新增任何 Theme JavaScript、未新增外部字型或圖示庫、未新增外掛依賴，
+    亦未變更 `theme.json`、`Requires at least`、`Requires PHP` 與 `Tested up to`。
 * 1.1.1 (Stable release)
   * 新增頁首圖示式可展開搜尋：預設僅顯示放大鏡圖示，點擊（或以鍵盤 Enter／Space）後
     展開搜尋輸入框，再次啟用即收合。以原生 HTML `<details>`／`<summary>` 實作，

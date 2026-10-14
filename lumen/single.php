@@ -42,9 +42,18 @@ if ( ! defined( 'ABSPATH' ) ) {
      duplicate navigation element. -->
 <div class="lumen-post-nav">
 	<?php
+	/*
+	 * Core the_post_navigation() still resolves the neighbouring posts, the
+	 * direction and the URLs; only the visible text changes.
+	 *
+	 * The arrow is a CSS pseudo-element on the <a>, so the whole pill is
+	 * clickable and the glyph is decorative. %title stays in the markup but is
+	 * visually hidden: screen readers get "Previous post: <title>", while the
+	 * page shows only the arrow. Core escapes %title in context.
+	 */
 	the_post_navigation( array(
-		'prev_text' => '<span class="lumen-post-nav-label">← ' . esc_html__( 'Previous', 'lumen' ) . '</span><span class="lumen-post-nav-title">%title</span>',
-		'next_text' => '<span class="lumen-post-nav-title">%title</span><span class="lumen-post-nav-label">' . esc_html__( 'Next', 'lumen' ) . ' →</span>',
+		'prev_text' => '<span class="visually-hidden">' . esc_html__( 'Previous post', 'lumen' ) . ': %title</span>',
+		'next_text' => '<span class="visually-hidden">' . esc_html__( 'Next post', 'lumen' ) . ': %title</span>',
 	) );
 	?>
 </div>

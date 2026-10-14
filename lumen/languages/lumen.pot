@@ -95,6 +95,26 @@ msgstr ""
 msgid "Next"
 msgstr ""
 
+#: home.php:44
+msgid "Previous page"
+msgstr ""
+
+#: home.php:51
+msgid "Next page"
+msgstr ""
+
+#: single.php:55
+msgid "Previous post"
+msgstr ""
+
+#: single.php:56
+msgid "Next post"
+msgstr ""
+
+#: inc/template-functions.php:80
+msgid "Site search"
+msgstr ""
+
 #: home.php:41
 #: template-parts/post-list.php:66
 msgid "No posts found."

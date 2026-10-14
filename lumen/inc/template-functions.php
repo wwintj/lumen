@@ -85,12 +85,11 @@ if ( ! function_exists( 'lumen_search_form' ) ) {
 		echo '<input id="' . esc_attr( $input_id ) . '" name="s" type="search" class="lumen-search-input" value="' . esc_attr( get_query_var( 's' ) ) . '" autocomplete="off">';
 
 		if ( $is_header ) {
-			// The submit control is icon-only; the visually-hidden text carries
-			// the accessible name, so the SVG stays decorative.
-			echo '<button type="submit" class="lumen-search-button">';
-			echo lumen_search_icon_svg();
-			echo '<span class="visually-hidden">' . esc_html__( 'Search', 'lumen' ) . '</span>';
-			echo '</button>';
+			// Header context: the form holds ONLY the input. The magnifier in the
+			// <summary> is the submit control for the open panel (an <input type=submit>
+			// there would be a second, visually redundant button), so no submit
+			// button is emitted here. Pressing Enter in the input still submits the
+			// form natively — no JavaScript involved.
 		} else {
 			echo '<button type="submit" class="lumen-search-button">' . esc_html__( 'Search', 'lumen' ) . '</button>';
 		}
@@ -110,9 +109,11 @@ if ( ! function_exists( 'lumen_search_icon_svg' ) ) {
 	 * @return string Raw SVG markup (safe: static, no user input).
 	 */
 	function lumen_search_icon_svg() {
-		return '<svg class="lumen-search-icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false">'
-			. '<circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5"/>'
-			. '<line x1="10.5" y1="10.5" x2="14.5" y2="14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>'
+		// 20px intrinsic box; the CSS sizes it responsively. Inline so no icon
+		// font or remote SVG is ever fetched.
+		return '<svg class="lumen-search-icon" viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" focusable="false">'
+			. '<circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.6"/>'
+			. '<line x1="12.6" y1="12.6" x2="17.5" y2="17.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>'
 			. '</svg>';
 	}
 }

@@ -24,15 +24,34 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<?php endwhile; ?>
 		</div>
 
+		<?php
+		/*
+		 * Arrow-only pills. Core previous_posts_link()/next_posts_link() still
+		 * provide the URL and the "is there a target?" logic: on page 1 the
+		 * previous call returns nothing, so the wrapper renders empty and CSS
+		 * collapses it — no ghost pill, no orphaned arrow.
+		 *
+		 * The arrow glyph is a CSS pseudo-element on the <a> itself, so the whole
+		 * pill is the click target and the glyph is decorative by nature. The
+		 * accessible name comes from a visually-hidden translatable string, so
+		 * the link is never an unnamed control.
+		 */
+		?>
 		<nav class="lumen-home-pagination">
-			<!-- Left: "Previous" = previous page (lower page number). Empty on page 1. -->
-			<span class="lumen-home-pagination-left">
-				<?php previous_posts_link( esc_html__( 'Previous', 'lumen' ) ); ?>
-			</span>
-			<!-- Right: "Next" = next page (higher page number). Empty on the last page. -->
-			<span class="lumen-home-pagination-right">
-				<?php next_posts_link( esc_html__( 'Next', 'lumen' ) ); ?>
-			</span>
+			<div class="lumen-pager lumen-pager-prev">
+				<?php
+				previous_posts_link(
+					'<span class="visually-hidden">' . esc_html__( 'Previous page', 'lumen' ) . '</span>'
+				);
+				?>
+			</div>
+			<div class="lumen-pager lumen-pager-next">
+				<?php
+				next_posts_link(
+					'<span class="visually-hidden">' . esc_html__( 'Next page', 'lumen' ) . '</span>'
+				);
+				?>
+			</div>
 		</nav>
 
 	<?php else : ?>

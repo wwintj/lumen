@@ -89,8 +89,14 @@ body.admin-bar .lumen-site-header {
 }
 
 .lumen-site-title {
+	/* Match the reading typography of the content so the header reads as
+	   part of the same document. 700 was tuned for the sans stack; light
+	   CJK faces like FangSong have no real bold, so the browser would
+	   synthesise one and smear the strokes. 400 keeps it crisp. */
+	font-family: var(--lumen-font-reading);
 	font-size: 1.5rem;
-	font-weight: 700;
+	font-weight: 400;
+	line-height: 1.4;
 	letter-spacing: -0.02em;
 	transition: color var(--lumen-duration);
 }
@@ -117,7 +123,10 @@ body.admin-bar .lumen-site-header {
 }
 
 .lumen-site-nav a {
+	font-family: var(--lumen-font-reading);
 	font-size: 1rem;
+	font-weight: 400;
+	line-height: 1.5;
 	padding: 0.25rem 0.5rem;
 	border-radius: var(--lumen-radius);
 	color: var(--lumen-fg-soft);
@@ -194,7 +203,10 @@ body.admin-bar .lumen-site-header {
 }
 
 .lumen-site-footer-nav a {
+	font-family: var(--lumen-font-reading);
 	font-size: 0.95rem;
+	font-weight: 400;
+	line-height: 1.5;
 	padding: 0.2rem 0.5rem;
 	border-radius: var(--lumen-radius);
 	transition: color var(--lumen-duration), background-color var(--lumen-duration);
@@ -207,11 +219,17 @@ body.admin-bar .lumen-site-header {
 .lumen-footer-copyright {
 	margin: 0;
 	color: var(--lumen-muted);
+	font-family: var(--lumen-font-reading);
 	font-size: 0.9rem;
+	font-weight: 400;
+	line-height: 1.6;
 }
 
 .lumen-footer-feed {
+	font-family: var(--lumen-font-reading);
 	font-size: 0.9rem;
+	font-weight: 400;
+	line-height: 1.6;
 	color: var(--lumen-muted);
 	padding: 0.15rem 0.5rem;
 	border-radius: var(--lumen-radius);
@@ -1131,6 +1149,161 @@ body.admin-bar .lumen-site-header {
 
 .lumen-search-button {
 	padding: 0.6rem 1rem;
+}
+
+/* ============================================================
+   Header search — icon-only, expands on activation
+   Scoped to .lumen-header-search so the in-page search form
+   (search.php / 404.php) keeps its own, larger presentation.
+
+   Collapsed by default: only <summary> (the magnifier) is shown.
+   Opening is handled natively by <details>; there is no JS here.
+   ============================================================ */
+
+.lumen-header-search-wrap {
+	min-width: 0;
+}
+
+.lumen-header-search {
+	/* details is display:block; keep it from stretching full width */
+	margin: 0;
+}
+
+/* The magnifier toggle. Sized to the header's existing control rhythm so it
+   does not add a separate tall row on mobile. */
+.lumen-header-search-toggle {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.25rem;
+	height: 2.25rem;
+	padding: 0;
+	color: var(--lumen-fg-soft);
+	border: 1px solid transparent;
+	border-radius: var(--lumen-radius);
+	cursor: pointer;
+	list-style: none; /* Firefox: drop the disclosure triangle */
+	transition: color var(--lumen-duration), background-color var(--lumen-duration);
+}
+
+/* WebKit/Blink: drop the default marker */
+.lumen-header-search-toggle::-webkit-details-marker {
+	display: none;
+}
+.lumen-header-search-toggle::marker {
+	content: "";
+}
+
+.lumen-header-search-toggle:hover {
+	color: var(--lumen-fg);
+	background: var(--lumen-bg-soft);
+}
+
+/* The summary is a real focus stop; keep the theme's focus ring visible. */
+.lumen-header-search-toggle:focus-visible {
+	outline: 2px solid var(--lumen-accent);
+	outline-offset: 2px;
+}
+
+/* Open state: the toggle reads as active. */
+.lumen-header-search[open] .lumen-header-search-toggle {
+	color: var(--lumen-fg);
+	background: var(--lumen-bg-soft);
+}
+
+/* --- Expanded panel --- */
+
+/* IMPORTANT: the panel's display must be gated on [open].
+   An unconditional author `display: flex` here would OVERRIDE the UA
+   stylesheet's `details:not([open]) > *:not(summary) { display: none }`
+   (author origin beats UA origin regardless of specificity), leaving the
+   field visible while the details is closed. Keeping the base rule at
+   `display: none` and turning it on only under [open] preserves the native
+   collapse and keeps the closed field out of the Tab order. */
+.lumen-header-search-panel {
+	display: none;
+}
+
+.lumen-header-search[open] .lumen-header-search-panel {
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: stretch;
+	gap: 0.35rem;
+	margin-top: 0.5rem;
+}
+
+.lumen-header-search-panel .lumen-search-form {
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: stretch;
+	gap: 0.35rem;
+	width: 100%;
+	max-width: 100%;
+	margin: 0;
+}
+
+.lumen-header-search-panel .lumen-search-input {
+	flex: 1 1 auto;
+	width: auto;
+	max-width: 100%;
+	min-width: 0;
+	padding: 0.35rem 0.6rem;
+	font-size: 0.9375rem;
+	background: var(--lumen-bg-soft);
+}
+
+/* Compact submit button that also carries the icon.
+   Overrides the global solid-dark button without changing it. */
+.lumen-header-search-panel .lumen-search-button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 auto;
+	padding: 0.35rem 0.6rem;
+	background: transparent;
+	color: var(--lumen-fg-soft);
+	border: 1px solid var(--lumen-border);
+}
+
+.lumen-header-search-panel .lumen-search-button:hover {
+	background: var(--lumen-bg-soft);
+	color: var(--lumen-fg);
+	opacity: 1;
+}
+
+.lumen-search-icon {
+	display: block;
+	width: 1rem;
+	height: 1rem;
+}
+
+@media (min-width: 768px) {
+	/* Desktop: Brand — Nav — Search icon.
+	   The nav shrinks and wraps instead of overflowing. */
+	.lumen-site-nav {
+		min-width: 0;
+	}
+
+	/* Expanded panel floats below the toggle so it never reflows the bar,
+	   is not clipped by the sticky header, and cannot cause overflow.
+	   Kept free of shadow / large overlay per the design constraints. */
+	.lumen-header-search {
+		position: relative;
+	}
+
+	.lumen-header-search[open] .lumen-header-search-panel {
+		position: absolute;
+		top: calc(100% + 0.4rem);
+		right: 0;
+		z-index: 60;
+		width: 18rem;
+		max-width: calc(100vw - 2rem);
+		margin-top: 0;
+		padding: 0.5rem;
+		background: var(--lumen-bg);
+		border: 1px solid var(--lumen-border);
+		border-radius: var(--lumen-radius);
+	}
 }
 
 /* ============================================================

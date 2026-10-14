@@ -1,5 +1,16 @@
 # Lumen — Phase 1 Runtime Validation Checklist
 
+> **⚠️ 歷史檔案（Historical archive）—— 適用範圍僅限 Phase 1。**
+>
+> 本文件記錄的是 **Lumen 0.1.0 / Phase 1** 時期的執行階段驗證清單，
+> **不適用於**目前的 1.1.0 版本，也**不是**任何後續版本的測試結果。
+>
+> 其中的檢查項目與環境假設（WordPress 6.7+、Theme `0.1.0`）皆為當時狀態。
+> 目前版本的測試與驗證狀態請以 [README.md](README.md) 及
+> [GitHub Releases](https://github.com/wwintj/lumen/releases) 的發布說明為準。
+>
+> 本檔案保留原樣以供沿革查考，內容**未**隨後續版本更新。
+
 Phase 1.2: deploy to a real WordPress environment and validate.
 
 ## Environment

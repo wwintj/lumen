@@ -1,5 +1,14 @@
 # Lumen Project State
 
+> **⚠️ 歷史檔案（Historical archive）—— 請勿視為現況。**
+>
+> 本文件記錄的是 **Lumen 0.2.0** 時期的專案狀態，**不是**目前版本。
+> 目前的正式版本為 **1.1.0**；最新狀態請以
+> [GitHub Releases](https://github.com/wwintj/lumen/releases) 與
+> [README.md](README.md) 為準。
+>
+> 本檔案保留原樣以供沿革查考，內容**未**隨後續版本更新。
+
 ## 1. Project
 
 Project:

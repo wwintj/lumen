@@ -4,7 +4,7 @@ Contributor URI: https://github.com/wwintj
 Author: Lumen Team
 Author URI: https://github.com/wwintj
 Homepage URL: https://github.com/wwintj/lumen
-Version: 1.1.0
+Version: 1.1.1
 Requires at least: 6.3
 Tested up to: 6.7
 Requires PHP: 8.2
@@ -14,7 +14,7 @@ Text Domain: lumen
 Domain Path: /
 Tags: blog, content, minimalist, responsive-layout, custom-menu, translation-ready, rss-icons
 
-極簡、對 SEO 友善的內容部落格佈景主題，專為中英雙語網站設計。1.1.0 為 Lumen 的正式穩定版本，提供歸檔與搜尋核心正確性、文字優先的閱讀排版，以及零 Theme JavaScript 的設計。
+極簡、對 SEO 友善的內容部落格佈景主題，專為中英雙語網站設計。1.1.1 為 Lumen 的正式穩定版本，在 1.1.0 的歸檔與搜尋核心正確性、文字優先閱讀排版，以及零 Theme JavaScript 設計之上，新增頁首圖示式可展開搜尋，並將 Header／Footer 字體統一為與正文相同的閱讀字體系統。
 
 == Features ==
 * 語意化 HTML5 結構（header、nav、main、article、section、footer）。
@@ -53,6 +53,24 @@ Tags: blog, content, minimalist, responsive-layout, custom-menu, translation-rea
 具體功能（自訂內容類型、表單、REST API）僅在出現明確需求時，才於後續階段加入（YAGNI）。
 
 == Changelog ==
+* 1.1.1 (Stable release)
+  * 新增頁首圖示式可展開搜尋：預設僅顯示放大鏡圖示，點擊（或以鍵盤 Enter／Space）後
+    展開搜尋輸入框，再次啟用即收合。以原生 HTML `<details>`／`<summary>` 實作，
+    **未新增任何 Theme JavaScript**，亦未自行維護 `aria-expanded`。
+  * 搜尋沿用 WordPress 原生 GET 搜尋（`action` 為 `home_url( '/' )`、參數 `s`），
+    未使用 Ajax、REST API 或任何外部搜尋服務；亦未新增外掛依賴。
+  * 頁首搜尋表單使用獨立的 HTML `id`（`lumen-header-search-input`），
+    與搜尋結果頁面原有的 `lumen-search` 並存時**不產生重複 id**；
+    `lumen_search_form()` 無參數呼叫的既有行為完全不變。
+  * Header／Footer 閱讀字體統一：網站標題、頁首導覽，以及頁尾導覽、版權宣告、
+    RSS 連結皆改用既有變數 `--lumen-font-reading`，與正文形成一致的閱讀字型系統。
+  * 網站標題字重自 700 調整為 400，避免明體類中文字型被瀏覽器套用合成的粗體
+    （synthetic bold）而使筆畫模糊；字級與版面結構均未變更。
+  * 未新增字型檔案或 CDN，維持本主題不捆綁字型的政策；正文、文章標題、
+    摘要、留言區、Gutenberg 內容、搜尋頁與程式碼區塊的字體均未受影響。
+  * 完善公開倉庫文件：README 補充 `main` 開發內容與最新正式 Release 的區別說明，
+    並修正已過時的發布政策敘述。
+  * 本版本未變更任何歸檔／搜尋的 PHP 查詢行為，亦未變更 `theme.json`。
 * 1.1.0 (Stable release)
   * 版本識別自 1.1.0-beta.1 調整為正式穩定版 1.1.0（`style.css` 標頭、`LUMEN_VERSION` 常數、本文件一致）。
   * 保留既有功能：歸檔／分類／標籤／搜尋核心正確性、單篇文章與頁面的文字優先閱讀排版，

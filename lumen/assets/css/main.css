@@ -820,35 +820,43 @@ body.category .lumen-post-list > li + li {
 }
 
 /* ============================================================
-   Date / category pills — Blog Home, archive lists, search results
+   Date / category pills — Blog Home, archive lists, search results,
+   and the Single post header
 
-   Scoped to the three list contexts only. Single post meta
-   (.lumen-single-meta) is deliberately NOT included and keeps its
-   original inline reading style.
+   The list contexts and the Single post header share one pill language:
+   grey date pill + green category pill(s), no middle-dot separator.
+   The selectors are listed per context (never as a bare
+   `.lumen-post-date`) so the pill language stays scoped to these four
+   meta rows and cannot leak into other date/category output.
    ============================================================ */
 
 .lumen-home-meta,
-.lumen-post-meta {
+.lumen-post-meta,
+.lumen-single-meta {
 	align-items: center;
 	gap: 8px;
 }
 
-/* Remove the legacy middle-dot separator and the margin that spaced it,
-   in the list contexts only (Single keeps its own separator). */
+/* No middle-dot separator and no separator margin in any pill context.
+   (Single post header previously drew its own '\00B7' here.) */
 .lumen-home-meta .lumen-post-cats,
-.lumen-post-meta .lumen-post-cats {
+.lumen-post-meta .lumen-post-cats,
+.lumen-single-meta .lumen-post-cats {
 	margin-left: 0;
 	gap: 8px;
+	align-items: center;
 }
 
 .lumen-home-meta .lumen-post-cats::before,
-.lumen-post-meta .lumen-post-cats::before {
+.lumen-post-meta .lumen-post-cats::before,
+.lumen-single-meta .lumen-post-cats::before {
 	content: none;
 }
 
 /* Date pill (grey). */
 .lumen-home-meta .lumen-post-date,
-.lumen-post-meta .lumen-post-date {
+.lumen-post-meta .lumen-post-date,
+.lumen-single-meta .lumen-post-date {
 	display: inline-block;
 	padding: 4px 10px;
 	font-size: 13px;
@@ -861,10 +869,11 @@ body.category .lumen-post-list > li + li {
 /* Category pills (green), each one its own pill inside the wrapper.
    The wrapper stays inline-flex + wrap so multiple categories never end up
    inside one big pill. The `a` variants are listed explicitly because the
-   legacy `.lumen-post-meta a { color: inherit }` rule would otherwise pull
-   the pill text down to the muted body colour. */
+   legacy `.lumen-post-meta a { color: inherit }` / `.lumen-single-meta a`
+   rules would otherwise pull the pill text down to the muted body colour. */
 .lumen-home-meta .lumen-post-cats,
-.lumen-post-meta .lumen-post-cats {
+.lumen-post-meta .lumen-post-cats,
+.lumen-single-meta .lumen-post-cats {
 	display: inline-flex;
 	flex-wrap: wrap;
 	align-items: center;
@@ -873,7 +882,9 @@ body.category .lumen-post-list > li + li {
 .lumen-home-meta .lumen-post-cat,
 .lumen-home-meta a.lumen-post-cat,
 .lumen-post-meta .lumen-post-cat,
-.lumen-post-meta a.lumen-post-cat {
+.lumen-post-meta a.lumen-post-cat,
+.lumen-single-meta .lumen-post-cat,
+.lumen-single-meta a.lumen-post-cat {
 	display: inline-block;
 	padding: 4px 10px;
 	font-size: 13px;
@@ -886,8 +897,10 @@ body.category .lumen-post-list > li + li {
 
 .lumen-home-meta a.lumen-post-cat:hover,
 .lumen-post-meta a.lumen-post-cat:hover,
+.lumen-single-meta a.lumen-post-cat:hover,
 .lumen-home-meta .lumen-post-cat:hover,
-.lumen-post-meta .lumen-post-cat:hover {
+.lumen-post-meta .lumen-post-cat:hover,
+.lumen-single-meta .lumen-post-cat:hover {
 	color: #176d39;
 	background: #d3ebda;
 	opacity: 1;
@@ -934,10 +947,14 @@ body.category .lumen-post-list > li + li {
 	margin-bottom: 0.75rem;
 }
 
+/* Single post header meta: same pill language as the list contexts
+   (grey date pill + green category pill). The legacy inline reading style
+   and the middle-dot separator are gone; the slug-specific rules live in
+   the shared pill block above. Only the container metrics stay here. */
 .lumen-single-meta {
 	display: flex;
 	flex-wrap: wrap;
-	align-items: baseline;
+	align-items: center;
 	font-family: var(--lumen-font-reading);
 	font-weight: 400;
 	font-size: 0.875rem;
@@ -947,29 +964,6 @@ body.category .lumen-post-list > li + li {
 
 .lumen-single-meta .lumen-post-date {
 	font-variant-numeric: tabular-nums;
-}
-
-.lumen-single-meta .lumen-post-cats {
-	display: inline-flex;
-	align-items: baseline;
-	gap: 0.5rem;
-	margin-left: 0.25rem;
-}
-
-/* Middle dot between date and categories; only appears when categories render. */
-.lumen-single-meta .lumen-post-cats::before {
-	content: '\00B7';
-}
-
-.lumen-single-meta .lumen-post-cat {
-	font-size: 0.875rem;
-	color: var(--lumen-muted);
-	text-decoration: none;
-	transition: color var(--lumen-duration);
-}
-
-.lumen-single-meta .lumen-post-cat:hover {
-	color: var(--lumen-fg);
 }
 
 .lumen-post-body,
@@ -1314,13 +1308,21 @@ body.category .lumen-post-list > li + li {
 }
 
 /* ============================================================
-   Comments
+   Comments — v1.1.15 minimal redesign
    ============================================================
-   Reads Core's native comment DOM (xhtml format): bare <li> items are now
-   wrapped in a semantic <ol.lumen-comment-list>; nested replies use Core's
-   <ul class="children">. Only the real Core classes are targeted; the
-   .lumen-comment-author / .lumen-comment-date / top-level .lumen-comment-list
-   selectors formerly here never matched and are replaced below. */
+   Reads Core's native comment DOM (xhtml format): bare <li> items are wrapped
+   in a semantic <ol.lumen-comment-list>; nested replies use Core's
+   <ul class="children">. Only real Core classes are targeted.
+
+   Visual language: calm, soft, unified with the rest of Lumen.
+     - comment text sits in a light-grey "chat bubble" (WhatsApp-like, but
+       still a blog: no tails, no saturated colours, no heavy shadow)
+     - dashed light-grey rules separate one comment from the next
+     - author name is a grey pill, date + Reply sit on the same compact row
+     - Reply is a soft green pill (same family as the category pill)
+
+   No heading is rendered at all (see comments.php): "Comments",
+   "Comments (N)" and "Leave a comment" are gone. */
 
 /* Section: clear separation from the Previous/Next nav. No card, no shadow. */
 .lumen-comments {
@@ -1331,14 +1333,10 @@ body.category .lumen-post-list > li + li {
 	border-top: 1px solid var(--lumen-border);
 }
 
-/* Section title — sans UI label, not reading content. */
-.lumen-comments-title {
-	font-family: var(--lumen-sans);
-	font-size: 1.5rem;
-	font-weight: 400;
-	line-height: 1.5;
-	color: var(--lumen-fg);
-	margin: 0 0 1.5rem;
+/* The section heading is intentionally absent. The rule is kept (harmless) so
+   an empty Core/plugin-injected title never inherits a stray 1.5rem block. */
+.lumen-comments-title:empty {
+	display: none;
 }
 
 /* Top-level list container (semantic <ol> for the bare <li> items). */
@@ -1347,10 +1345,13 @@ body.category .lumen-post-list > li + li {
 	margin: 0;
 	padding: 0;
 }
+
+/* Dashed rule *between* comments — drawn on the item, never across the bubble
+   (the bubble is a child of .comment-body, so the rule stays in the gap). */
 .lumen-comment-list > li {
 	margin: 0;
-	padding: 1.25rem 0;
-	border-top: 1px solid var(--lumen-border);
+	padding: 1.5rem 0;
+	border-top: 1px dashed var(--lumen-border);
 }
 .lumen-comment-list > li:first-child {
 	padding-top: 0;
@@ -1362,48 +1363,96 @@ body.category .lumen-post-list > li + li {
 	margin: 0;
 }
 
-/* Author: sans UI layer, no card. */
-.lumen-comments .comment-author {
+/* ------------------------------------------------------------
+   Compact header row: author pill · date · Reply
+   ------------------------------------------------------------ */
+
+/* Core emits .comment-author, .comment-meta and .reply as separate blocks.
+   We make the item a containing block and float-free-position them onto one
+   flex row via the item's own flex context: .comment-body becomes the row
+   owner and the three children become row items.
+
+   Avatar: Core prints it inside .comment-author. A 48px gravatar next to a
+   compact pill row made the header two-storey and broke the minimal,
+   calm look that this round asks for, so the avatar is *visually* hidden
+   (not removed from the DOM). Screen readers and Core's own markup are
+   unaffected; the author pill carries the identity instead. */
+.lumen-comments .comment-body {
 	display: flex;
-	align-items: baseline;
-	gap: 0.5rem;
 	flex-wrap: wrap;
-	margin: 0 0 0.35rem;
+	align-items: center;
+	column-gap: 0.5rem;
+	row-gap: 0.35rem;
 }
+
+.lumen-comments .comment-author {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin: 0;
+	min-width: 0;
+}
+
 .lumen-comments .comment-author .avatar {
-	flex: 0 0 auto;
-	width: 48px;
-	height: 48px;
-	border-radius: 50%;
-	object-fit: cover;
-	/* no border, no shadow, no frame */
+	/* Visually hidden, still in the accessibility tree. */
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	clip-path: inset(50%);
+	white-space: nowrap;
+	border: 0;
 }
-.lumen-comments .comment-author .fn a,
-.lumen-comments .comment-author .fn {
-	font-family: var(--lumen-sans);
-	font-size: 0.925rem;
-	font-weight: 500;
-	color: var(--lumen-fg);
-}
+
+/* Author name → grey pill (the theme's pill family, calmer than the green
+   category pill; the green is reserved for actions like Reply / submit). */
+.lumen-comments .comment-author .fn,
 .lumen-comments .comment-author .fn a {
+	display: inline-block;
+	padding: 2px 10px;
+	font-family: var(--lumen-sans);
+	font-size: 0.8125rem;
+	font-weight: 500;
+	line-height: 1.5;
+	color: var(--lumen-comment-pill-fg);
+	background: var(--lumen-comment-pill);
+	border-radius: 999px;
 	text-decoration: none;
 }
 .lumen-comments .comment-author .fn a:hover {
-	color: var(--lumen-fg-soft);
-}
-.lumen-comments .comment-author .says {
-	font-family: var(--lumen-sans);
-	font-size: 0.8rem;
-	color: var(--lumen-muted);
+	color: #2f3337;
+	background: #e6e8ea;
 }
 
-/* Metadata: date + optional edit link. Sans, muted, tabular numerals. */
+/* Core's "says" is decorative connective text — keep it for screen readers,
+   drop it from the visual compact row. */
+.lumen-comments .comment-author .says {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	clip-path: inset(50%);
+	white-space: nowrap;
+	border: 0;
+}
+
+/* Date (and optional edit link): quiet, same row, tabular numerals. */
 .lumen-comments .comment-meta {
-	margin: 0 0 0.5rem;
+	display: inline-flex;
+	align-items: baseline;
+	gap: 0.5rem;
+	margin: 0;
 	font-family: var(--lumen-sans);
 }
-.lumen-comments .comment-meta a {
-	font-size: 0.8rem;
+.lumen-comments .comment-meta a,
+.lumen-comments .comment-meta .comment-date {
+	font-size: 0.7875rem;
 	color: var(--lumen-muted);
 	font-variant-numeric: tabular-nums;
 	text-decoration: none;
@@ -1422,24 +1471,52 @@ body.category .lumen-post-list > li + li {
 	color: var(--lumen-fg);
 }
 
-/* Awaiting moderation: quiet, not error-red. */
+/* Awaiting moderation: quiet, not error-red. Own row under the header. */
 .lumen-comments .comment-awaiting-moderation {
+	flex: 0 0 100%;
 	font-family: var(--lumen-sans);
 	font-size: 0.8rem;
 	color: var(--lumen-muted);
-	margin: 0.25rem 0 0.5rem;
+	margin: 0;
 }
 
-/* Comment text: reading content — FangSong / 仿宋, same reading language. */
+/* ------------------------------------------------------------
+   Comment text — light grey chat bubble
+   ------------------------------------------------------------ */
+
+/* The bubble spans the full row (flex-basis 100%) so it always starts on a
+   new line under the header row, whatever the header wraps to. Soft grey,
+   generous radius, no hard border, no heavy shadow. Comment text is
+   direct-child <p> of .comment-body (Core's format); the bubble is drawn by
+   the first paragraph so paragraphs inside the comment stack inside the
+   bubble instead of each becoming its own bubble. */
+.lumen-comments .comment-body > p {
+	flex: 0 0 100%;
+	width: 100%;
+	margin: 0;
+	padding: 0.75rem 0.95rem;
+	background: var(--lumen-comment-bubble);
+	border-radius: 14px;
+}
+
+/* Subsequent paragraphs (and pre blocks) join the bubble visually. */
+.lumen-comments .comment-body > p + p,
+.lumen-comments .comment-body > pre {
+	flex: 0 0 100%;
+	width: 100%;
+	margin: 0;
+}
+
 .lumen-comments .comment-body p {
 	font-family: var(--lumen-font-reading);
 	font-size: 1rem;
 	font-weight: 400;
 	line-height: 1.85;
 	color: var(--lumen-fg);
-	margin: 0 0 0.9rem;
 }
-.lumen-comments .comment-body p:last-child {
+
+/* Keep a single trailing margin reset for the last text block. */
+.lumen-comments .comment-body > :last-child {
 	margin-bottom: 0;
 }
 
@@ -1448,7 +1525,7 @@ body.category .lumen-post-list > li + li {
 	color: var(--lumen-muted);
 	text-decoration: underline;
 	text-decoration-thickness: 1px;
-	text-decoration-offset: 0.18em;
+	text-underline-offset: 0.18em;
 }
 .lumen-comments .comment-body p a:hover {
 	color: var(--lumen-fg);
@@ -1456,21 +1533,49 @@ body.category .lumen-post-list > li + li {
 
 /* Inline code: mono, never overflows. (pre/code already styled globally.) */
 .lumen-comments .comment-body pre {
-	margin-bottom: 0.9rem;
-}
-.lumen-comments .comment-body pre:last-child {
-	margin-bottom: 0;
+	overflow-x: auto;
 }
 
-/* Reply link: sans UI, quiet, hover lifts to fg. */
-.lumen-comments .reply .comment-reply-link {
+/* Reply link → soft green pill. On the header row, pushed to the end so the
+   row reads author · date ............ Reply, and wraps gracefully on narrow
+   screens instead of squeezing the pills.
+
+   IMPORTANT — Core's source order inside .comment-body is:
+       .comment-author  .comment-meta  <p>  .reply
+   i.e. the Reply link comes *after* the comment text. The bubble <p> is made
+   full-width (flex-basis 100%), so without an explicit order the Reply link
+   would be pushed onto the line below the bubble. `order` re-sequences the
+   flex row visually (author → date → Reply, then the bubble) without touching
+   Core's markup, so Reply still targets exactly the same element. */
+.lumen-comments .comment-body > .comment-author { order: 1; }
+.lumen-comments .comment-body > .comment-meta   { order: 2; }
+.lumen-comments .comment-body > .reply          { order: 3; }
+.lumen-comments .comment-body > p,
+.lumen-comments .comment-body > pre,
+.lumen-comments .comment-body > blockquote,
+.lumen-comments .comment-body > .comment-awaiting-moderation { order: 4; }
+
+.lumen-comments .reply {
+	display: inline-flex;
+	align-items: center;
+	margin: 0 0 0 auto;
 	font-family: var(--lumen-sans);
-	font-size: 0.8rem;
-	color: var(--lumen-muted);
+}
+.lumen-comments .reply .comment-reply-link {
+	display: inline-block;
+	padding: 2px 12px;
+	font-family: var(--lumen-sans);
+	font-size: 0.7875rem;
+	font-weight: 500;
+	line-height: 1.5;
+	color: var(--lumen-comment-green-fg);
+	background: var(--lumen-comment-green);
+	border-radius: 999px;
 	text-decoration: none;
 }
 .lumen-comments .reply .comment-reply-link:hover {
-	color: var(--lumen-fg);
+	color: var(--lumen-comment-green-fg);
+	background: var(--lumen-comment-green-hover);
 }
 
 /* Empty / closed state. */
@@ -1482,44 +1587,64 @@ body.category .lumen-post-list > li + li {
 	margin: 0;
 }
 
-/* Nested threading: a left guide per level. No top border on nested items;
-   the <ul class="children"> supplies the guide. Each level indents a modest
-   amount so 3-4 deep replies stay readable (no infinite indentation). */
+/* ------------------------------------------------------------
+   Nested threading: dashed guide per level, modest indent, same styling.
+   ------------------------------------------------------------ */
 .lumen-comments li > ul.children,
 .lumen-comments li > ol.children {
 	list-style: none;
-	margin: 0.6rem 0 0 1.25rem;
+	margin: 0.75rem 0 0 1.1rem;
 	padding: 0;
-	padding-left: 1.25rem;
-	border-left: 1px solid var(--lumen-border);
+	padding-left: 1.1rem;
+	border-left: 1px dashed var(--lumen-border);
 }
 .lumen-comments ul.children > li,
 .lumen-comments ol.children > li {
 	margin: 0;
-	padding: 0.5rem 0;
+	padding: 0.75rem 0;
+}
+.lumen-comments ul.children > li:first-child,
+.lumen-comments ol.children > li:first-child {
+	padding-top: 0;
 }
 @media (max-width: 480px) {
 	.lumen-comments li > ul.children,
 	.lumen-comments li > ol.children {
-		margin: 0.4rem 0 0 0.6rem;
-		padding-left: 0.85rem;
+		margin: 0.5rem 0 0 0.5rem;
+		padding-left: 0.7rem;
 	}
 	.lumen-comments ul.children > li,
 	.lumen-comments ol.children > li {
-		padding: 0.5rem 0;
+		padding: 0.6rem 0;
 	}
 }
 
-/* Comment form: sans UI throughout, no card. */
+/* ------------------------------------------------------------
+   Comment form — minimal, unified, no harsh WordPress default look
+   ------------------------------------------------------------ */
 .lumen-comment-form-wrap {
-	margin-top: 2.5rem;
+	margin-top: 2rem;
 }
+
+/* The visible "Leave a Reply" heading is removed (title_reply => ''), but
+   Core still prints <h3 id="reply-title">. Collapse it when it carries no
+   content so it adds no gap; once the visitor clicks Reply on a comment, Core
+   injects the cancel-reply link and the h3 renders as a small quiet row.
+   (:has() is used only as a progressive enhancement — the :empty rule above
+   it already covers the real, whitespace-free empty case.) */
 .lumen-comments .comment-reply-title {
-	font-family: var(--lumen-font-reading);
-	font-size: 1.3rem;
-	font-weight: 400;
+	font-family: var(--lumen-sans);
+	font-size: 0.9rem;
+	font-weight: 500;
 	line-height: 1.5;
-	margin: 0 0 1.25rem;
+	color: var(--lumen-muted);
+	margin: 0 0 0.75rem;
+}
+.lumen-comments .comment-reply-title:empty {
+	display: none;
+}
+.lumen-comments .comment-reply-title:not(:has(a)):not(:has(small)) {
+	display: none;
 }
 .lumen-comments .comment-reply-title small {
 	font-size: 0.75rem;
@@ -1535,67 +1660,127 @@ body.category .lumen-post-list > li + li {
 	color: var(--lumen-fg);
 }
 
+/* Notes: Core's required-field / email-privacy sentences, kept small and
+   quiet (they are re-enabled in comments.php for guest commenters). */
 .lumen-comments .comment-notes,
 .lumen-comments .comment-notes .required-field-message {
-	font-size: 0.8rem;
-	color: var(--lumen-muted);
-	margin: 0 0 0.75rem;
-}
-.lumen-comments #commentform p {
-	margin: 0 0 1rem;
-}
-.lumen-comments #commentform label {
-	display: block;
 	font-family: var(--lumen-sans);
-	font-size: 0.9rem;
-	font-weight: 500;
+	font-size: 0.7875rem;
+	color: var(--lumen-muted);
+	margin: 0 0 0.85rem;
+}
+
+.lumen-comments #commentform p {
+	margin: 0 0 0.85rem;
+}
+
+/* Labels are kept in the DOM for accessibility but visually hidden: the
+   placeholder + autocomplete carry the visible affordance (E.2/E.3). */
+.lumen-comments #commentform > p > label,
+.lumen-comments #commentform .comment-form-comment > label,
+.lumen-comments #commentform .comment-form-author > label,
+.lumen-comments #commentform .comment-form-email > label,
+.lumen-comments #commentform .comment-form-url > label {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	clip-path: inset(50%);
+	white-space: nowrap;
+	border: 0;
+}
+
+/* Fields: one unified soft style — light grey fill, hairline border, pill-ish
+   radius. This replaces the harsh black-and-white WordPress default. */
+.lumen-comments #commentform input[type="text"],
+.lumen-comments #commentform input[type="email"],
+.lumen-comments #commentform input[type="url"],
+.lumen-comments #commentform textarea {
+	width: 100%;
+	max-width: 100%;
+	padding: 0.6rem 0.9rem;
+	font-family: var(--lumen-font-reading);
+	font-size: 0.95rem;
+	line-height: 1.7;
 	color: var(--lumen-fg);
-	margin-bottom: 0.35rem;
+	background: #f7f8f8;
+	border: 1px solid var(--lumen-border);
+	border-radius: 12px;
+	box-shadow: none;
+	transition: border-color var(--lumen-duration), background var(--lumen-duration);
+}
+.lumen-comments #commentform textarea {
+	border-radius: 14px;
+	min-height: 7.5rem;
+	resize: vertical;
+}
+.lumen-comments #commentform input[type="text"]:focus,
+.lumen-comments #commentform input[type="email"]:focus,
+.lumen-comments #commentform input[type="url"]:focus,
+.lumen-comments #commentform textarea:focus {
+	background: #fff;
+	border-color: #b9c2c6;
+	outline: none;
+}
+.lumen-comments #commentform input::placeholder,
+.lumen-comments #commentform textarea::placeholder {
+	color: #9aa1a7;
+	opacity: 1;
+}
+
+/* Cookies consent: quiet inline row. */
+.lumen-comments #commentform input[type="checkbox"] {
+	flex: 0 0 auto;
+	vertical-align: baseline;
 }
 .lumen-comments #commentform .cookies-consent-text,
 .lumen-comments .comment-form-cookies-consent label {
 	font-weight: 400;
 }
-
-.lumen-comments #commentform input[type="checkbox"] {
-	flex: 0 0 auto;
-	vertical-align: baseline;
-}
-
 .lumen-comments .comment-form-cookies-consent {
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
-	margin: 0 0 1rem;
-	font-size: 0.8rem;
-	color: var(--lumen-fg);
+	margin: 0 0 0.85rem;
+	font-family: var(--lumen-sans);
+	font-size: 0.7875rem;
+	color: var(--lumen-muted);
 }
 .lumen-comments .comment-form-cookies-consent label {
 	margin-bottom: 0;
 }
 
-/* Submit button reuses the theme's primary-button language. */
+/* Submit: soft green pill — the same family as the category / Reply pills,
+   replacing the former hard black button. */
 .lumen-comments .form-submit {
 	margin: 0;
 }
 .lumen-comments .form-submit input,
 .lumen-comments .form-submit button {
-	font: inherit;
 	font-family: var(--lumen-sans);
-	font-size: 0.9rem;
+	font-size: 0.875rem;
 	font-weight: 500;
-	padding: 0.5em 1.1em;
-	border: 1px solid var(--lumen-fg);
-	border-radius: var(--lumen-radius);
-	background: var(--lumen-fg);
-	color: #fff;
+	line-height: 1.5;
+	padding: 0.5em 1.35em;
+	color: var(--lumen-comment-green-fg);
+	background: var(--lumen-comment-green);
+	border: 1px solid #cfe8d7;
+	border-radius: 999px;
 	cursor: pointer;
+	transition: background var(--lumen-duration), border-color var(--lumen-duration);
 }
 .lumen-comments .form-submit input:hover,
 .lumen-comments .form-submit button:hover {
-	opacity: 0.9;
+	color: var(--lumen-comment-green-fg);
+	background: var(--lumen-comment-green-hover);
+	border-color: #bfe0cb;
 }
-.lumen-comments .form-submit input:focus-visible {
+.lumen-comments .form-submit input:focus-visible,
+.lumen-comments .form-submit button:focus-visible {
+	outline: 2px solid var(--lumen-comment-green-fg);
 	outline-offset: 2px;
 }
 

@@ -130,3 +130,66 @@ if ( ! function_exists( 'lumen_search_icon_svg' ) ) {
 			. '</svg>';
 	}
 }
+
+if ( ! function_exists( 'lumen_comment_form_defaults' ) ) {
+	add_filter( 'comment_form_defaults', 'lumen_comment_form_defaults' );
+
+	/**
+	 * Comments (v1.1.15) — remove the visible headings and add a placeholder.
+	 *
+	 * Scope: this filter runs for every comment_form() call in the theme, which
+	 * is only the one in comments.php. It changes *presentation strings and
+	 * attributes*, never the permission model:
+	 *
+	 *   - 'title_reply' is emptied, so no "Leave a Reply"/"Leave a comment"
+	 *     heading is printed. Core still emits <h3 id="reply-title">, which
+	 *     keeps the canonical anchor and the cancel-reply target intact.
+	 *   - Core's own field labels are NOT removed. They stay in the DOM and are
+	 *     visually hidden by CSS, so the placeholder never becomes the only
+	 *     accessible name (WCAG 3.3.2 / 1.3.1).
+	 *   - Whether Name / Email / Website are shown, and whether they are
+	 *     required, is decided entirely by Core from the site's Discussion
+	 *     settings (comment_registration / require_name_email). Nothing here
+	 *     overrides that.
+	 *
+	 * @param array $defaults Core's comment form defaults.
+	 * @return array
+	 */
+	function lumen_comment_form_defaults( $defaults ) {
+		$defaults['title_reply'] = '';
+
+		// Keep Core's semantic wrapper so #reply-title and the cancel link
+		// survive; the CSS collapses the element while it is empty.
+		$defaults['title_reply_before'] = '<h3 id="reply-title" class="comment-reply-title">';
+		$defaults['title_reply_after']  = '</h3>';
+
+		// The "Required fields are marked *" sentence is useful to guests, so it
+		// stays; only the redundant heading text is dropped.
+		return $defaults;
+	}
+}
+
+if ( ! function_exists( 'lumen_comment_form_field' ) ) {
+	add_filter( 'comment_form_field_comment', 'lumen_comment_form_field' );
+
+	/**
+	 * Add the "Write your comment..." placeholder to Core's textarea.
+	 *
+	 * The placeholder is a convenience only: Core's real <label for="comment">
+	 * is left untouched in the markup (and visually hidden by CSS), so the
+	 * field always has a programmatic accessible name.
+	 *
+	 * @param string $field Core's rendered textarea paragraph.
+	 * @return string
+	 */
+	function lumen_comment_form_field( $field ) {
+		if ( false !== strpos( $field, 'placeholder=' ) ) {
+			return $field;
+		}
+		return str_replace(
+			'<textarea ',
+			'<textarea placeholder="' . esc_attr__( 'Write your comment...', 'lumen' ) . '" ',
+			$field
+		);
+	}
+}

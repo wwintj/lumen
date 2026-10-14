@@ -14,6 +14,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<header class="lumen-post-header">
 		<h1 class="lumen-post-title"><?php the_title(); ?></h1>
 
+		<!--
+			Meta: grey date pill + green category pill(s), the same pill
+			language as the Blog Home / archive / search list meta. There is
+			deliberately no separator glyph between them — the original
+			middle dot was removed in v1.1.15 (it was drawn by CSS on
+			.lumen-single-meta .lumen-post-cats::before).
+		-->
 		<div class="lumen-single-meta">
 			<?php lumen_post_date(); ?>
 			<?php lumen_post_categories(); ?>

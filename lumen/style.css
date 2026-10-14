@@ -4,7 +4,7 @@ Theme URI: https://github.com/wwintj/lumen
 Author: Lumen Team
 Author URI: https://github.com/wwintj
 Description: Lumen is a minimalist, SEO-friendly content blog theme for a bilingual (EN/CN) site. Semantic structure, fast loading, mobile-first, and designed to pair with a thin companion plugin.
-Version: 1.1.14
+Version: 1.1.15
 Requires at least: 6.3
 Requires PHP: 8.2
 Text Domain: lumen
@@ -27,6 +27,15 @@ Tags: blog, content, minimalist, responsive-layout, custom-menu, translation-rea
 	--lumen-accent: #1b1b1b;
 	--lumen-accent-hover: #555555;
 	--lumen-link: #1b1b1b;
+
+	/* Comments (v1.1.15): soft light-grey chat-bubble family + green pill
+	   actions. Kept as tokens so the comment block stays one visual system. */
+	--lumen-comment-bubble: #f3f4f5;
+	--lumen-comment-pill: #f0f1f2;
+	--lumen-comment-pill-fg: #52565c;
+	--lumen-comment-green: #e0f3e5;
+	--lumen-comment-green-hover: #d3ebda;
+	--lumen-comment-green-fg: #176d39;
 
 	/* Type */
 	--lumen-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;

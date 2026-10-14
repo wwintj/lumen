@@ -1423,24 +1423,23 @@ body.category .lumen-post-list > li + li {
    name look slanted — so font-style is normalised here. There is deliberately
    no :hover rule: the name is static text, not a control.
 
-   v1.1.17 (C): the requested change is a name that reads twice as large. The
-   measured computed font-size in v1.1.16 was 13px, so this is 13 * 2 = 26px
-   (1.625rem) — exactly the doubled value, not an approximation. The pill keeps
-   its 1px/10px padding, its 999px radius, its single layer and its normal
-   weight, so it stays one quiet capsule; only the type grows. line-height is
-   pinned to 1.2 (instead of 1.5) because at 26px the inherited 1.5 would push
-   the 999px radius past a true capsule and make the pill noticeably taller
-   than the date sitting beside it. 26px * 1.2 still leaves the glyph box
-   taller than the 13px date text, so the doubling is unmistakable on screen
-   while the row stays on one line. */
+   v1.1.17 (C) doubled this to 26px. v1.1.18 (A) reverses that: production
+   feedback was that 26px reads far too large beside the date, so the size is
+   now 1.0625rem, i.e. exactly 17px in a 16px-root document. Everything that
+   made the pill safe is untouched - the 1px/10px padding, the 999px radius,
+   the single layer, the normal weight, the static text and the absence of any
+   :hover rule - so this changes the type size and nothing else. line-height
+   returns to 1.4, which at 17px keeps the capsule a true capsule and still
+   leaves it taller than the 12.6px date beside it, so the name stays the
+   visually dominant element on the meta row without dwarfing it. */
 .lumen-comments .comment-author .fn {
 	display: inline-block;
 	padding: 1px 10px;
 	font-family: var(--lumen-sans);
-	font-size: 1.625rem;
+	font-size: 1.0625rem;
 	font-style: normal;
 	font-weight: 500;
-	line-height: 1.2;
+	line-height: 1.4;
 	color: var(--lumen-comment-pill-fg);
 	background: var(--lumen-comment-pill);
 	border-radius: 999px;
@@ -1542,7 +1541,6 @@ body.category .lumen-post-list > li + li {
 
 /* Awaiting moderation: quiet, not error-red. Own row under the header. */
 .lumen-comments .comment-awaiting-moderation {
-	flex: 0 0 100%;
 	font-family: var(--lumen-sans);
 	font-size: 0.8rem;
 	color: var(--lumen-muted);
@@ -1559,69 +1557,156 @@ body.category .lumen-post-list > li + li {
    direct-child <p> of .comment-body (Core's format); the bubble is drawn by
    the first paragraph so paragraphs inside the comment stack inside the
    bubble instead of each becoming its own bubble. */
+/* The bubble is a grid item spanning both columns. Its right padding is the
+   normal 0.95rem PLUS the width of the action lane that overlays it, so the
+   first line of text stops before the pill. Because the padding applies to the
+   whole block, every following line also stops there and the copy reads as a
+   clean column beside the button; on a short comment that costs nothing,
+   because there is no second line at all. */
 .lumen-comments .comment-body > p {
-	flex: 0 0 100%;
 	width: 100%;
+	min-width: 0;
 	margin: 0;
 	padding: 0.375rem 0.95rem;
 	background: var(--lumen-comment-bubble);
 	border-radius: 14px;
 }
+/* Only a comment that actually has a Reply button reserves the lane, so a
+   comment the visitor cannot reply to keeps its full text width. */
+.lumen-comments .comment-body:has(> .reply) > p {
+	padding-right: calc(0.95rem + var(--lumen-reply-lane));
+}
 
 /* Subsequent paragraphs (and pre blocks) join the bubble visually. */
 .lumen-comments .comment-body > p + p,
 .lumen-comments .comment-body > pre {
-	flex: 0 0 100%;
 	width: 100%;
+	min-width: 0;
 	margin: 0;
 }
 
-/* v1.1.17 (E): the Reply link now sits INSIDE the comment's own bubble.
-   Core's markup is fixed and cannot be re-parented without abandoning
-   wp_list_comments(), so the association is made structurally instead of by
-   moving the node: the bubble becomes a positioning context and the Reply
-   row is laid into it at the bottom-right, inside the grey field, so the
-   button visually belongs to exactly one comment.
+/* v1.1.18 (C): the Reply action shares the FIRST line of the comment text
+   instead of occupying a dedicated second row.
 
-   The link is still Core's own .comment-reply-link produced by
-   get_comment_reply_link(), so clicking it still runs Core's comment-reply
-   script: #respond relocates, #comment_parent is set and Cancel reply works.
-   Nothing here fakes or intercepts that behaviour.
+   v1.1.17 absolutely positioned Reply at the bubble's bottom-right and paid for
+   it with 30.4px of reserved bottom padding. On a one-line comment that meant
+   an empty second row holding nothing but the button, which is exactly what
+   production feedback rejected.
 
-   Space for the button is reserved with padding on the bubble's last line so
-   a long comment never runs underneath it. */
-.lumen-comments .comment-body:has(> .reply) > p:last-of-type {
-	/* Reserve exactly the height of one Reply pill plus its bottom offset, so
-	   the last line of a comment never runs under the button. A fixed value
-	   would waste a whole empty line on a short comment, so it is expressed as
-	   the pill's own box: 21px pill + 6px offset + a 3px optical gap. */
-	padding-bottom: calc(21px + 0.4rem + 3px);
-}
-.lumen-comments .comment-body > .reply {
-	order: 4;
-	position: absolute;
-	right: 0.55rem;
-	bottom: 0.4rem;
-	z-index: 1;
-}
-/* The comment body must be the containing block for the overlaid Reply row. */
+   Core's DOM cannot be re-parented, so the association is made by LAYOUT: the
+   .comment-body becomes a 2-column grid whose second column is a fixed-width
+   action lane, and Reply is placed into row 2 / column 2 - the same grid row
+   the text bubble occupies. The bubble spans column 1, so the button sits on
+   the first line's right without ever overlapping a glyph, and because the
+   button lives inside the bubble's own grid row the grey field still encloses
+   it, which keeps the v1.1.17 "Reply belongs to this comment" reading.
+
+   Row 1 holds the header (author / date / edit) spanning both columns, so the
+   meta row is untouched. Subsequent paragraphs and <pre> blocks span both
+   columns and continue below the lane.
+
+   Column 2 is a fixed 4.25rem (68px) - comfortably wider than the ~58px pill -
+   and the bubble keeps its own 0.95rem side padding, so the gap between the
+   last glyph of line 1 and the pill is never less than ~16px.
+
+   `.comment-body` had `display: flex` before this rule; the grid replaces that
+   flex formatting context for comment bodies only. Nothing outside
+   .lumen-comments is affected.
+
+   The link is still Core's own .comment-reply-link from get_comment_reply_link(),
+   so clicking it still runs Core's comment-reply script: #respond relocates,
+   #comment_parent is set and Cancel reply works. Nothing here fakes or
+   intercepts that behaviour. */
 .lumen-comments .comment-body {
 	position: relative;
+	display: grid;
+	/* Column 2 is the action lane. Its width is a token so the grid track and
+	   the bubble's reserved right padding can never drift apart. */
+	grid-template-columns: minmax(0, 1fr) var(--lumen-reply-lane);
+	align-items: start;
 }
-/* Only a comment that actually has a bubble gets the absolute treatment; a
-   comment without any text must not lose its Reply button underneath. */
-.lumen-comments .comment-body:not(:has(> p)) > .reply {
+
+/* Header row spans the full width so the meta row behaves exactly as before. */
+.lumen-comments .comment-body > .comment-author,
+.lumen-comments .comment-body > .comment-meta {
+	grid-row: 1;
+	grid-column: 1 / -1;
+}
+
+/* The BUBBLE spans both columns, so the grey field still encloses the Reply
+   pill exactly as it did in v1.1.17. Only the TEXT inside it is inset on the
+   right, by an amount equal to the action lane, which is what puts Reply on
+   the first line without letting it overlap a glyph. */
+.lumen-comments .comment-body > p {
+	grid-row: 2;
+	grid-column: 1 / -1;
+}
+
+/* Reply rides in row 2, column 2 - i.e. on the first line's right, inside the
+   bubble's own row. */
+.lumen-comments .comment-body > .reply {
+	grid-row: 2;
+	grid-column: 2;
+	align-self: start;
+	justify-self: end;
 	position: static;
-	right: auto;
-	bottom: auto;
+	margin: 0;
+	/* Optically centre the pill against the first 15px/1.65 line box. */
+	margin-top: 0.1875rem;
+}
+
+/* Anything that is not the bubble continues below the lane, full width. */
+.lumen-comments .comment-body > p + p,
+.lumen-comments .comment-body > pre,
+.lumen-comments .comment-body > blockquote,
+.lumen-comments .comment-body > .comment-awaiting-moderation {
+	grid-column: 1 / -1;
+}
+
+/* A comment with no text still needs its Reply button reachable; without a
+   bubble there is no row 2 to share, so it simply flows full width. */
+.lumen-comments .comment-body:not(:has(> p)) > .reply {
+	grid-column: 1 / -1;
+	justify-self: start;
+	margin-top: 0.25rem;
+}
+
+/* On the narrowest screens the 68px action lane would leave too little room
+   for the text, so the lane shrinks and the pill stays put; below that the
+   button moves to its own line rather than squeezing the copy. */
+@media (max-width: 480px) {
+	.lumen-comments .comment-body {
+		grid-template-columns: minmax(0, 1fr) auto;
+	}
+	.lumen-comments .comment-body > .reply {
+		margin-top: 0.125rem;
+	}
 }
 
 .lumen-comments .comment-body p {
 	font-family: var(--lumen-font-reading);
-	font-size: 1rem;
+	/* v1.1.18 (B): comment copy is set to 15px with a 1.65 line-height, down
+	   from 16px / 1.85. In a 16px-root document 0.9375rem computes to exactly
+	   15px, so this is the real computed value and not a visual scale. The
+	   family, weight and colour are unchanged, as are the bubble background,
+	   its 14px radius, its horizontal padding and the compact vertical rhythm
+	   established in v1.1.16/1.1.17.
+
+	   Scoped to `.lumen-comments .comment-body p`, which reaches the top level
+	   and every nesting depth (children are just nested .comment-body
+	   elements). It does NOT reach the single-post body, Gutenberg content,
+	   the form textarea, the author pill, the date, the Edit pill, the Reply
+	   pill or the submit/cancel controls - each of those sets its own size and
+	   none of them is a `.comment-body p`. */
+	font-size: 0.9375rem;
 	font-weight: 400;
-	line-height: 1.85;
+	line-height: 1.65;
 	color: var(--lumen-fg);
+	/* v1.1.18 (C): a long unbroken string must never widen the page. This is
+	   the "very long continuous English string" case from the layout contract;
+	   without it a 36-character word repeated six times pushed the document
+	   scrollWidth to 1305px at a 390px viewport. */
+	overflow-wrap: anywhere;
 }
 
 /* Keep a single trailing margin reset for the last text block. */
@@ -1645,24 +1730,13 @@ body.category .lumen-post-list > li + li {
 	overflow-x: auto;
 }
 
-/* Reply link → soft green pill. On the header row, pushed to the end so the
-   row reads author · date ............ Reply, and wraps gracefully on narrow
-   screens instead of squeezing the pills.
-
-   IMPORTANT — Core's source order inside .comment-body is:
-       .comment-author  .comment-meta  <p>  .reply
-   i.e. the Reply link comes *after* the comment text. The bubble <p> is made
-   full-width (flex-basis 100%), so without an explicit order the Reply link
-   would be pushed onto the line below the bubble. `order` re-sequences the
-   flex row visually (author → date → Reply, then the bubble) without touching
-   Core's markup, so Reply still targets exactly the same element. */
-.lumen-comments .comment-body > .comment-author { order: 1; }
-.lumen-comments .comment-body > .comment-meta   { order: 2; }
-.lumen-comments .comment-body > .reply          { order: 3; }
-.lumen-comments .comment-body > p,
-.lumen-comments .comment-body > pre,
-.lumen-comments .comment-body > blockquote,
-.lumen-comments .comment-body > .comment-awaiting-moderation { order: 4; }
+/* Reply link → soft green pill.
+   v1.1.17 sequenced this row with flex `order`; v1.1.18 replaced that flex
+   formatting context with an explicit 2-column grid on .comment-body (see the
+   Feature C block above), so placement is now expressed as grid-row /
+   grid-column instead of `order`. The `order` declarations were removed rather
+   than left behind, because a stale `order` on a grid item is inert and would
+   have silently misled anyone reading this file later.
 
 .lumen-comments .reply {
 	display: inline-flex;
@@ -1802,7 +1876,14 @@ body.category .lumen-post-list > li + li {
 	font-weight: 500;
 	line-height: 1.5;
 	color: var(--lumen-muted);
-	margin: 0 0 0.75rem;
+	margin: 0;
+	/* v1.1.18 (D): the heading now always contains a visually hidden span (see
+	   lumen_comment_form_defaults), so it is never :empty. It must therefore
+	   contribute no height of its own - the span below is taken out of flow and
+	   the heading collapses to zero, leaving no blank placeholder between the
+	   comment list and the form. */
+	height: 0;
+	overflow: hidden;
 }
 .lumen-comments .comment-reply-title:empty {
 	display: none;
@@ -1810,6 +1891,24 @@ body.category .lumen-post-list > li + li {
 .lumen-comments .comment-reply-title:not(:has(a)):not(:has(small)) {
 	display: none;
 }
+/* The visually hidden label inside #reply-title. It exists purely so Core's
+   comment-reply.js finds a real firstChild to read (an empty heading throws a
+   TypeError there and aborts the form relocation). It must not be visible and
+   must not occupy space. This is the standard clipped pattern already used
+   elsewhere in this file for Core's own hidden labels. */
+.lumen-comments .comment-reply-title .screen-reader-text {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	clip-path: inset(50%);
+	white-space: nowrap;
+	border: 0;
+}
+
 .lumen-comments .comment-reply-title small {
 	font-size: 0.75rem;
 	font-weight: 400;
@@ -1918,8 +2017,17 @@ body.category .lumen-post-list > li + li {
 }
 
 /* Submit: soft green pill — the same family as the category / Reply pills,
-   replacing the former hard black button. */
+   replacing the former hard black button.
+
+   v1.1.18 (D): .form-submit is also the action ROW. Core's submit button and
+   the relocated native cancel link are siblings inside this <p>, so a flex row
+   places them side by side and lets them wrap naturally on narrow screens
+   (wrapping rather than hiding, so neither action is ever lost). */
 .lumen-comments .form-submit {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5rem;
 	margin: 0;
 }
 .lumen-comments .form-submit input,
@@ -1945,6 +2053,44 @@ body.category .lumen-post-list > li + li {
 .lumen-comments .form-submit input:focus-visible,
 .lumen-comments .form-submit button:focus-visible {
 	outline: 2px solid var(--lumen-comment-green-fg);
+	outline-offset: 2px;
+}
+
+/* v1.1.18 (D): the native cancel link, restyled as a soft-red pill sitting to
+   the RIGHT of Post Comment.
+
+   Core writes `style="display:none;"` inline on this anchor and its own
+   comment-reply.js toggles that inline style to reveal the control while a
+   reply is in progress. The inline style therefore must NOT be overridden
+   here - no `display:` declaration is set on the element itself, so Core keeps
+   full control of when it appears. The link is left in normal flow beside the
+   submit button and simply takes the pill shape.
+
+   Sizes are inherited from the same declarations as the submit button (0.875rem
+   type, 0.5em/1.35em padding, 1px border, 999px radius) so the two actions
+   measure identical heights without hard-coding a px value that could drift.
+   The border is a tint of the background rather than a hard edge. */
+.lumen-comments .form-submit #cancel-comment-reply-link {
+	font-family: var(--lumen-sans);
+	font-size: 0.875rem;
+	font-weight: 500;
+	line-height: 1.5;
+	padding: 0.5em 1.35em;
+	color: var(--lumen-comment-cancel-fg);
+	background: var(--lumen-comment-cancel);
+	border: 1px solid #f3d0d0;
+	border-radius: 999px;
+	text-decoration: none;
+	cursor: pointer;
+	transition: background var(--lumen-duration), border-color var(--lumen-duration);
+}
+.lumen-comments .form-submit #cancel-comment-reply-link:hover {
+	color: var(--lumen-comment-cancel-fg);
+	background: var(--lumen-comment-cancel-hover);
+	border-color: #eebcbc;
+}
+.lumen-comments .form-submit #cancel-comment-reply-link:focus-visible {
+	outline: 2px solid var(--lumen-comment-cancel-fg);
 	outline-offset: 2px;
 }
 

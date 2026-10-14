@@ -167,6 +167,48 @@ if ( ! function_exists( 'lumen_comment_form_defaults' ) ) {
 		$defaults['title_reply_before'] = '<h3 id="reply-title" class="comment-reply-title">';
 		$defaults['title_reply_after']  = '</h3>';
 
+		// v1.1.18 (D): the visible "Leave a Reply to <author>" heading is gone,
+		// but the heading element must NOT be emptied.
+		//
+		// wp-includes/js/comment-reply.js reads, inside addPlaceHolder():
+		//
+		//     var replyElement = getElementById( 'reply-title' );
+		//     var initialHeadingText = replyElement ? replyElement.firstChild.textContent : '';
+		//
+		// It dereferences `firstChild` unguarded. An empty <h3 id="reply-title">
+		// has firstChild === null, so that line throws a TypeError, addPlaceHolder
+		// never inserts the #wp-temp-form-div placeholder, and the rest of the
+		// Reply cycle breaks: #respond is not relocated, and the Cancel handler
+		// later bails out at its own `if ( ! temporaryElement ... ) return;`
+		// guard. Measured on this theme before the fix: wp-temp-form-div absent
+		// and #respond never moved, even though #comment_parent was set.
+		//
+		// So the heading keeps a REAL text node for Core to read and stash in the
+		// placeholder, and that node is hidden from sight with the standard
+		// clipped-visually-hidden pattern (see .lumen-comments .comment-reply-title
+		// .screen-reader-text in main.css). The result is a heading with no
+		// visible text, no blank placeholder and no layout height, while Core's
+		// string handling stays on its supported path.
+		// aria-hidden keeps the string out of the accessibility tree as well as
+		// out of sight: the heading is decorative plumbing for Core's JS, and
+		// the form's real accessible name comes from the fields themselves.
+		$lumen_reply_heading = '<span class="screen-reader-text" aria-hidden="true">%s</span>';
+
+		$defaults['title_reply']    = sprintf( $lumen_reply_heading, __( 'Leave a Reply', 'lumen' ) );
+		$defaults['title_reply_to'] = sprintf( $lumen_reply_heading, __( 'Leave a Reply to %s', 'lumen' ) );
+
+		// The <small> wrapper around the cancel link is dropped because the
+		// link is relocated (see lumen_comment_cancel_reply_link below); the
+		// empty strings keep Core's echo statements harmless.
+		$defaults['cancel_reply_before'] = '';
+		$defaults['cancel_reply_after']  = '';
+
+		// The visible label. "Cancel reply" is replaced by the plain "Cancel"
+		// the design calls for; the string still runs through Core's
+		// translation layer because this value is passed to
+		// cancel_comment_reply_link() as its $link_text argument.
+		$defaults['cancel_reply_link'] = __( 'Cancel', 'lumen' );
+
 		// v1.1.17 (A): drop the whole "Logged in as X. Edit your profile.
 		// Log out? Required fields are marked *" paragraph for authenticated
 		// visitors. That sentence comes from Core's 'logged_in_as' default,
@@ -243,5 +285,115 @@ if ( ! function_exists( 'lumen_comment_edit_link' ) ) {
 		$label = preg_replace( '/[（(]\s*|\s*[)）]/u', '', $link );
 
 		return false !== $label ? $label : $link;
+	}
+}
+
+if ( ! function_exists( 'lumen_comment_cancel_reply_link' ) ) {
+	add_filter( 'cancel_comment_reply_link', 'lumen_comment_cancel_reply_link', 10, 3 );
+
+	/**
+	 * Comments (v1.1.18, D) — take Core's ONE native cancel link out of the
+	 * title block and hand it to the submit-field filter instead.
+	 *
+	 * WordPress builds the cancel control exactly once, inside #reply-title:
+	 *
+	 *     <h3 id="reply-title" class="comment-reply-title">
+	 *         <small><a rel="nofollow" id="cancel-comment-reply-link"
+	 *                   href="…#respond" style="display:none;">Cancel reply</a></small>
+	 *     </h3>
+	 *
+	 * The submit button, by contrast, is rendered much later inside
+	 * #commentform .form-submit. The requirement is a single Cancel pill sitting
+	 * immediately to the RIGHT of Post Comment, so the native link has to move
+	 * between two DOM regions that Core does not otherwise connect.
+	 *
+	 * This filter does not create a second link and it does not imitate one. It
+	 * captures the exact string Core generated — same id
+	 * `cancel-comment-reply-link`, same rel, same href (which Core already
+	 * stripped of replytocom/unapproved/moderation-hash and anchored at
+	 * #respond), same inline `style="display:none;"` that Core's own
+	 * comment-reply.js flips to make the control appear) — returns an empty
+	 * string so the title block renders no copy, and stores the captured HTML
+	 * for lumen_comment_submit_field() to echo in the action row.
+	 *
+	 * Keeping Core's ID and inline display is what preserves the native
+	 * behaviour: wp-includes/js/comment-reply.js looks the element up with
+	 * getElementById( 'cancel-comment-reply-link' ) and writes .style.display
+	 * directly. Any hand-built replacement with a different id, or a copy
+	 * without that inline style, would break the show/hide cycle, and two
+	 * elements sharing the id would make getElementById ambiguous. Exactly one
+	 * link therefore exists in both the normal and the reply state.
+	 *
+	 * @param string $link      Core's complete cancel link HTML.
+	 * @param string $link_url  The URL Core computed.
+	 * @param string $link_text The visible label Core was given.
+	 * @return string Empty string: the title block must render nothing.
+	 */
+	function lumen_comment_cancel_reply_link( $link, $link_url = '', $link_text = '' ) {
+		// Only capture for the theme's own comment form. Core only ever calls
+		// this while rendering a comment form, but guarding on the expected
+		// shape keeps any unrelated caller from having its link swallowed.
+		if ( false === strpos( $link, 'cancel-comment-reply-link' ) ) {
+			return $link;
+		}
+
+		$GLOBALS['lumen_captured_cancel_link'] = $link;
+
+		return '';
+	}
+}
+
+if ( ! function_exists( 'lumen_comment_submit_field' ) ) {
+	add_filter( 'comment_form_submit_field', 'lumen_comment_submit_field', 10, 2 );
+
+	/**
+	 * Comments (v1.1.18, D) — put the captured native cancel link beside the
+	 * submit button, inside Core's own .form-submit wrapper.
+	 *
+	 * Core hands this filter the fully assembled submit field:
+	 *
+	 *     <p class="form-submit">%1$s %2$s</p>
+	 *
+	 * where %1$s is the submit button and %2$s is get_comment_id_fields() — the
+	 * hidden `comment_post_ID` and `comment_parent` inputs. Those hidden fields
+	 * are the entire contract for threading, so they are never touched here:
+	 * the markup is emitted verbatim with the cancel link appended after it and
+	 * still inside the <p>.
+	 *
+	 * The link is inserted only when Core actually produced one this request,
+	 * which is exactly when `get_option( 'thread_comments' )` is on. With
+	 * threading disabled no link was captured, nothing is appended, and no
+	 * reply control is offered anywhere.
+	 *
+	 * @param string $submit_field Core's assembled submit field markup.
+	 * @param array  $args         Arguments passed to comment_form().
+	 * @return string
+	 */
+	function lumen_comment_submit_field( $submit_field, $args = array() ) {
+		$cancel = isset( $GLOBALS['lumen_captured_cancel_link'] ) ? $GLOBALS['lumen_captured_cancel_link'] : '';
+
+		// Consume it so a second comment_form() on the same request (a
+		// different post, or a theme/plugin rendering another form) starts
+		// from a clean slate and cannot inherit a stale link.
+		unset( $GLOBALS['lumen_captured_cancel_link'] );
+
+		if ( '' === $cancel ) {
+			return $submit_field;
+		}
+
+		// Append inside the existing wrapper rather than emitting a second
+		// container, so Post Comment and Cancel are siblings in one flex row
+		// and Core's .form-submit markup is otherwise untouched.
+		$closing = '</p>';
+		$pos     = strrpos( $submit_field, $closing );
+
+		if ( false === $pos ) {
+			// Unexpected shape: leave Core's markup alone rather than
+			// rebuilding it. The cancel link stays unrendered and the form is
+			// still fully functional, just without the pill.
+			return $submit_field;
+		}
+
+		return substr( $submit_field, 0, $pos ) . $cancel . $closing . substr( $submit_field, $pos + strlen( $closing ) );
 	}
 }

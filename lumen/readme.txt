@@ -4,7 +4,7 @@ Contributor URI: https://github.com/wwintj
 Author: Lumen Team
 Author URI: https://github.com/wwintj
 Homepage URL: https://github.com/wwintj/lumen
-Version: 1.1.17
+Version: 1.1.18
 Requires at least: 6.3
 Tested up to: 6.7
 Requires PHP: 8.2
@@ -53,6 +53,30 @@ Tags: blog, content, minimalist, responsive-layout, custom-menu, translation-rea
 具體功能（自訂內容類型、表單、REST API）僅在出現明確需求時，才於後續階段加入（YAGNI）。
 
 == Changelog ==
+* 1.1.18 (Stable release)
+  * **留言作者名稱縮小**：由 26px 降為 17px（`1.0625rem`），維持單層淺灰膠囊
+    （`border-radius: 999px`、`font-style: normal`、不可點擊、無 hover 變色、
+    無陰影），未重新引入 1.1.15 的雙層膠囊，也未加回作者網站連結。
+  * **留言內文字級與行高調整**：由 `1rem` / `1.85` 改為 **15px**（`0.9375rem`）
+    / **`line-height: 1.65`**。僅作用於 `.lumen-comments` 內的留言本文（含所有
+    巢狀層級、多段落、中英文），不影響文章本文、表單輸入框、作者名稱、日期、
+    Edit、Reply 與送出按鈕。
+  * **Reply 按鈕移到第一行右側**：不再佔用專屬第二列高度。`.comment-body` 改用
+    CSS Grid，讓頭像列（作者／日期／Edit）橫跨整列，本文泡泡與 Reply 同列，
+    泡泡以 `padding-right` 保留 Reply 的空間，因此文字不會被覆蓋。Reply 仍在
+    淺灰泡泡內、維持綠色膠囊，且可鍵盤聚焦點擊。
+  * **移除可見的「Reply to X」與「Cancel reply」文字列**：原生取消功能改以
+    **淡紅色 Cancel 膠囊**放在 `Post Comment` 右側，僅在回覆模式顯示
+    （`#FBE8E8` / `#A33737`、`border-radius: 999px`、與 Post Comment 同高）。
+    一般模式只有 `[Post Comment]`，回覆模式為 `[Post Comment] [Cancel]`。
+  * 取消連結仍是 WordPress Core 原生的 `#cancel-comment-reply-link`，沿用 Core
+    的 ID 與 inline `display`，因此巢狀回覆的顯示／隱藏週期與 `comment_parent`
+    重設行為完全由 Core 的 `comment-reply.js` 控制，未以自製按鈕或 CSS 假造。
+  * `#reply-title` 不再輸出可見文字，但保留一個裁切且 `aria-hidden` 的標籤，
+    因為 Core 的 `comment-reply.js` 會在 `addPlaceHolder()` 中直接讀取
+    `firstChild.textContent`；若該處為空會拋出 TypeError，導致表單無法被搬移、
+    取消功能失效。
+  * 原生疊層留言、訪客留言、留言審核與權限模型均未變更；非留言區版面完全未動。
 * 1.1.17 (Stable release)
   * **移除留言表單上方的登入提示**：`Logged in as X. Edit your profile. Log out?
     Required fields are marked *` 整段不再顯示。經 `comment_form_defaults` 的

@@ -20,7 +20,7 @@ Lumen 是一層輕量的**呈現層**：版面、排版、色彩、導覽，以�
 
 ## 版本與發布政策
 
-目前**正式發布**版本為 **1.1.17**（GitHub `Latest`）。`main` 分支會持續整併尚未發布的開發內容，
+目前**正式發布**版本為 **1.1.18**（GitHub `Latest`）。`main` 分支會持續整併尚未發布的開發內容，
 因此 **`main` 的內容可能領先於正式版 ZIP**。實際發布版本、下載檔案及 `Latest` 狀態，
 一律以 [GitHub Releases](https://github.com/wwintj/lumen/releases) 頁面為準。
 
@@ -82,7 +82,7 @@ Lumen 是一層輕量的**呈現層**：版面、排版、色彩、導覽，以�
 ### 從正式 Release 安裝（建議）
 
 1. 至 [GitHub Releases](https://github.com/wwintj/lumen/releases) 下載最新正式版 ZIP
-   （目前為 `lumen-1.1.17.zip`）。
+   （目前為 `lumen-1.1.18.zip`）。
 2. 於 wp-admin：**外觀 → 佈景主題 → 安裝佈景主題 → 上傳佈景主題** → 選擇該 ZIP。
 3. 啟用佈景主題。
 4. *（選用）* 安裝並啟用 **Lumen Blog** 配套外掛。
@@ -99,7 +99,41 @@ Lumen 是一層輕量的**呈現層**：版面、排版、色彩、導覽，以�
 ### 歷史版本
 
 舊版 Release 保留於 [GitHub Releases](https://github.com/wwintj/lumen/releases) 頁面，
-可作為回退用途；`v1.1.16` 為 1.1.17 之前的穩定版本，`v1.1.15` 為 1.1.16 之前的穩定版本，`v1.1.14` 為 1.1.15 之前的穩定版本，`v1.1.13` 為 1.1.14 之前的穩定版本，`v1.1.12` 為 1.1.13 之前的穩定版本，`v1.1.11` 為 1.1.12 之前的穩定版本，`v1.1.10`，`v1.1.9`，`v1.1.8`，`v1.1.7`，`v1.1.6`、`v1.1.5`、`v1.1.4`、`v1.1.3`、`v1.1.2`、`v1.1.1`、`v1.1.0` 為更早的穩定版本。
+可作為回退用途；`v1.1.17` 為 1.1.18 之前的穩定版本，`v1.1.16` 為 1.1.17 之前的穩定版本，`v1.1.15` 為 1.1.16 之前的穩定版本，`v1.1.14` 為 1.1.15 之前的穩定版本，`v1.1.13` 為 1.1.14 之前的穩定版本，`v1.1.12` 為 1.1.13 之前的穩定版本，`v1.1.11` 為 1.1.12 之前的穩定版本，`v1.1.10`，`v1.1.9`，`v1.1.8`，`v1.1.7`，`v1.1.6`、`v1.1.5`、`v1.1.4`、`v1.1.3`、`v1.1.2`、`v1.1.1`、`v1.1.0` 為更早的穩定版本。
+
+## Lumen 1.1.18 版本重點
+
+1.1.18 為 **單篇文章留言區第三次精修（Production Feedback）**：依實際安裝 1.1.17 後的回饋，
+只調整留言區的字級、Reply 位置與表單動作列，其餘版面完全凍結。
+
+| 項目 | 1.1.17 | 1.1.18 |
+| --- | --- | --- |
+| 留言作者名稱字級 | 26px | **17px**（`1.0625rem`） |
+| 留言內文字級 | `1rem`（16px） | **15px**（`0.9375rem`） |
+| 留言內文行高 | `1.85` | **`1.65`** |
+| Reply 按鈕位置 | 專屬第二列 | **第一行文字右側** |
+| `Reply to X` 文字列 | 可見 | **移除** |
+| 取消回覆 | `Cancel reply` 純文字（在標題列） | **淡紅 `Cancel` 膠囊（在 Post Comment 右側）** |
+
+### 主要變更
+
+1. **留言作者名稱縮小**：26px → 17px，維持單層淺灰膠囊、`font-style: normal`、
+   不可點擊、無 hover 變色、無陰影；未重新引入 1.1.15 的雙層膠囊，也未加回網站連結。
+2. **留言內文字級／行高**：`0.9375rem` / `1.65`，僅限 `.lumen-comments` 內的留言本文
+   （含所有巢狀層級、多段落、中英文），不影響文章本文與表單欄位。
+3. **Reply 移至第一行右側**：`.comment-body` 改用 CSS Grid，頭像列橫跨整列，
+   本文泡泡與 Reply 同列，並以 `padding-right` 保留 Reply 空間，文字不會被覆蓋；
+   Reply 仍在淺灰泡泡內、維持綠色膠囊。
+4. **原生取消功能重新定位**：移除可見的 `Reply to X`／`Cancel reply` 文字，
+   將 Core 原生的 `#cancel-comment-reply-link` 以淡紅膠囊呈現在 `Post Comment`
+   右側，僅在回覆模式顯示：一般模式為 `[Post Comment]`，回覆模式為
+   `[Post Comment] [Cancel]`。取消連結沿用 Core 的 ID 與 inline `display`，
+   因此顯示／隱藏與 `comment_parent` 重設仍由 Core 的 `comment-reply.js` 控制。
+5. `#reply-title` 不再有可見文字，但保留一個裁切且 `aria-hidden` 的標籤：Core 的
+   `comment-reply.js` 在 `addPlaceHolder()` 直接讀取 `firstChild.textContent`，
+   若為空會拋出 TypeError，使表單無法搬移、取消功能失效。
+6. 原生疊層留言、訪客留言、留言審核與權限模型均未變更；非留言區版面完全未動
+   （Home／Category／Tag／Date／Author／Search／Page／404／Header／Footer 逐像素相同）。
 
 ## Lumen 1.1.17 版本重點
 
@@ -790,7 +824,7 @@ dashed dividers、author/date/reply compact header row、green pill actions。
 - **頁首／頁尾互動回饋** —— 頁首導覽與頁尾 RSS／選單連結的柔和背景懸停效果、目前頁面／分類的
   常駐作用中狀態，以及網站標題的細緻懸停效果。
 
-目前原始碼版本：**1.1.17**。完整變更紀錄：[lumen/readme.txt](lumen/readme.txt#changelog)。
+目前原始碼版本：**1.1.18**。完整變更紀錄：[lumen/readme.txt](lumen/readme.txt#changelog)。
 實際發布版本與下載檔案，請以 [GitHub Releases](https://github.com/wwintj/lumen/releases) 為準。
 
 ## 專案目錄結構

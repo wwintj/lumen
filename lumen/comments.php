@@ -46,14 +46,21 @@ if ( ! $lumen_has_comments && ! $lumen_comments_open ) {
 /*
  * comment_form() args. Only Core-supported args are used.
  *
- * 'title_reply' => '' removes the visible heading (E.1). Core still prints
- * <h3 id="reply-title" class="comment-reply-title"> — now empty — which keeps
- * the cancel-reply anchor and #respond contract intact for nested replies.
- * 'label_submit' keeps Core's own translated string, and 'comment_notes_before'
- * is left at Core's default so guests still see the email-privacy notice.
+ * v1.1.18 (D): 'title_reply' is deliberately NOT set here any more.
+ * comment_form() merges as wp_parse_args( $args, apply_filters(
+ * 'comment_form_defaults', $defaults ) ), so anything passed in this array
+ * OVERRIDES the filtered default. Passing '' here would win over the theme's
+ * comment_form_defaults filter and empty <h3 id="reply-title"> completely -
+ * and an empty heading makes wp-includes/js/comment-reply.js throw inside
+ * addPlaceHolder() on `replyElement.firstChild.textContent`, which stops the
+ * form from being relocated at all. The heading is now produced by
+ * lumen_comment_form_defaults() as a visually hidden span, so it has a real
+ * firstChild for Core while showing no text.
+ *
+ * 'comment_notes_before' is emptied so the guest email-privacy paragraph does
+ * not appear; 'label_submit' is left at Core's own translated string.
  */
 $lumen_form_args = array(
-	'title_reply'          => '',
 	'title_reply_before'   => '<h3 id="reply-title" class="comment-reply-title">',
 	'title_reply_after'    => '</h3>',
 	'comment_notes_before' => '',

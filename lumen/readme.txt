@@ -4,7 +4,7 @@ Contributor URI: https://github.com/wwintj
 Author: Lumen Team
 Author URI: https://github.com/wwintj
 Homepage URL: https://github.com/wwintj/lumen
-Version: 1.1.4
+Version: 1.1.5
 Requires at least: 6.3
 Tested up to: 6.7
 Requires PHP: 8.2
@@ -53,6 +53,31 @@ Tags: blog, content, minimalist, responsive-layout, custom-menu, translation-rea
 具體功能（自訂內容類型、表單、REST API）僅在出現明確需求時，才於後續階段加入（YAGNI）。
 
 == Changelog ==
+* 1.1.5 (Stable release)
+  * 全域搜尋框改為真正的純白、無邊框膠囊：背景改為 #ffffff，並移除 1px 灰色邊框。
+    1.1.4 的底色為 --lumen-bg-soft（#f4f4f4）且帶 1px #e6e6e6 邊框，
+    灰底與灰框疊加會產生「盒子感」，使膠囊看起來不夠圓潤。
+  * 以極淡的兩層柔和陰影取代邊框，作為與背景的分離方式：
+    0 1px 2px rgba(16, 24, 20, 0.04) 與 0 4px 14px rgba(16, 24, 20, 0.05)。
+    陰影刻意維持極低透明度，避免變成浮起的卡片。
+  * 圓角維持完整膠囊 999px，並確認三層（popover／form／input）皆為 999px。
+    經逐點量測，左右兩端為完全對稱的半圓，無圓角截斷、無方角、
+    無灰色矩形底層露出，亦無雙重圓角邊界。
+  * 焦點呈現方式改為「膠囊內側的細緻綠色邊」：焦點存在時才出現，
+    且為 inset（向內），因此不會像 1.1.4 那樣在白色膠囊外圍形成明顯的綠色外框。
+    預設（未聚焦）狀態下，膠囊完全沒有綠色、沒有任何描邊。
+    此內側邊緣與白色的對比約 6.4:1，高於 WCAG 1.4.11 對焦點指示的 3:1 要求；
+    若僅以陰影表現焦點，實測僅約 1.05:1，不足以作為可辨識的焦點指示。
+  * 背景霧化維持不變（Feature C 凍結）：rgba(248, 249, 248, 0.68) 搭配
+    blur(6px) saturate(0.9)，未提高或降低模糊強度，未新增 Overlay 元素。
+  * 高對比／forced-colors 模式改用系統 Highlight 色繪製焦點外框，
+    且該規則使用輸入框自身的 :focus-visible，不依賴 :has() 支援。
+  * 搜尋行為完全未變更：原生 popover="auto"、原生按鈕觸發、
+    Esc 關閉、點擊外部關閉、再次點擊關閉、自動聚焦、
+    WordPress 原生 GET 搜尋（method="get"、參數 s、type="search"）。
+  * 仍然維持零 JavaScript：主題內沒有任何 .js 檔案。
+  * 本次僅修改 lumen/assets/css/main.css 一個功能檔案，未更動任何 HTML 模板。
+
 * 1.1.4 (Stable release)
   * 全域搜尋改為完整膠囊造型：彈出視窗與內部輸入框統一使用 border-radius: 999px，
     與首頁日期、分類膠囊及箭頭分頁的既有視覺語彙一致。

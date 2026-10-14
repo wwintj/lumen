@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'LUMEN_VERSION', '1.1.4' );
+define( 'LUMEN_VERSION', '1.1.5' );
 define( 'LUMEN_DIR', get_template_directory() );
 define( 'LUMEN_URI', get_template_directory_uri() );
 define( 'LUMEN_TEXT_DOMAIN', 'lumen' );

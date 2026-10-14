@@ -573,9 +573,15 @@ body.category .lumen-site-main {
 
 /* Narrow screens: the reading column would run edge to edge, leaving
    the panel nowhere to bleed. Give the category archive a gutter and
-   keep it exactly equal to the panel padding, so the bleed fully
-   cancels the padding and the panel text still lands on the column
-   edge. */
+   keep it equal to the panel padding, so the bleed fully cancels the
+   padding and the panel text still lands on the column edge.
+
+   Note that this equality is what makes the panel itself flush with the
+   column edge: with gutter == pad-x the bleed is min(pad-x, room) ==
+   pad-x, cancelling the horizontal padding exactly. Raising the gutter
+   above pad-x (see the max-width: 768px block below) is therefore the
+   supported way to inset the panel, because the bleed is capped by
+   pad-x and cannot grow past it. */
 @media (max-width: 860px) {
 	body.category .lumen-archive-wrap {
 		--lumen-cat-intro-gutter: 20px;
@@ -619,6 +625,38 @@ body.category .lumen-site-main {
 	}
 	body.category .lumen-site-main {
 		padding-block-start: 18px;
+	}
+}
+
+/* 8L-R1: mobile horizontal breathing room.
+
+   On phones the reading column is as wide as the viewport, so the archive
+   wrap's gutter is the only horizontal space available and the panel's
+   bleed consumes all of it (`min(pad-x, room)` clamps to pad-x). The
+   panel therefore ran edge to edge with zero visible margin at every
+   width up to 768px — measured at 0px on both sides from 320px through
+   768px.
+
+   Raising the gutter ABOVE the panel's horizontal padding keeps the
+   panel's text where it was while exposing the surplus as real margin:
+   the bleed stays capped at pad-x, so the difference (gutter - pad-x)
+   becomes visible whitespace outside the panel. The wrap's inline
+   padding is what the panel text and the post list both align to, so the
+   two stay in step automatically.
+
+   20px + 16px = 36px for the normal mobile range, and 18px + 16px = 34px
+   at 360px and below, which keeps the extra space identical across the
+   small-mobile breakpoint. Above 768px nothing here applies, so the
+   tablet (769-860px) and desktop layouts are untouched. */
+@media (max-width: 768px) {
+	body.category .lumen-archive-wrap {
+		--lumen-cat-intro-gutter: 36px;
+	}
+}
+
+@media (max-width: 360px) {
+	body.category .lumen-archive-wrap {
+		--lumen-cat-intro-gutter: 34px;
 	}
 }
 

@@ -690,6 +690,64 @@ body.category .lumen-site-main {
 	border-bottom: 0;
 }
 
+/* 8M-R1: category archive post divider rhythm.
+
+   The homepage pairs --lumen-home-divider-gap as a padding-bottom on each
+   post with the same value as a padding-top on the following post, which
+   puts equal whitespace on both sides of its divider. The shared archive
+   list only ever had the padding-bottom half, so on a category page the
+   next post's meta sat directly under the line, and the above-side value
+   was also fixed at 1.75rem — the homepage's mobile value — leaving
+   desktop 4px short of the homepage's 2rem.
+
+   Category only. Tag, date and author archives share .lumen-post-list and
+   must keep their existing spacing, so every rule here is scoped through
+   body.category and reads a category-scoped variable rather than the
+   homepage's --lumen-home-divider-gap. The last item keeps its existing
+   "no divider, no bottom padding" rule above. */
+body.category .lumen-archive-wrap {
+	--lumen-category-post-divider-gap: 2rem;
+}
+
+/* The list is a grid whose items are separated by the newlines in
+   post-list.php. Those whitespace text nodes form the container's own
+   inline formatting context, and their strut adds ~6px of leading to each
+   grid row — measured at exactly 5.94px on every divider, which is the
+   list's inherited line-height (28.9px) minus its font-size (17px),
+   halved. That is what pushed the next post's meta to 38px below the line
+   instead of the homepage's 32px, so it has to be neutralised before the
+   spacing below can be made to match.
+
+   font-size:0 removes the strut. The text inside has its own explicit
+   sizes already, but the card is restated at the theme's body size so
+   nothing can inherit 0 — verified against meta/title/excerpt computed
+   sizes, which are unchanged. */
+body.category .lumen-post-list {
+	font-size: 0;
+}
+
+body.category .lumen-post-card {
+	font-size: 1rem;
+}
+
+/* Whitespace above the divider, matching the homepage's desktop value. */
+body.category .lumen-post-list > li:not(:last-child) .lumen-post-card {
+	padding-bottom: var(--lumen-category-post-divider-gap);
+}
+
+/* Whitespace below the divider. The first post is excluded so the intro
+   divider's existing margin-block-end already provides its 2rem, and no
+   second gap is stacked on top of it. */
+body.category .lumen-post-list > li + li {
+	padding-top: var(--lumen-category-post-divider-gap);
+}
+
+@media (max-width: 768px) {
+	body.category .lumen-archive-wrap {
+		--lumen-category-post-divider-gap: 1.75rem;
+	}
+}
+
 /* Archive list title: reading serif, 400, lh 1.5, normal ls
    (desktop ~1.35rem–1.4rem / mobile ~1.2rem–1.3rem). */
 .lumen-post-card .lumen-post-title {

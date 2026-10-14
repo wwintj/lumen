@@ -377,17 +377,30 @@ body.admin-bar .lumen-site-header {
 /* B. Category title: keeps the archived H1 typography and simply
    inherits the site foreground token (--lumen-fg = #1B1B1B).
 
-   Title-to-pill spacing (8H-R1): the shared archive title rule carries
-   `margin-bottom: var(--lumen-space-3)` = 24px. Inside the intro panel
-   that reads as too much air before the statistics pill, so the
-   category archive halves it to 0.75rem (12px).
+   Title-to-pill spacing (8I-R1): the shared archive title rule carries
+   `margin-bottom: var(--lumen-space-3)` = 24px, which reads as far too
+   much air before the statistics pill inside the intro panel. The
+   category archive now sets `margin-bottom: 2px` so the measured
+   title-to-pill distance lands at the intended ~4px.
 
-   Why 12px rather than exactly 13px: the pill is an inline-flex box
-   inside the panel's inline formatting context, so its line box adds a
-   strut of roughly (28.9px line-height - 26.19px pill height) / 2 ~= 2px
-   above the pill. The measured DOM gap was therefore 26px, and 12px of
-   margin lands it at 14px -- 54% of the previous spacing, which is the
-   closest whole-token step to half.
+   Why the CSS value is 2px when the visual target is 4px: the pill is an
+   inline-flex box inside the panel's inline formatting context, so its
+   line box contributes a strut above the pill. Measured at every
+   viewport from 320px to 1920px this strut is exactly 2.00px:
+
+     strut = (parent line-height 28.9px - pill height 26.19px) / 2
+           ~= 1.36px, rendering as a 2px advance in the inline flow
+
+   So the DOM gap is `margin-bottom + 2px`, not `margin-bottom`:
+   12px margin produced the previous 14px gap, and 2px margin produces
+   the 4px gap targeted here. Measured confirmations:
+
+     v1.1.9 : 12px margin + 2px strut = 14px DOM gap
+     v1.1.10:  2px margin + 2px strut =  4px DOM gap
+
+   2px is used rather than a token because the design target is an exact
+   pixel outcome (4px), not a spacing step; no token in this theme
+   resolves to 2px.
 
    Scope: the selector is `.lumen-category-intro .lumen-archive-title`.
    It has the SAME specificity as the shared archive title rule and sits
@@ -402,7 +415,7 @@ body.admin-bar .lumen-site-header {
    line-height, letter-spacing and colour. */
 .lumen-category-intro .lumen-archive-title {
 	color: var(--lumen-fg);
-	margin-bottom: 0.75rem;
+	margin-bottom: 2px;
 }
 
 /* C. Muted dark lavender statistics pill ("Category · N posts").

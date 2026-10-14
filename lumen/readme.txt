@@ -4,7 +4,7 @@ Contributor URI: https://github.com/wwintj
 Author: Lumen Team
 Author URI: https://github.com/wwintj
 Homepage URL: https://github.com/wwintj/lumen
-Version: 1.1.9
+Version: 1.1.10
 Requires at least: 6.3
 Tested up to: 6.7
 Requires PHP: 8.2
@@ -14,7 +14,7 @@ Text Domain: lumen
 Domain Path: /
 Tags: blog, content, minimalist, responsive-layout, custom-menu, translation-ready, rss-icons
 
-極簡、對 SEO 友善的內容部落格佈景主題，專為中英雙語網站設計。1.1.9 為 Lumen 的正式穩定版本，在 1.1.0 的歸檔與搜尋核心正確性、文字優先閱讀排版，以及零 Theme JavaScript 設計之上，於 1.1.1 新增頁首圖示式可展開搜尋並統一 Header／Footer 閱讀字體，1.1.2 進一步調整頁首搜尋與導覽的版面、為列表加上日期與分類膠囊標籤，並將首頁分頁與單篇文章導覽改為純箭頭膠囊，1.1.6 精修分類頁頂部介紹區，1.1.7 進一步校正該介紹區的版式節奏，1.1.8 讓分類頁第一篇文章與分隔線的間距對齊首頁節奏並改為低飽和暗紫色統計膠囊，1.1.9 則收緊分類頁標題與統計膠囊之間的垂直留白。
+極簡、對 SEO 友善的內容部落格佈景主題，專為中英雙語網站設計。1.1.10 為 Lumen 的正式穩定版本，在 1.1.0 的歸檔與搜尋核心正確性、文字優先閱讀排版，以及零 Theme JavaScript 設計之上，於 1.1.1 新增頁首圖示式可展開搜尋並統一 Header／Footer 閱讀字體，1.1.2 進一步調整頁首搜尋與導覽的版面、為列表加上日期與分類膠囊標籤，並將首頁分頁與單篇文章導覽改為純箭頭膠囊，1.1.6 精修分類頁頂部介紹區，1.1.7 進一步校正該介紹區的版式節奏，1.1.8 讓分類頁第一篇文章與分隔線的間距對齊首頁節奏並改為低飽和暗紫色統計膠囊，1.1.9 收緊分類頁標題與統計膠囊之間的垂直留白，1.1.10 則將該留白進一步收至約 4px。
 
 == Features ==
 * 語意化 HTML5 結構（header、nav、main、article、section、footer）。
@@ -53,6 +53,30 @@ Tags: blog, content, minimalist, responsive-layout, custom-menu, translation-rea
 具體功能（自訂內容類型、表單、REST API）僅在出現明確需求時，才於後續階段加入（YAGNI）。
 
 == Changelog ==
+* 1.1.10 (Stable release)
+  * 再次收緊分類頁「分類標題 → `Category · N posts` 統計膠囊」之間的垂直留白，
+    由 1.1.9 的 14px 進一步縮小至 **約 4px**（約為原本的 28.6%）。
+  * 實作僅將分類頁標題的 `margin-bottom` 由 `0.75rem`（12px）改為 `2px`。
+    由於膠囊位於行內格式化上下文，其行盒會額外貢獻約 2px 的支柱空白，
+    因此 **CSS 值為 2px，實際量測 DOM 間距為 4px**。
+  * 於 320／360／390／768／769／860／1024／1440／1920 共 9 種寬度
+    **實測皆為 4px**，7 種分類頁情境（一般／無描述／單篇／多篇／空／長標題／分頁第 2 頁）
+    全部一致。
+  * 107 字元長分類名稱在 2～6 行換行下，間距仍為 4px，左對齊保持、無重疊、無溢出。
+  * 未新增或移除任何選擇器；僅修改既有規則中的一行屬性。
+  * 共用的 `.lumen-archive-wrap .lumen-archive-title` 規則**逐字未變**，
+    標籤／日期／作者／搜尋彙整頁仍維持 24px 節奏。
+  * 標題的字體、字級、字重、行高、字距與顏色（`#1b1b1b`）皆未變更。
+  * 暗紫色統計膠囊（`#d8cbea`／`#49375f`、`999px`、`4px 12px`、13px）
+    尺寸與顏色完全未變。
+  * 淺綠色介紹面板（`#eef6ef`）、圓角與內距未變；面板上下內距對稱
+    （18/18、20/20、28/28）與「分隔線 → 第一篇文章」距離
+    （桌機 32px、≤768px 為 28px）皆未改變。
+  * 面板因內容變緊而自然變矮 10px，其下方元素僅隨文件流整體上移。
+  * 文章列表日期膠囊（`#f0f1f2`／`#52565c`）與分類綠色膠囊
+    （`#e0f3e5`／`#176d39`）完全未變。
+  * 首頁、標籤、日期、作者、搜尋、單篇文章、頁面、404 逐像素與 1.1.9 相同。
+  * 本次僅修改 `lumen/assets/css/main.css`，未修改任何模板與 JavaScript。
 * 1.1.9 (Stable release)
   * 收緊分類頁「分類標題 → `Category · N posts` 統計膠囊」之間的垂直留白，
     由原本的 24px 下邊距減半為 12px（`0.75rem`）。

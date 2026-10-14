@@ -4,7 +4,7 @@ Contributor URI: https://github.com/wwintj
 Author: Lumen Team
 Author URI: https://github.com/wwintj
 Homepage URL: https://github.com/wwintj/lumen
-Version: 1.1.18
+Version: 1.1.19
 Requires at least: 6.3
 Tested up to: 6.7
 Requires PHP: 8.2
@@ -53,6 +53,25 @@ Tags: blog, content, minimalist, responsive-layout, custom-menu, translation-rea
 具體功能（自訂內容類型、表單、REST API）僅在出現明確需求時，才於後續階段加入（YAGNI）。
 
 == Changelog ==
+* 1.1.19 (Stable release)
+  * **修正留言作者名稱與日期重疊（Production Visual Hotfix）**：1.1.18 將
+    `.comment-author` 與 `.comment-meta` 指定到**同一個** grid 區域
+    （`grid-row: 1; grid-column: 1 / -1`）。同一個區域內的兩個 grid 子項不會
+    自動並排，而是互相疊印，導致作者名稱（`tim`）直接壓在日期
+    （`October 14, 2026 at 7:19 pm`）之上，且由頂層到第 4 層巢狀全部發生。
+    現在改為作者與日期各自佔用**不同的 grid 欄位**（欄 1／欄 2），由 grid
+    自動配置決定位置，未使用 `margin-left`、`left` 或 `transform` 等位移補丁。
+    作者 17px、日期字級、Edit 紫色膠囊、Reply 位於氣泡首行右側皆維持不變。
+  * **修正 Reply 按鈕綠色膠囊消失**：1.1.18 的 `/* Reply link → soft green pill.`
+    註解區塊**缺少結束標記**。CSS 註解會一直延續到下一個結束標記出現為止，
+    因此瀏覽器把 `.lumen-comments .reply`、`.lumen-comments .reply
+    .comment-reply-link`、其 `:hover` 以及 `.lumen-comments-closed` 整段規則
+    當成註解丟棄，Reply 因而以未套用樣式的黑字呈現。現已補回結束標記，並新增
+    CSSOM 驗證（確認規則確實進入瀏覽器解析後的樣式表，而非只存在於原始碼）。
+  * **窄螢幕巢狀留言表頭改為堆疊**：在 480px 以下且巢狀層級很深的留言中，
+    欄寬不足時表頭改為作者在上、日期在下，維持閱讀順序且完全不重疊、不溢出。
+  * 其餘 26 個非留言頁面經像素比對為 0 差異；PHP 17 個檔案語法檢查通過；
+    佈景主題自訂 JavaScript 維持 0 個檔案。
 * 1.1.18 (Stable release)
   * **留言作者名稱縮小**：由 26px 降為 17px（`1.0625rem`），維持單層淺灰膠囊
     （`border-radius: 999px`、`font-style: normal`、不可點擊、無 hover 變色、

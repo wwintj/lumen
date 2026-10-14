@@ -1620,17 +1620,53 @@ body.category .lumen-post-list > li + li {
 .lumen-comments .comment-body {
 	position: relative;
 	display: grid;
-	/* Column 2 is the action lane. Its width is a token so the grid track and
-	   the bubble's reserved right padding can never drift apart. */
-	grid-template-columns: minmax(0, 1fr) var(--lumen-reply-lane);
+	/* THREE tracks.
+	     1: minmax(0, 1fr) - the header's author column. minmax(0,...) is what
+	        lets a long author name wrap instead of forcing horizontal overflow.
+	     2: auto - the header's own second column, holding the date (+ Edit) at
+	        exactly the width it needs, so the date hugs the author pill.
+	     3: var(--lumen-reply-lane) - the action lane. Kept as a token so the
+	        track and the bubble's reserved right padding cannot drift apart.
+	   Splitting the header into its own two tracks is the v1.1.19 (BUG A) fix:
+	   in v1.1.18 author and meta shared ONE area and therefore overprinted. */
+	grid-template-columns: minmax(0, 1fr) auto var(--lumen-reply-lane);
 	align-items: start;
 }
 
-/* Header row spans the full width so the meta row behaves exactly as before. */
+/* Header row.
+   v1.1.19 (BUG A): v1.1.18 gave .comment-author and .comment-meta the SAME
+   explicit grid area (grid-row: 1; grid-column: 1 / -1). Two grid items
+   assigned to one and the same area are NOT laid out side by side - they are
+   both placed into that single area and therefore paint over each other. On
+   production that put the author pill directly on top of the date: `tim` and
+   "October 14, 2026 at 7:19 pm" started at the identical x coordinate, at
+   every nesting depth.
+   The two children now occupy two DIFFERENT tracks, so they occupy successive
+   columns in document order (author, then meta) and can never share a cell.
+   `minmax(0, 1fr)` on the author track lets it shrink so a very long user name
+   wraps inside its own column rather than pushing the date out of the box.
+   Distinct tracks are what remove the conflict - there is no margin, offset or
+   transform papering over it. */
 .lumen-comments .comment-body > .comment-author,
 .lumen-comments .comment-body > .comment-meta {
 	grid-row: 1;
-	grid-column: 1 / -1;
+}
+
+.lumen-comments .comment-body > .comment-author {
+	grid-column: 1;
+	min-width: 0;
+	/* The gap that separates the author pill from the date. It is grid padding
+	   on the first track rather than a margin on either child, so it cannot be
+	   collapsed away or double-applied and it holds at every nesting depth. */
+	padding-right: 0.5rem;
+}
+
+/* Column 2 is `auto`, not `1fr`: the date column takes only the width it needs,
+   so the date hugs the author pill instead of being pushed to the far edge of
+   the comment. Column 1 absorbs the remaining space. */
+.lumen-comments .comment-body > .comment-meta {
+	grid-column: 2;
+	min-width: 0;
 }
 
 /* The BUBBLE spans both columns, so the grey field still encloses the Reply
@@ -1642,11 +1678,12 @@ body.category .lumen-post-list > li + li {
 	grid-column: 1 / -1;
 }
 
-/* Reply rides in row 2, column 2 - i.e. on the first line's right, inside the
-   bubble's own row. */
+/* Reply rides in row 2, column 3 - i.e. on the first line's right, inside the
+   bubble's own row. Column 3 rather than 2 because track 2 now belongs to the
+   header's date column (v1.1.19, BUG A). */
 .lumen-comments .comment-body > .reply {
 	grid-row: 2;
-	grid-column: 2;
+	grid-column: 3;
 	align-self: start;
 	justify-self: end;
 	position: static;
@@ -1676,10 +1713,45 @@ body.category .lumen-post-list > li + li {
    button moves to its own line rather than squeezing the copy. */
 @media (max-width: 480px) {
 	.lumen-comments .comment-body {
+		/* Narrow screens give up the action lane so the bubble keeps the full
+		   width, exactly as in v1.1.18. The header keeps its own two tracks so
+		   the author and the date still cannot overlap. */
 		grid-template-columns: minmax(0, 1fr) auto;
 	}
+	/* Deeply nested comments have very little width, so the header's two tracks
+	   can no longer both fit. Rather than squeezing the author into a sliver and
+	   pushing the date above it (which inverted the reading order), the header
+	   deliberately stacks: the author keeps the full width on row 1 and the meta
+	   row moves down to row 2. Reading order and containment are preserved and
+	   nothing overlaps; `grid-column: 1 / -1` on both makes that explicit, so
+	   neither child can ever land on top of the other. */
+	.lumen-comments .comment-body > .comment-author {
+		grid-column: 1 / -1;
+		padding-right: 0;
+		margin-bottom: 0.125rem;
+	}
+	.lumen-comments .comment-body > .comment-meta {
+		grid-row: 2;
+		grid-column: 1 / -1;
+	}
+	/* The bubble and Reply must now shift down a row, because the header spends
+	   rows 1 and 2 when it stacks. */
+	.lumen-comments .comment-body > p {
+		grid-row: 3;
+	}
 	.lumen-comments .comment-body > .reply {
+		grid-row: 3;
+		/* The action lane is gone, so Reply takes the free second track and
+		   stays at the bubble's right edge instead of overflowing. */
+		grid-column: 2;
 		margin-top: 0.125rem;
+	}
+	.lumen-comments .comment-body > p + p,
+	.lumen-comments .comment-body > pre,
+	.lumen-comments .comment-body > blockquote,
+	.lumen-comments .comment-body > .comment-awaiting-moderation {
+		grid-row: auto;
+		grid-column: 1 / -1;
 	}
 }
 
@@ -1738,6 +1810,19 @@ body.category .lumen-post-list > li + li {
    than left behind, because a stale `order` on a grid item is inert and would
    have silently misled anyone reading this file later.
 
+   v1.1.19: this comment block was shipped WITHOUT its closing comment
+   terminator in v1.1.18. A CSS comment does not stop at the end of the line -
+   it runs on until the next terminator sequence wherever that appears - so the
+   browser swallowed this whole region: the .reply container rule, the green
+   pill rule below, its :hover rule, and the .lumen-comments-closed rule. They
+   were discarded and the Reply control rendered as unstyled black text.
+   The terminator is restored at the end of this comment, and CSS_PARSER_QA.json
+   now asserts that the sheet holds no unterminated comment.
+
+   NOTE FOR FUTURE EDITS: never write the comment terminator sequence inside a
+   comment's prose, not even in backticks or as an example. It closes the
+   comment early and silently swallows whatever follows - which is exactly the
+   bug this block documents. */
 .lumen-comments .reply {
 	display: inline-flex;
 	align-items: center;

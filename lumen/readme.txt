@@ -4,7 +4,7 @@ Contributor URI: https://github.com/wwintj
 Author: Lumen Team
 Author URI: https://github.com/wwintj
 Homepage URL: https://github.com/wwintj/lumen
-Version: 1.1.7
+Version: 1.1.8
 Requires at least: 6.3
 Tested up to: 6.7
 Requires PHP: 8.2
@@ -14,7 +14,7 @@ Text Domain: lumen
 Domain Path: /
 Tags: blog, content, minimalist, responsive-layout, custom-menu, translation-ready, rss-icons
 
-極簡、對 SEO 友善的內容部落格佈景主題，專為中英雙語網站設計。1.1.7 為 Lumen 的正式穩定版本，在 1.1.0 的歸檔與搜尋核心正確性、文字優先閱讀排版，以及零 Theme JavaScript 設計之上，於 1.1.1 新增頁首圖示式可展開搜尋並統一 Header／Footer 閱讀字體，1.1.2 進一步調整頁首搜尋與導覽的版面、為列表加上日期與分類膠囊標籤，並將首頁分頁與單篇文章導覽改為純箭頭膠囊，1.1.6 精修分類頁頂部介紹區，1.1.7 則進一步校正該介紹區的版式節奏：面板內文與文章列表共用同一條左側基線、上下留白對稱，統計膠囊改為淡紫色。
+極簡、對 SEO 友善的內容部落格佈景主題，專為中英雙語網站設計。1.1.8 為 Lumen 的正式穩定版本，在 1.1.0 的歸檔與搜尋核心正確性、文字優先閱讀排版，以及零 Theme JavaScript 設計之上，於 1.1.1 新增頁首圖示式可展開搜尋並統一 Header／Footer 閱讀字體，1.1.2 進一步調整頁首搜尋與導覽的版面、為列表加上日期與分類膠囊標籤，並將首頁分頁與單篇文章導覽改為純箭頭膠囊，1.1.6 精修分類頁頂部介紹區，1.1.7 進一步校正該介紹區的版式節奏，1.1.8 則讓分類頁第一篇文章與分隔線的間距對齊首頁節奏，並將統計膠囊改為低飽和暗紫色。
 
 == Features ==
 * 語意化 HTML5 結構（header、nav、main、article、section、footer）。
@@ -53,6 +53,22 @@ Tags: blog, content, minimalist, responsive-layout, custom-menu, translation-rea
 具體功能（自訂內容類型、表單、REST API）僅在出現明確需求時，才於後續階段加入（YAGNI）。
 
 == Changelog ==
+* 1.1.8 (Stable release)
+  * 分類頁分隔線與第一篇文章之間的間距改為與首頁文章分隔線節奏一致：
+    桌機（>768px）32px、行動裝置（≤768px）28px，實測 320–1920px 共 9 種寬度皆與首頁相同。
+  * 為此將 `.lumen-category-intro-divider` 的 `margin-block` 拆分為獨立的
+    `margin-block-start`（面板→分隔線）與 `margin-block-end`（分隔線→第一篇文章）。
+    上方維持 1.1.7 已驗收的對稱值 24px／20px／18px，不受影響。
+  * 新增分類頁專屬變數 `--lumen-cat-intro-gap-below`（2rem，≤768px 為 1.75rem），
+    未讀取或修改首頁的 `--lumen-home-divider-gap`。
+  * 分類統計膠囊由淡紫改為**低飽和暗紫色**：`#d8cbea` 底、`#49375f` 字，
+    對比 6.84:1（WCAG AA）。較 1.1.7 的 `#ece7f6` 明顯更深，飽和度仍僅 13%。
+  * 膠囊幾何完全未變（`inline-flex`、`4px 12px`、`999px`、13px／1.4、相同外距），
+    文字仍由 WordPress 動態產生（`found_posts`、單複數與 i18n 未動）。
+  * 分類介紹面板淺綠底色（`#eef6ef`）、標題色（`#1b1b1b`）、圓角與內距皆未變。
+  * 文章列表日期膠囊（`#f0f1f2`／`#52565c`）與分類綠色膠囊（`#e0f3e5`／`#176d39`）
+    完全未變；首頁、搜尋、單篇文章、404、標籤、日期、作者彙整頁逐像素與 1.1.7 相同。
+  * 本次僅修改 `lumen/assets/css/main.css`，未修改任何模板與 JavaScript。
 * 1.1.7 (Stable release)
   * 分類頁介紹面板的左右內距改以等量負邊界抵銷，使面板內的標題、統計膠囊與描述，
     與下方第一篇文章的標題／摘要／meta 共用同一條左側垂直基線（A2）。

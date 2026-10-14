@@ -380,15 +380,21 @@ body.admin-bar .lumen-site-header {
 	color: var(--lumen-fg);
 }
 
-/* C. Light lavender statistics pill ("Category · N posts").
+/* C. Muted dark lavender statistics pill ("Category · N posts").
    inline-flex keeps the pill shrink-to-fit instead of spanning the
    full row, and the explicit margin-bottom replaces the original
    paragraph margin so the pill height stays predictable.
 
-   The lavender is intentionally distinct from BOTH the pale green
-   panel (#EEF6EF) it sits on and the green post category pill
-   (#E0F3E5) further down, so the two never read as the same
-   component. #3D3357 on #ECE7F6 measures 9.58:1 (WCAG AAA). */
+   Geometry is frozen: same display, padding, radius, font-size,
+   line-height and margin as before — only the two colours changed
+   (8G-R1). The deeper lavender is deliberately distinct from BOTH the
+   pale green panel (#EEF6EF) it sits on and the green post category
+   pill (#E0F3E5) further down, so the two never read as the same
+   component: #D8CBEA sits 24.82 ΔE from the panel.
+
+   Low saturation on purpose (13% HSV) - greyer and deeper than the
+   1.1.7 tint, never neon or a saturated button purple. #49375F on
+   #D8CBEA measures 6.84:1, comfortably WCAG AA. */
 .lumen-category-intro .lumen-archive-context {
 	display: inline-flex;
 	align-items: center;
@@ -396,8 +402,8 @@ body.admin-bar .lumen-site-header {
 	border-radius: 999px;
 	font-size: 13px;
 	line-height: 1.4;
-	color: #3d3357;
-	background: #ece7f6;
+	color: #49375f;
+	background: #d8cbea;
 	margin: 0 0 var(--lumen-space-2);
 	border: 0;
 }
@@ -412,17 +418,32 @@ body.admin-bar .lumen-site-header {
 
 /* E. Divider between the intro panel and the post listing.
    Sits outside the panel, spanning the reading column (not the
-   panel's wider bleed), with equal space on each side so the panel
-   reads as optically centred in its own band of whitespace. This
-   divider also gives the first post the same "rule + meta + title +
-   excerpt" opening that every later post has, so the first item is
-   not a special case (requirement A4); the post list itself is
-   untouched. */
+   panel's wider bleed). This divider also gives the first post the
+   same "rule + meta + title + excerpt" opening that every later post
+   has, so the first item is not a special case (requirement A4); the
+   post list itself is untouched.
+
+   The two sides are deliberately SEPARATE margins (8G-R1):
+     margin-block-start -> panel bottom to the divider. This is the
+       existing A3 symmetry value (24px / 20px / 18px) and must not
+       move, or the top/bottom balance of the panel would break.
+     margin-block-end   -> divider to the first post. This now mirrors
+       the homepage rhythm (--lumen-home-divider-gap: 2rem / 1.75rem)
+       so the first post opens with the same breathing room as every
+       post on the homepage.
+
+   --lumen-cat-intro-gap-below defaults to the homepage desktop value
+   (2rem = 32px) and is tightened to 1.75rem (28px) at the same 768px
+   breakpoint the homepage uses. Only this category-scoped variable is
+   touched — the homepage's own --lumen-home-divider-gap is never
+   read or modified. */
 .lumen-category-intro-divider {
+	--lumen-cat-intro-gap-below: 2rem;
 	height: 1px;
 	width: 100%;
 	background: #dde1e2;
-	margin-block: 24px;
+	margin-block-start: 24px;
+	margin-block-end: var(--lumen-cat-intro-gap-below);
 }
 
 /* F. Symmetric vertical rhythm (A3).
@@ -452,12 +473,22 @@ body.category .lumen-site-main {
 		--lumen-cat-intro-pad-y: 20px;
 		border-radius: 14px;
 	}
+	/* Top side keeps the A3 symmetry value. */
 	body.category .lumen-category-intro-divider {
-		margin-block: 20px;
+		margin-block-start: 20px;
 	}
 	/* Keep A3 symmetric on narrow screens too. */
 	body.category .lumen-site-main {
 		padding-block-start: 20px;
+	}
+}
+
+/* Match the homepage divider rhythm below the divider. The homepage
+   tightens --lumen-home-divider-gap to 1.75rem at max-width 768px, so
+   the category gap follows the same breakpoint to stay in step. */
+@media (max-width: 768px) {
+	body.category .lumen-category-intro-divider {
+		--lumen-cat-intro-gap-below: 1.75rem;
 	}
 }
 
@@ -469,8 +500,9 @@ body.category .lumen-site-main {
 		--lumen-cat-intro-pad-x: 18px;
 		--lumen-cat-intro-pad-y: 18px;
 	}
+	/* Top side only — the bottom side keeps the homepage 1.75rem. */
 	body.category .lumen-category-intro-divider {
-		margin-block: 18px;
+		margin-block-start: 18px;
 	}
 	body.category .lumen-site-main {
 		padding-block-start: 18px;

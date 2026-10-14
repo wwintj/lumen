@@ -318,6 +318,94 @@ body.admin-bar .lumen-site-header {
 }
 
 /* ============================================================
+   Category archive intro (Phase 8F-R1) — CATEGORY ONLY.
+
+   index.php renders category / tag / date / author / taxonomy
+   archives, so every rule below is scoped to .lumen-category-intro,
+   which the template adds only when is_category() is true. Tag,
+   date, author and taxonomy archives keep the original header.
+
+   The pale green panel, the light blue statistics pill and the
+   divider below are the only changes; the post list that follows —
+   and in particular the grey date pill and the green category pill
+   — is deliberately untouched.
+   ============================================================ */
+
+/* A. Pale green introduction panel.
+   #EEF6EF is deliberately lower-saturation and lighter than the
+   green category pill (#E0F3E5) used in the post meta below, so the
+   two never read as the same component. Flat colour, no shadow,
+   no gradient, no background image. */
+.lumen-category-intro {
+	background: #eef6ef;
+	border-radius: 16px;
+	padding: 28px 32px;
+	margin-bottom: 0;
+}
+
+/* B. Category title: keeps the archived H1 typography and simply
+   inherits the site foreground token (--lumen-fg = #1B1B1B). */
+.lumen-category-intro .lumen-archive-title {
+	color: var(--lumen-fg);
+}
+
+/* C. Light blue statistics pill ("Category · 9 posts").
+   inline-flex keeps the pill shrink-to-fit instead of spanning the
+   full row, and the explicit margin-bottom replaces the original
+   paragraph margin so the pill height stays predictable. */
+.lumen-category-intro .lumen-archive-context {
+	display: inline-flex;
+	align-items: center;
+	padding: 4px 12px;
+	border-radius: 999px;
+	font-size: 13px;
+	line-height: 1.4;
+	color: #355b76;
+	background: #e6f2fc;
+	margin: 0 0 var(--lumen-space-2);
+	border: 0;
+}
+
+/* D. Description: unchanged reading typography and colour. The
+   trailing margin is reset here because the panel now supplies the
+   bottom spacing, and long unbroken strings must never escape. */
+.lumen-category-intro .lumen-archive-description {
+	margin: 0;
+	overflow-wrap: anywhere;
+}
+
+/* E. Divider between the intro panel and the post listing.
+   Sits outside the panel: 24px below it, 24px above the first post. */
+.lumen-category-intro-divider {
+	height: 1px;
+	width: 100%;
+	background: #dde1e2;
+	margin: 24px 0;
+}
+
+/* Narrow viewports: tighter panel padding and slightly reduced
+   spacing. The 320px case drops to 18px so the panel never crowds
+   the reading column edge-to-edge. */
+@media (max-width: 767px) {
+	.lumen-category-intro {
+		padding: 20px 20px;
+		border-radius: 14px;
+	}
+	.lumen-category-intro-divider {
+		margin: 20px 0;
+	}
+}
+
+@media (max-width: 360px) {
+	.lumen-category-intro {
+		padding: 18px 18px;
+	}
+	.lumen-category-intro-divider {
+		margin: 18px 0;
+	}
+}
+
+/* ============================================================
    Post list (archive / search)
    ============================================================ */
 

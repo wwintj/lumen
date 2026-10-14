@@ -17,8 +17,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 <?php get_header(); ?>
 
+<?php
+/*
+ * Category-only intro enhancement (see Phase 8F-R1). This must be resolved
+ * before the <header> element is rendered, because the decorative class is
+ * part of its class attribute. Applied on is_category() alone so that tag,
+ * date, author, taxonomy and post-type archives sharing this template keep
+ * their original presentation.
+ */
+$is_category_intro = is_category();
+?>
+
 <section class="lumen-archive-wrap">
-	<header class="lumen-archive-header">
+	<header class="<?php echo esc_attr( 'lumen-archive-header' . ( $is_category_intro ? ' lumen-category-intro' : '' ) ); ?>">
 		<h1 class="lumen-archive-title">
 			<?php
 			$archive_title = '';
@@ -69,6 +80,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</p>
 		<?php endif; ?>
 	</header>
+
+	<?php if ( $is_category_intro ) : ?>
+		<?php
+		/*
+		 * Divider between the category introduction and the post listing.
+		 * Purely decorative: aria-hidden + empty, so it is skipped by
+		 * assistive technology and never appears in the heading outline.
+		 */
+		?>
+		<div class="lumen-category-intro-divider" aria-hidden="true"></div>
+	<?php endif; ?>
 
 	<?php get_template_part( 'template-parts/post-list', null, array( 'context' => 'archive' ) ); ?>
 </section>

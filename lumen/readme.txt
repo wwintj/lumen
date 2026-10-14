@@ -4,7 +4,7 @@ Contributor URI: https://github.com/wwintj
 Author: Lumen Team
 Author URI: https://github.com/wwintj
 Homepage URL: https://github.com/wwintj/lumen
-Version: 1.1.5
+Version: 1.1.6
 Requires at least: 6.3
 Tested up to: 6.7
 Requires PHP: 8.2
@@ -14,7 +14,7 @@ Text Domain: lumen
 Domain Path: /
 Tags: blog, content, minimalist, responsive-layout, custom-menu, translation-ready, rss-icons
 
-極簡、對 SEO 友善的內容部落格佈景主題，專為中英雙語網站設計。1.1.2 為 Lumen 的正式穩定版本，在 1.1.0 的歸檔與搜尋核心正確性、文字優先閱讀排版，以及零 Theme JavaScript 設計之上，於 1.1.1 新增頁首圖示式可展開搜尋並統一 Header／Footer 閱讀字體，1.1.2 進一步調整頁首搜尋與導覽的版面、為列表加上日期與分類膠囊標籤，並將首頁分頁與單篇文章導覽改為純箭頭膠囊。
+極簡、對 SEO 友善的內容部落格佈景主題，專為中英雙語網站設計。1.1.6 為 Lumen 的正式穩定版本，在 1.1.0 的歸檔與搜尋核心正確性、文字優先閱讀排版，以及零 Theme JavaScript 設計之上，於 1.1.1 新增頁首圖示式可展開搜尋並統一 Header／Footer 閱讀字體，1.1.2 進一步調整頁首搜尋與導覽的版面、為列表加上日期與分類膠囊標籤，並將首頁分頁與單篇文章導覽改為純箭頭膠囊，1.1.6 則精修分類頁頂部介紹區：淺綠色面板、深灰標題、淡藍統計膠囊與獨立分隔線。
 
 == Features ==
 * 語意化 HTML5 結構（header、nav、main、article、section、footer）。
@@ -53,6 +53,16 @@ Tags: blog, content, minimalist, responsive-layout, custom-menu, translation-rea
 具體功能（自訂內容類型、表單、REST API）僅在出現明確需求時，才於後續階段加入（YAGNI）。
 
 == Changelog ==
+* 1.1.6 (Stable release)
+  * 分類頁頂部介紹區改為淺綠色圓角面板（#eef6ef），讓「分類說明」與下方文章列表的層級一眼可辨。
+  * 分類標題維持原本的閱讀襯線大標與 --lumen-fg（#1b1b1b）深灰色，不另造新色。
+  * 分類統計改為淡藍色膠囊（#e6f2fc 底、#355b76 字），以 inline-flex 依內容自然撐開，不整行鋪滿。
+  * 分類描述維持既有正文字體、字級與 #4b4b4b 顏色，僅在面板內取消多餘下緣留白並加上長字詞換行保護。
+  * 介紹面板與文章列表之間新增一條 1px 淺灰分隔線（#dde1e2），上下各留 24px；行動裝置縮為 20px／18px。
+  * 上述樣式一律以 is_category() 產生的 .lumen-category-intro 作用域限定，屬分類頁專屬；
+    標籤、日期、作者、分類法與文章類型彙整頁，以及首頁、搜尋、單篇文章均維持原樣。
+  * 文章列表的日期膠囊（#f0f1f2／#52565c）與分類綠色膠囊（#e0f3e5／#176d39）完全未變。
+  * 未新增任何 JavaScript，維持零 Theme JavaScript 設計。
 * 1.1.5 (Stable release)
   * 全域搜尋框改為真正的純白、無邊框膠囊：背景改為 #ffffff，並移除 1px 灰色邊框。
     1.1.4 的底色為 --lumen-bg-soft（#f4f4f4）且帶 1px #e6e6e6 邊框，

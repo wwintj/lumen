@@ -318,28 +318,59 @@ body.admin-bar .lumen-site-header {
 }
 
 /* ============================================================
-   Category archive intro (Phase 8F-R1) — CATEGORY ONLY.
+   Category archive intro (Phase 8F-R1 / 8F-R2) — CATEGORY ONLY.
 
    index.php renders category / tag / date / author / taxonomy
-   archives, so every rule below is scoped to .lumen-category-intro,
-   which the template adds only when is_category() is true. Tag,
-   date, author and taxonomy archives keep the original header.
+   archives, so everything below is scoped to the category archive
+   through the body class WordPress already emits (`body.category`,
+   from body_class()). Tag, date, author and taxonomy archives keep
+   the original header untouched. The intro-panel selectors are also
+   prefixed with .lumen-category-intro, which the template adds only
+   when is_category() is true, as a second line of defence.
 
-   The pale green panel, the light blue statistics pill and the
-   divider below are the only changes; the post list that follows —
-   and in particular the grey date pill and the green category pill
-   — is deliberately untouched.
+   The post list that follows — and in particular the grey date pill
+   and the green category pill — is deliberately untouched.
+
+   Layout model (8F-R2, requirement A2):
+     The panel's horizontal padding is cancelled by an equal negative
+     inline margin, so the TEXT inside the panel starts on exactly the
+     same vertical line as the post titles, meta and excerpts below
+     it. The pale green field therefore bleeds symmetrically to either
+     side instead of pushing its content 32px right of the column.
+
+     The bleed needs free space beside the reading column. On desktop
+     the centred column already provides it. On narrow screens the
+     column would run edge to edge, so the category archive gets a
+     small gutter that the panel bleeds back out across. Gutter and
+     panel padding are kept equal, so the panel text lands exactly on
+     the column edge at every width.
+
+   No :has() and no JavaScript are used, so this works in every
+   browser the theme supports.
    ============================================================ */
 
 /* A. Pale green introduction panel.
-   #EEF6EF is deliberately lower-saturation and lighter than the
-   green category pill (#E0F3E5) used in the post meta below, so the
-   two never read as the same component. Flat colour, no shadow,
-   no gradient, no background image. */
+   #EEF6EF is deliberately lower-saturation and lighter than the green
+   category pill (#E0F3E5) used in the post meta below, so the two
+   never read as the same component. Flat colour: no shadow, no
+   gradient, no background image. */
 .lumen-category-intro {
+	--lumen-cat-intro-pad-x: 32px;
+	--lumen-cat-intro-pad-y: 28px;
+	/* Free space the panel may bleed into: whatever the centred
+	   reading column leaves on wide screens, plus (on narrow screens)
+	   the gutter declared on the archive wrap below. */
+	--lumen-cat-intro-room: calc(var(--lumen-cat-intro-gutter, 0px) + max(0px, (100vw - var(--lumen-content-max)) / 2));
+
 	background: #eef6ef;
 	border-radius: 16px;
-	padding: 28px 32px;
+	padding: var(--lumen-cat-intro-pad-y) var(--lumen-cat-intro-pad-x);
+	/* Bleed out symmetrically so the panel's TEXT aligns with the
+	   post content below, capped by the room actually available so
+	   the panel can never cause horizontal overflow at any width. */
+	margin-inline: calc(-1 * min(var(--lumen-cat-intro-pad-x), var(--lumen-cat-intro-room)));
+	/* The panel owns the space beneath it; the divider margin is
+	   measured from here. */
 	margin-bottom: 0;
 }
 
@@ -349,10 +380,15 @@ body.admin-bar .lumen-site-header {
 	color: var(--lumen-fg);
 }
 
-/* C. Light blue statistics pill ("Category · 9 posts").
+/* C. Light lavender statistics pill ("Category · N posts").
    inline-flex keeps the pill shrink-to-fit instead of spanning the
    full row, and the explicit margin-bottom replaces the original
-   paragraph margin so the pill height stays predictable. */
+   paragraph margin so the pill height stays predictable.
+
+   The lavender is intentionally distinct from BOTH the pale green
+   panel (#EEF6EF) it sits on and the green post category pill
+   (#E0F3E5) further down, so the two never read as the same
+   component. #3D3357 on #ECE7F6 measures 9.58:1 (WCAG AAA). */
 .lumen-category-intro .lumen-archive-context {
 	display: inline-flex;
 	align-items: center;
@@ -360,8 +396,8 @@ body.admin-bar .lumen-site-header {
 	border-radius: 999px;
 	font-size: 13px;
 	line-height: 1.4;
-	color: #355b76;
-	background: #e6f2fc;
+	color: #3d3357;
+	background: #ece7f6;
 	margin: 0 0 var(--lumen-space-2);
 	border: 0;
 }
@@ -375,33 +411,69 @@ body.admin-bar .lumen-site-header {
 }
 
 /* E. Divider between the intro panel and the post listing.
-   Sits outside the panel: 24px below it, 24px above the first post. */
+   Sits outside the panel, spanning the reading column (not the
+   panel's wider bleed), with equal space on each side so the panel
+   reads as optically centred in its own band of whitespace. This
+   divider also gives the first post the same "rule + meta + title +
+   excerpt" opening that every later post has, so the first item is
+   not a special case (requirement A4); the post list itself is
+   untouched. */
 .lumen-category-intro-divider {
 	height: 1px;
 	width: 100%;
 	background: #dde1e2;
-	margin: 24px 0;
+	margin-block: 24px;
 }
 
-/* Narrow viewports: tighter panel padding and slightly reduced
-   spacing. The 320px case drops to 18px so the panel never crowds
-   the reading column edge-to-edge. */
-@media (max-width: 767px) {
-	.lumen-category-intro {
-		padding: 20px 20px;
+/* F. Symmetric vertical rhythm (A3).
+   The two bands of whitespace around the panel should read as equal:
+     above = site header's bottom border -> panel top
+     below = panel bottom -> listing divider
+   .lumen-site-main contributes 2.5rem (40px) of top padding while the
+   divider below the panel carries 24px, so the panel originally sat
+   in a 16px-taller band above than below. Pin the top padding to the
+   same 24px rhythm used underneath. */
+body.category .lumen-site-main {
+	padding-block-start: 24px;
+}
+
+/* Narrow screens: the reading column would run edge to edge, leaving
+   the panel nowhere to bleed. Give the category archive a gutter and
+   keep it exactly equal to the panel padding, so the bleed fully
+   cancels the padding and the panel text still lands on the column
+   edge. */
+@media (max-width: 860px) {
+	body.category .lumen-archive-wrap {
+		--lumen-cat-intro-gutter: 20px;
+		padding-inline: var(--lumen-cat-intro-gutter);
+	}
+	body.category .lumen-category-intro {
+		--lumen-cat-intro-pad-x: 20px;
+		--lumen-cat-intro-pad-y: 20px;
 		border-radius: 14px;
 	}
-	.lumen-category-intro-divider {
-		margin: 20px 0;
+	body.category .lumen-category-intro-divider {
+		margin-block: 20px;
+	}
+	/* Keep A3 symmetric on narrow screens too. */
+	body.category .lumen-site-main {
+		padding-block-start: 20px;
 	}
 }
 
 @media (max-width: 360px) {
-	.lumen-category-intro {
-		padding: 18px 18px;
+	body.category .lumen-archive-wrap {
+		--lumen-cat-intro-gutter: 18px;
 	}
-	.lumen-category-intro-divider {
-		margin: 18px 0;
+	body.category .lumen-category-intro {
+		--lumen-cat-intro-pad-x: 18px;
+		--lumen-cat-intro-pad-y: 18px;
+	}
+	body.category .lumen-category-intro-divider {
+		margin-block: 18px;
+	}
+	body.category .lumen-site-main {
+		padding-block-start: 18px;
 	}
 }
 

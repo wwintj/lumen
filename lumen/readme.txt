@@ -4,7 +4,7 @@ Contributor URI: https://github.com/wwintj
 Author: Lumen Team
 Author URI: https://github.com/wwintj
 Homepage URL: https://github.com/wwintj/lumen
-Version: 1.1.6
+Version: 1.1.7
 Requires at least: 6.3
 Tested up to: 6.7
 Requires PHP: 8.2
@@ -14,7 +14,7 @@ Text Domain: lumen
 Domain Path: /
 Tags: blog, content, minimalist, responsive-layout, custom-menu, translation-ready, rss-icons
 
-極簡、對 SEO 友善的內容部落格佈景主題，專為中英雙語網站設計。1.1.6 為 Lumen 的正式穩定版本，在 1.1.0 的歸檔與搜尋核心正確性、文字優先閱讀排版，以及零 Theme JavaScript 設計之上，於 1.1.1 新增頁首圖示式可展開搜尋並統一 Header／Footer 閱讀字體，1.1.2 進一步調整頁首搜尋與導覽的版面、為列表加上日期與分類膠囊標籤，並將首頁分頁與單篇文章導覽改為純箭頭膠囊，1.1.6 則精修分類頁頂部介紹區：淺綠色面板、深灰標題、淡藍統計膠囊與獨立分隔線。
+極簡、對 SEO 友善的內容部落格佈景主題，專為中英雙語網站設計。1.1.7 為 Lumen 的正式穩定版本，在 1.1.0 的歸檔與搜尋核心正確性、文字優先閱讀排版，以及零 Theme JavaScript 設計之上，於 1.1.1 新增頁首圖示式可展開搜尋並統一 Header／Footer 閱讀字體，1.1.2 進一步調整頁首搜尋與導覽的版面、為列表加上日期與分類膠囊標籤，並將首頁分頁與單篇文章導覽改為純箭頭膠囊，1.1.6 精修分類頁頂部介紹區，1.1.7 則進一步校正該介紹區的版式節奏：面板內文與文章列表共用同一條左側基線、上下留白對稱，統計膠囊改為淡紫色。
 
 == Features ==
 * 語意化 HTML5 結構（header、nav、main、article、section、footer）。
@@ -53,6 +53,21 @@ Tags: blog, content, minimalist, responsive-layout, custom-menu, translation-rea
 具體功能（自訂內容類型、表單、REST API）僅在出現明確需求時，才於後續階段加入（YAGNI）。
 
 == Changelog ==
+* 1.1.7 (Stable release)
+  * 分類頁介紹面板的左右內距改以等量負邊界抵銷，使面板內的標題、統計膠囊與描述，
+    與下方第一篇文章的標題／摘要／meta 共用同一條左側垂直基線（A2）。
+  * 面板左右改為對稱溢出閱讀欄；窄螢幕為分類頁加上與內距等寬的留白，
+    讓文字仍精準落在欄位邊緣，且 320–1920px 全區間皆無橫向溢出。
+  * 介紹面板上下留白改為對稱：頁首下緣分隔線到面板、面板到列表分隔線，桌面皆為 24px，
+    行動裝置 20px、≤360px 為 18px（A3）。
+  * 面板與列表之間維持獨立 1px 淺灰分隔線（#dde1e2），第一篇文章因此與後續文章
+    共用同一套「分隔線 + meta + 標題 + 摘要」節奏，不再是特例（A4）。
+  * 分類統計膠囊由淡藍改為淡紫（#ece7f6 底、#3d3357 字，對比 9.58:1 / WCAG AAA），
+    與淺綠面板及下方綠色分類膠囊在色相上明確區隔（B）。
+  * 文章列表的日期膠囊（#f0f1f2／#52565c）與分類綠色膠囊（#e0f3e5／#176d39）完全未變；
+    首頁、搜尋、單篇文章、404、標籤、日期、作者彙整頁逐像素與 1.1.6 相同。
+  * 本次僅修改 lumen/assets/css/main.css，未新增或修改任何模板與 JavaScript，
+    並以 body.category 作用域限定，不使用 :has()，維持零 Theme JavaScript 設計。
 * 1.1.6 (Stable release)
   * 分類頁頂部介紹區改為淺綠色圓角面板（#eef6ef），讓「分類說明」與下方文章列表的層級一眼可辨。
   * 分類標題維持原本的閱讀襯線大標與 --lumen-fg（#1b1b1b）深灰色，不另造新色。

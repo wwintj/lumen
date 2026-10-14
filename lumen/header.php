@@ -21,16 +21,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<header class="lumen-site-header">
 		<div class="lumen-container lumen-header-inner">
-			<?php
-			/*
-			 * Desktop-only balancing spacer (hidden on mobile). On desktop the
-			 * header is a 3-column grid whose outer columns are equal, so the
-			 * middle column — the search + nav group — is centred while the brand
-			 * stays hard left. Purely presentational.
-			 */
-			?>
-			<div class="lumen-header-spacer-before" aria-hidden="true"></div>
-
 			<div class="lumen-site-brand-wrap">
 				<?php if ( has_custom_logo() ) : ?>
 					<div class="lumen-site-logo">
@@ -45,49 +35,72 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			<?php
 			/*
-			 * Search + navigation form ONE group, so the magnifier sits directly
-			 * before the first nav link and the pair can be centred as a unit on
-			 * desktop or split across two rows on mobile (M2).
-			 *
-			 * <details>/<summary> gives the open/close behaviour natively: the
-			 * summary is focusable and toggles on Enter/Space with no JavaScript
-			 * and no hand-maintained aria-expanded. While closed, the inner input
-			 * is not rendered and stays out of the normal Tab order.
+			 * Search + navigation form ONE group. On desktop the group is pushed
+			 * to the right edge with an auto margin, giving the same left/right
+			 * rhythm the footer uses so the last menu item and the footer RSS link
+			 * line up. On mobile the group is split across two grid rows by CSS:
+			 * the magnifier on the brand's row, the navigation on its own row.
 			 *
 			 * There is deliberately ONE markup instance, repositioned purely with
 			 * CSS per breakpoint — not a duplicate desktop/mobile search form with
 			 * one of them hidden.
 			 *
-			 * The search toggle is never nested inside the navigation <ul>, so the
-			 * menu stays a single semantic list and cannot disturb its wrapping.
-			 *
-			 * Note: native <details> does NOT close on Escape. That behaviour is
-			 * intentionally not faked, since doing so would require JavaScript.
+			 * The search toggle is a <button>, never an <a>: it performs an action
+			 * rather than navigating, and a button is announced and activated
+			 * correctly. `type="button"` keeps it from submitting any surrounding
+			 * form. The toggle is also never nested inside the navigation <ul>, so
+			 * the menu stays a single semantic list and cannot disturb its wrapping.
 			 */
 			?>
 			<div class="lumen-header-nav-group">
 				<div class="lumen-header-search-wrap">
-					<details class="lumen-header-search">
-						<summary class="lumen-header-search-toggle">
-							<?php
-							echo lumen_search_icon_svg(); // phpcs:ignore WordPress.Security.EscapeOutput -- static inline SVG.
-							?>
-							<span class="visually-hidden"><?php echo esc_html__( 'Search', 'lumen' ); ?></span>
-						</summary>
-						<div class="lumen-header-search-panel">
-							<?php lumen_search_form( 'header' ); ?>
-						</div>
-					</details>
+					<button
+						type="button"
+						class="lumen-header-search-toggle"
+						popovertarget="lumen-site-search-popover"
+						popovertargetaction="toggle"
+						aria-label="<?php echo esc_attr__( 'Search', 'lumen' ); ?>"
+					>
+						<?php
+						echo lumen_search_icon_svg(); // phpcs:ignore WordPress.Security.EscapeOutput -- static inline SVG.
+						?>
+					</button>
 				</div>
 
 				<nav class="lumen-site-nav" aria-label="<?php echo esc_attr__( 'Primary menu', 'lumen' ); ?>">
 					<?php lumen_render_nav( 'primary' ); ?>
 				</nav>
 			</div>
-
-			<div class="lumen-header-spacer" aria-hidden="true"></div>
 		</div>
 	</header>
+
+	<?php
+	/*
+	 * Global search popover.
+	 *
+	 * Native HTML Popover API: the button above toggles this element through
+	 * popovertarget/popovertargetaction, so open, close, re-click, Escape and
+	 * click-outside are all the browser's job. No JavaScript, no focus trap and
+	 * no aria-modal — this is a NON-modal popover and must not claim to confine
+	 * keyboard focus the way showModal() would.
+	 *
+	 * `popover="auto"` (not `manual`) is required here. Escape-to-close and
+	 * light dismiss are defined only for the auto state; a manual popover never
+	 * closes on Escape and never closes when the user clicks away, which would
+	 * leave the search field stuck open with no pointer-only way out. Auto also
+	 * supplies the ::backdrop used for the dimming layer in CSS.
+	 *
+	 * Colour refinement: with `auto`, ::backdrop is the browser's own layer, so
+	 * the click target is the underlying page rather than the popover — clicking
+	 * the toggle while open still reaches the button and closes the search.
+	 *
+	 * This sits outside <header> so it is not bound to the sticky header's
+	 * stacking context or clipped by the container.
+	 */
+	?>
+	<div id="lumen-site-search-popover" class="lumen-search-popover" popover="auto">
+		<?php lumen_search_form( 'header' ); ?>
+	</div>
 
 	<!-- tabindex="-1" makes #lumen-main a focus target for the skip link
 	     (not a Tab stop, so it does not alter keyboard navigation). -->

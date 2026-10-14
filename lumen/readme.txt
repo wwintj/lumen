@@ -4,7 +4,7 @@ Contributor URI: https://github.com/wwintj
 Author: Lumen Team
 Author URI: https://github.com/wwintj
 Homepage URL: https://github.com/wwintj/lumen
-Version: 1.1.2
+Version: 1.1.3
 Requires at least: 6.3
 Tested up to: 6.7
 Requires PHP: 8.2
@@ -53,6 +53,39 @@ Tags: blog, content, minimalist, responsive-layout, custom-menu, translation-rea
 具體功能（自訂內容類型、表單、REST API）僅在出現明確需求時，才於後續階段加入（YAGNI）。
 
 == Changelog ==
+* 1.1.3 (Stable release)
+  * 桌面版頁首改為左右對齊：網站標題或 Custom Logo 貼齊容器左緣，搜尋圖示與主要導覽組成
+    一個群組整組靠右，最後一個選單項目的右緣與頁尾 RSS 的右緣一致。取消先前用於強制置中
+    導覽的三欄 Grid，並移除左右平衡用的空白 Spacer，改用單純的 flex 自動邊距；
+    頁首字體、導覽 hover／active 顏色與字級皆未變更。
+  * 行動版維持既有的兩列配置（M2）：第一列為品牌與右側搜尋圖示，第二列為可自由換行的導覽；
+    320px 不產生橫向溢出，未複製第二套搜尋元件，Sticky Header 與 Admin Bar 行為不變。
+  * 全站搜尋改為原生 HTML Popover：頁首只保留一個放大鏡按鈕，點擊後於瀏覽器可視區域
+    「正中央」開啟單一搜尋輸入框，背景以 ::backdrop 輕微變暗（rgba(0,0,0,0.10)）。
+  * Popover 使用原生 popover="auto" 與原生按鈕觸發（type="button"、
+    popovertarget="lumen-site-search-popover"、popovertargetaction="toggle"）：
+    再次點擊圖示、按 Esc、點擊浮層外部皆可關閉，關閉後焦點回到觸發按鈕，
+    全部交由瀏覽器處理。
+  * 彈出視窗內只有一個搜尋輸入框：無標題、無說明文字、無第二個放大鏡、無送出按鈕、
+    無關閉按鈕、無底部說明、無搜尋歷史、無推薦關鍵字、無結果預覽。
+    輸入框內僅提供 placeholder「Search articles…」，且不取代真正的可存取 Label。
+  * 搜尋沿用 WordPress 原生 GET 機制（method="get"、action 為 home_url('/')、
+    參數 s、type="search"），輸入關鍵字後按 Enter 前往搜尋結果頁；
+    支援中文、英文、空白與特殊字元的正確 URL 編碼，既有搜尋關鍵字亦安全回顯。
+  * 彈出視窗寬度：桌面約 420px、輸入區高度約 48px、1px 淺灰邊框、圓角 8px、
+    無陰影、無動畫；行動版最大寬度為可視區域減去左右各 16px，不溢出、不產生橫向捲動。
+  * 浮層由瀏覽器 Top Layer 呈現，不再依賴 Header 的 position: sticky 或 z-index，
+    也不再以 right: 0 綁定頁首右緣；開啟時不改變頁首高度、不推動文章列表、
+    捲動頁面後仍能正常置中彈出。
+  * 移除舊版 details／summary 下拉式搜尋的專屬 CSS 與其浮層定位規則，
+    不再保留互相衝突的過時樣式；未使用 Popover API 的瀏覽器仍可透過一般表單使用搜尋。
+  * 仍然維持零 JavaScript：主題內沒有任何 .js 檔案，未新增外掛、第三方框架、
+    外部字體或外部圖示庫，未使用 AJAX 搜尋、搜尋建議或自訂搜尋索引，
+    亦未新增任何 WordPress 管理後台設定。
+  * 既有功能全部保留：部落格首頁、歸檔與搜尋結果的日期與分類膠囊、
+    首頁純箭頭分頁、單篇文章純箭頭導覽、頁首與頁尾字體、文章閱讀字體、
+    程式碼字體與搜尋結果頁排版皆未變更。
+  * 新增可翻譯字串並同步更新 languages/lumen.pot。
 * 1.1.2 (Stable release)
   * 頁首搜尋版面調整：搜尋圖示改與主要導覽視為同一個視覺群組，桌面版將兩者一起置中，
     圖示緊接在第一個導覽連結之前（間距約 16px），不再被孤立推到頁首最右端；

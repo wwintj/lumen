@@ -80,15 +80,28 @@ if ( ! function_exists( 'lumen_search_form' ) ) {
 			? ' aria-label="' . esc_attr__( 'Site search', 'lumen' ) . '"'
 			: '';
 
+		// Header context: the input lives inside the global search popover, so
+		// it asks for focus as the popover opens. `autofocus` is honoured where
+		// the popover moves focus on open; where it is not, the user simply
+		// clicks or Tabs into the field. Nothing here depends on that.
+		$autofocus = $is_header ? ' autofocus' : '';
+
+		// Header context: a short hint inside the field. The placeholder is a
+		// convenience ONLY — it never replaces the real <label> below, which
+		// stays in the accessibility tree as the field's name.
+		$placeholder = $is_header
+			? ' placeholder="' . esc_attr__( 'Search articles…', 'lumen' ) . '"'
+			: '';
+
 		echo '<form role="search" method="get" action="' . esc_url( home_url( '/' ) ) . '" class="' . esc_attr( $form_class ) . '"' . $aria_label . '>';
 		echo '<label id="' . esc_attr( $label_id ) . '" for="' . esc_attr( $input_id ) . '" class="visually-hidden">' . esc_html__( 'Search', 'lumen' ) . '</label>';
-		echo '<input id="' . esc_attr( $input_id ) . '" name="s" type="search" class="lumen-search-input" value="' . esc_attr( get_query_var( 's' ) ) . '" autocomplete="off">';
+		echo '<input id="' . esc_attr( $input_id ) . '" name="s" type="search" class="lumen-search-input" value="' . esc_attr( get_query_var( 's' ) ) . '" autocomplete="off"' . $placeholder . $autofocus . '>';
 
 		if ( $is_header ) {
-			// Header context: the form holds ONLY the input. The magnifier in the
-			// <summary> is the submit control for the open panel (an <input type=submit>
-			// there would be a second, visually redundant button), so no submit
-			// button is emitted here. Pressing Enter in the input still submits the
+			// Header context: the form holds ONLY the input. The magnifier button
+			// opens the popover and is not a submit control (an <input type=submit>
+			// here would be a second, visually redundant button), so no submit
+			// button is emitted. Pressing Enter in the input still submits the
 			// form natively — no JavaScript involved.
 		} else {
 			echo '<button type="submit" class="lumen-search-button">' . esc_html__( 'Search', 'lumen' ) . '</button>';

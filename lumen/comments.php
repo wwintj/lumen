@@ -69,9 +69,39 @@ $lumen_form_args = array(
 			them in a semantic <ol class="lumen-comment-list">; the nested
 			<ul class="children"> remain valid Core child lists. Only valid Core
 			args are passed: 'avatar_size' sizes the gravatar.
+
+			Static author names (v1.1.16): the filter below is attached only for
+			the duration of this one wp_list_comments() call and detached again
+			immediately after, so the change is scoped strictly to the comment
+			list rendered here. It does not affect wp-admin, feeds, or any other
+			author output elsewhere on the site.
 		-->
 		<ol class="lumen-comment-list">
-			<?php wp_list_comments( array( 'avatar_size' => 48 ) ); ?>
+			<?php
+			/*
+			 * Render the comment author as plain, escaped text instead of a
+			 * link. Requires no custom walker: Core builds the author from
+			 * get_comment_author_link(), so filtering that value to the safely
+			 * escaped display name removes the <a> for every comment in this
+			 * list (top-level and nested alike).
+			 *
+			 * get_comment_author_link() passes the already-linked HTML as the
+			 * first argument and the comment ID as the second, so the raw name
+			 * is read back through Core's own get_comment_author() and escaped
+			 * once with esc_html() — no double-escaping, no HTML survives.
+			 *
+			 * This deliberately does NOT touch the stored comment_author_url
+			 * data or any user profile; it only changes what this list prints.
+			 */
+			$lumen_static_author = static function ( $link, $comment_id = 0 ) {
+				return esc_html( get_comment_author( (int) $comment_id ) );
+			};
+			add_filter( 'get_comment_author_link', $lumen_static_author, 10, 2 );
+
+			wp_list_comments( array( 'avatar_size' => 48 ) );
+
+			remove_filter( 'get_comment_author_link', $lumen_static_author, 10 );
+			?>
 		</ol>
 
 		<?php the_comments_pagination(); ?>

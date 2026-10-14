@@ -20,7 +20,7 @@ Lumen 是一層輕量的**呈現層**：版面、排版、色彩、導覽，以�
 
 ## 版本與發布政策
 
-目前**正式發布**版本為 **1.1.15**（GitHub `Latest`）。`main` 分支會持續整併尚未發布的開發內容，
+目前**正式發布**版本為 **1.1.16**（GitHub `Latest`）。`main` 分支會持續整併尚未發布的開發內容，
 因此 **`main` 的內容可能領先於正式版 ZIP**。實際發布版本、下載檔案及 `Latest` 狀態，
 一律以 [GitHub Releases](https://github.com/wwintj/lumen/releases) 頁面為準。
 
@@ -82,7 +82,7 @@ Lumen 是一層輕量的**呈現層**：版面、排版、色彩、導覽，以�
 ### 從正式 Release 安裝（建議）
 
 1. 至 [GitHub Releases](https://github.com/wwintj/lumen/releases) 下載最新正式版 ZIP
-   （目前為 `lumen-1.1.15.zip`）。
+   （目前為 `lumen-1.1.16.zip`）。
 2. 於 wp-admin：**外觀 → 佈景主題 → 安裝佈景主題 → 上傳佈景主題** → 選擇該 ZIP。
 3. 啟用佈景主題。
 4. *（選用）* 安裝並啟用 **Lumen Blog** 配套外掛。
@@ -99,7 +99,75 @@ Lumen 是一層輕量的**呈現層**：版面、排版、色彩、導覽，以�
 ### 歷史版本
 
 舊版 Release 保留於 [GitHub Releases](https://github.com/wwintj/lumen/releases) 頁面，
-可作為回退用途；`v1.1.14` 為 1.1.15 之前的穩定版本，`v1.1.13` 為 1.1.14 之前的穩定版本，`v1.1.12` 為 1.1.13 之前的穩定版本，`v1.1.11` 為 1.1.12 之前的穩定版本，`v1.1.10`，`v1.1.9`，`v1.1.8`，`v1.1.7`，`v1.1.6`、`v1.1.5`、`v1.1.4`、`v1.1.3`、`v1.1.2`、`v1.1.1`、`v1.1.0` 為更早的穩定版本。
+可作為回退用途；`v1.1.15` 為 1.1.16 之前的穩定版本，`v1.1.14` 為 1.1.15 之前的穩定版本，`v1.1.13` 為 1.1.14 之前的穩定版本，`v1.1.12` 為 1.1.13 之前的穩定版本，`v1.1.11` 為 1.1.12 之前的穩定版本，`v1.1.10`，`v1.1.9`，`v1.1.8`，`v1.1.7`，`v1.1.6`、`v1.1.5`、`v1.1.4`、`v1.1.3`、`v1.1.2`、`v1.1.1`、`v1.1.0` 為更早的穩定版本。
+
+## Lumen 1.1.16 版本重點
+
+1.1.16 為 **Production Feedback Bugfix Release**：由使用者在真實 WordPress 站點安裝
+1.1.15 後回報的三個問題驅動，本輪只修這三件事，不做其他視覺改版或重構。
+
+### 1. 修復原生 Reply（巢狀回覆）
+
+**症狀**：點擊留言右側綠色 `Reply` 膠囊後沒有任何反應。
+
+**根因**：`lumen/inc/enqueue.php` 只入隊樣式表，**全主題沒有任何
+`wp_enqueue_script()` 呼叫**，因此 WordPress Core 的 `comment-reply` 腳本從未載入。
+`Reply` 連結本身仍由 Core 正確輸出，但沒有 JS 綁定事件去搬移 `#respond` 表單，
+瀏覽器只執行預設錨點跳轉，看起來就像「按了沒反應」。
+
+**修復**：依 Core 標準條件入隊 Core 內建腳本：
+
+```php
+if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
+    wp_enqueue_script( 'comment-reply' );
+}
+```
+
+只使用 WordPress 自帶的 `comment-reply`：沒有自訂回覆 JavaScript、沒有 jQuery 外掛、
+沒有 CDN、沒有複製或修改 Core 腳本。首頁、分類、搜尋、404 完全不載入。
+
+> 本主題的「零 JavaScript」目標指的是 **主題自訂 JS 檔案為 0**；
+> 載入 Core 原生的回覆能力並不違反該目標。
+
+> 若站點的 `設定 → 討論` 未開啟「Enable threaded (nested) comments」，
+> WordPress 本身就不會提供巢狀回覆互動。主題不會代為修改站點設定。
+
+### 2. 留言區縱向留白減半
+
+| 項目 | 1.1.15 | 1.1.16 |
+| --- | --- | --- |
+| 氣泡上下內距 | 12px | 6px |
+| 頂層留言上下內距 | 24px | 12px |
+| 作者膠囊縱向內距 | 2px | 1px |
+| Reply 膠囊縱向內距 | 2px | 1px |
+| 標頭列間距 | 0.35rem | 0.175rem |
+| 巢狀子項內距／children 上緣間距 | 12px／12px | 6px／6px |
+
+**只調整縱向留白**：氣泡水平內距、膠囊水平內距、字級、顏色、氣泡寬度（維持 100%）、
+虛線分隔與整體視覺語言全部不變。
+
+### 3. 評論者姓名改為靜態文字
+
+**症狀**：留言者姓名出現**雙層膠囊**、Hover 時內層背景變化、姓名为**斜體**，
+且點擊姓名會**跳轉網站首頁**。
+
+**根因**（三項）：
+
+1. WordPress Core 依留言者的 Website 欄位輸出 `<cite class="fn"><a href="…">姓名</a></cite>`；
+   Website 留空時 Core 會補上站點首頁，於是點擊即跳首頁。
+2. 1.1.15 的 CSS 選擇器 `.lumen-comments .comment-author .fn, .lumen-comments .comment-author .fn a`
+   同時命中**外層 `<cite>` 與內層 `<a>`**，兩者各自取得 padding 與背景 → 雙層膠囊；
+   內層另有 `:hover` 規則 → Hover 變色。
+3. `<cite>` 的瀏覽器預設樣式是 `font-style: italic` → 姓名斜體。
+
+**修復**：
+
+- 以 WordPress 原生 `get_comment_author_link` 過濾器，在 `wp_list_comments()` 的
+  渲染期間把作者輸出為**安全轉義的純文字**，渲染結束立即 `remove_filter()`。
+  範圍僅限該次留言列表：不影響後台、RSS Feed 或站點其他作者輸出。
+- 不修改資料庫中的留言者 Website，不修改使用者 Profile，不開發自訂 Walker。
+- CSS 只對 `.fn` 上色，並保留 `.fn a` 的重設規則作為防禦；加上 `font-style: normal`，
+  移除 `:hover` 變色。姓名膠囊只保留**單層**樣式、無陰影、無 Hover 變化。
 
 ## Lumen 1.1.15 版本重點
 
@@ -668,7 +736,7 @@ dashed dividers、author/date/reply compact header row、green pill actions。
 - **頁首／頁尾互動回饋** —— 頁首導覽與頁尾 RSS／選單連結的柔和背景懸停效果、目前頁面／分類的
   常駐作用中狀態，以及網站標題的細緻懸停效果。
 
-目前原始碼版本：**1.1.15**。完整變更紀錄：[lumen/readme.txt](lumen/readme.txt#changelog)。
+目前原始碼版本：**1.1.16**。完整變更紀錄：[lumen/readme.txt](lumen/readme.txt#changelog)。
 實際發布版本與下載檔案，請以 [GitHub Releases](https://github.com/wwintj/lumen/releases) 為準。
 
 ## 專案目錄結構

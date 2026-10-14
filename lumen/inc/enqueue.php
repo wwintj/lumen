@@ -2,8 +2,16 @@
 /**
  * Lumen — asset enqueue.
  *
- * Enqueues the theme stylesheet. JS is not loaded: the navigation is a
- * no-JS, always-accessible horizontal list (see header.php).
+ * Enqueues the theme stylesheets, plus WordPress Core's own `comment-reply`
+ * script on singular views where threaded commenting is actually available.
+ *
+ * JavaScript policy: the theme ships NO custom JavaScript files
+ * (THEME CUSTOM JS FILES = 0) and still has no JS-driven navigation. The one
+ * script enqueued here is WordPress Core's bundled `comment-reply`, which is
+ * what makes the native "Reply" link move the comment form. It is Core's own
+ * file, not a theme asset: no custom reply JS, no jQuery plugin, no CDN, and
+ * nothing copied or modified from Core.
+ *
  * Uses get_template_directory_uri() (no hardcoded URLs).
  *
  * @package lumen
@@ -33,5 +41,29 @@ if ( ! function_exists( 'lumen_enqueue_assets' ) ) {
 			array( 'lumen-base' ),
 			LUMEN_VERSION
 		);
+
+		// --- WordPress Core threaded-comment reply -------------------------
+		// Core's comment-reply.js is what relocates #respond under the comment
+		// being replied to and fills #comment_parent. WordPress does NOT load
+		// it automatically; the theme must enqueue it. Without this the Reply
+		// link is a dead anchor (the v1.1.15 regression).
+		//
+		// Conditions mirror Core's own requirements exactly:
+		//   is_singular()                 - only single posts/pages carry the
+		//                                   single comment thread UI.
+		//   comments_open()               - nothing to reply to otherwise.
+		//   get_option('thread_comments') - Core only emits nested Reply links
+		//                                   when threading is enabled, so
+		//                                   loading the script otherwise would
+		//                                   be a wasted request.
+		// Home, archives, search and 404 never match is_singular(), so they are
+		// completely unaffected.
+		if (
+			is_singular()
+			&& comments_open()
+			&& get_option( 'thread_comments' )
+		) {
+			wp_enqueue_script( 'comment-reply' );
+		}
 	}
 }

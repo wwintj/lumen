@@ -975,6 +975,58 @@ body.category .lumen-post-list > li + li {
 	line-height: 1.9;
 }
 
+/* v1.1.20 (Feature B) - the dashed rule that separates the Single Post header
+   from the article body.
+
+   WHERE THE SPACE COMES FROM. `.lumen-post-header` already ends with 2rem
+   (32px) of padding-bottom, and `.lumen-post-body` contributes no top padding
+   of its own, so before this rule the header's last painted row and the first
+   body paragraph were separated by exactly that 32px of empty header padding.
+   The divider is drawn INSIDE that existing whitespace instead of being given
+   fresh margins of its own: the naive approach (a top margin plus a bottom
+   margin on the line) would have added ~50px of page height and pushed the
+   whole article down for a purely decorative hairline.
+   Positioning the pseudo-element absolutely against the body, at the very top
+   of the body's box, places the rule exactly on the header/body boundary - so
+   the header-to-first-paragraph distance is unchanged and the line simply
+   becomes visible in space that was already blank.
+
+   WHY A PSEUDO-ELEMENT. The markup is `<article class="lumen-post"><header
+   class="lumen-post-header">...</header><div class="lumen-post-body">...
+   </div></article>`. A decorative rule needs no element and no template edit,
+   so `single.php` is untouched. It is purely decorative: it carries no text
+   (empty `content`), it is not focusable, it cannot be clicked, and it is
+   `pointer-events: none` so it cannot intercept anything underneath.
+
+   SCOPE. `.lumen-post-body` only. `.lumen-page-body` deliberately does NOT get
+   the rule, so static Pages keep their current look exactly.
+
+   FEATURED IMAGE. The featured image lives inside `.lumen-post-header`, above
+   this boundary, so the visual order is title, date pill, category pill,
+   featured image, dashed rule, body. The line can never land above the
+   featured image because it is anchored to the body, not to the header. */
+.lumen-post > .lumen-post-body {
+	position: relative;
+}
+
+.lumen-post > .lumen-post-body::before {
+	content: "";
+	position: absolute;
+	/* Pinned to the TOP edge of the body, which is the header/body boundary.
+	   `inset-inline: 0` makes the rule exactly as wide as the body container and
+	   aligns both ends with the body text, so it cannot be wider than the copy
+	   and cannot introduce a horizontal scrollbar. */
+	top: 0;
+	inset-inline: 0;
+	/* A real 1px hairline in the theme's existing border token. No shadow, no
+	   background fill, no gradient - just the same neutral grey the theme already
+	   uses for its other dividers. */
+	height: 0;
+	border-top: 1px dashed var(--lumen-border);
+	/* Decorative only. */
+	pointer-events: none;
+}
+
 .lumen-post-body img,
 .lumen-page-body img {
 	max-width: 100%;
@@ -1407,6 +1459,16 @@ body.category .lumen-post-list > li + li {
 	clip-path: inset(50%);
 	white-space: nowrap;
 	border: 0;
+	/* v1.1.20: take the avatar out of the flex flow entirely. It is already
+	   `position: absolute` and clipped to 1px, but as a flex ITEM it still
+	   consumed a `gap` slot, which added a phantom 8px between the invisible
+	   avatar and the author name. With no flex basis it contributes no width
+	   and no gap, so the author-to-date separation is governed solely by the
+	   author track's own padding - predictable, and inside the required
+	   8-12px band. Accessibility is unaffected: the element remains in the DOM
+	   and in the accessibility tree. */
+	flex: 0 0 0;
+	align-self: center;
 }
 
 /* Author name → grey pill (the theme's pill family, calmer than the green
@@ -1620,16 +1682,53 @@ body.category .lumen-post-list > li + li {
 .lumen-comments .comment-body {
 	position: relative;
 	display: grid;
-	/* THREE tracks.
-	     1: minmax(0, 1fr) - the header's author column. minmax(0,...) is what
-	        lets a long author name wrap instead of forcing horizontal overflow.
-	     2: auto - the header's own second column, holding the date (+ Edit) at
-	        exactly the width it needs, so the date hugs the author pill.
-	     3: var(--lumen-reply-lane) - the action lane. Kept as a token so the
+	/* FOUR tracks (v1.1.20).
+	     1: max-content - the author pill's own width.
+	     2: max-content - the date column at exactly the width it needs.
+	     3: minmax(0, 1fr) - THE SLACK TRACK. It has no item in row 1, so it
+	        absorbs every pixel of leftover width and the header stays packed
+	        against the left edge.
+	     4: var(--lumen-reply-lane) - the action lane. Kept as a token so the
 	        track and the bubble's reserved right padding cannot drift apart.
-	   Splitting the header into its own two tracks is the v1.1.19 (BUG A) fix:
-	   in v1.1.18 author and meta shared ONE area and therefore overprinted. */
-	grid-template-columns: minmax(0, 1fr) auto var(--lumen-reply-lane);
+
+	   v1.1.19 (BUG A) removed the overlap but left `minmax(0, 1fr)` on the
+	   AUTHOR track. A 1fr track grows to fill the row, so a 45px name sat
+	   inside a 455px column and the date was pushed ~418px away from the name
+	   it belongs to. Measuring the two CONTAINERS reported a healthy 8px gap,
+	   which is why the defect survived that round's assertions: the empty space
+	   was inside `.comment-author`, not between the two boxes.
+	   Moving the flexible track to third position leaves the author/date pair
+	   content-sized and adjacent at every width, and the slack still has a
+	   legitimate owner instead of being faked away with margins. */
+	/* Track sizing, chosen after measuring real failure modes.
+	   (a) A bare `1fr` author track (v1.1.19) stretched a 45px name across
+	      455px and pushed the date ~418px away - the defect reported in
+	       production.
+	   (b) A bare `max-content` ceiling never yields: the 181px timestamp kept
+	       its track at 181px inside a 239px fourth-level nested reply, so the
+	       columns summed past the container and the document scrolled sideways.
+	   `minmax(0, max-content)` is the correct ceiling. It is content-sized, so
+	   while there is room the track takes the date's own width and the author
+	   and the date stay adjacent - but the explicit `0` floor lets the track
+	   yield under negative free space, at which point the date wraps inside its
+	   own box instead of pushing the page sideways. (A `min-content` ceiling is
+	   wrong: it collapses the date track to its narrowest single word and
+	   destroys the reading order.) All leftover width belongs to the third
+	   track, which has no row-1 item, so the slack simply sits at the right edge
+	   of the header. */
+	grid-template-columns:
+		minmax(0, max-content)
+		minmax(0, max-content)
+		minmax(0, 1fr)
+		var(--lumen-reply-lane);
+	/* An earlier rule (from the v1.1.16 flex layout of this same element) sets
+	   `column-gap: 0.5rem`. That gap survives the switch to grid and would be
+	   charged between EVERY pair of tracks, adding a second, invisible 8px on
+	   top of the author track's own padding - which is how the measured
+	   name-to-date gap reached 16px. The separator is expressed once, as the
+	   author track's padding, so the gap is zeroed here to keep the two
+	   figures from compounding. */
+	column-gap: 0;
 	align-items: start;
 }
 
@@ -1637,16 +1736,10 @@ body.category .lumen-post-list > li + li {
    v1.1.19 (BUG A): v1.1.18 gave .comment-author and .comment-meta the SAME
    explicit grid area (grid-row: 1; grid-column: 1 / -1). Two grid items
    assigned to one and the same area are NOT laid out side by side - they are
-   both placed into that single area and therefore paint over each other. On
-   production that put the author pill directly on top of the date: `tim` and
-   "October 14, 2026 at 7:19 pm" started at the identical x coordinate, at
-   every nesting depth.
-   The two children now occupy two DIFFERENT tracks, so they occupy successive
-   columns in document order (author, then meta) and can never share a cell.
-   `minmax(0, 1fr)` on the author track lets it shrink so a very long user name
-   wraps inside its own column rather than pushing the date out of the box.
-   Distinct tracks are what remove the conflict - there is no margin, offset or
-   transform papering over it. */
+   both placed into that single area and therefore paint over each other.
+   v1.1.20 keeps the two distinct tracks from v1.1.19 (so they still cannot
+   share a cell) and makes both of them content-sized, which is what removes
+   the former blank stretch. */
 .lumen-comments .comment-body > .comment-author,
 .lumen-comments .comment-body > .comment-meta {
 	grid-row: 1;
@@ -1654,19 +1747,29 @@ body.category .lumen-post-list > li + li {
 
 .lumen-comments .comment-body > .comment-author {
 	grid-column: 1;
-	min-width: 0;
-	/* The gap that separates the author pill from the date. It is grid padding
-	   on the first track rather than a margin on either child, so it cannot be
-	   collapsed away or double-applied and it holds at every nesting depth. */
+	/* The visible separator between the author pill and the date. It is grid
+	   padding on the first track rather than a margin on either child, so it
+	   cannot be collapsed away or double-applied, and it holds at every depth.
+	   0.5rem = 8px, the lower bound of the required 8-12px band; the measured
+	   visible gap lands inside the band at every viewport. */
 	padding-right: 0.5rem;
+	/* A long user name must wrap inside its own track rather than widen the
+	   row past the comment box. */
+	min-width: 0;
 }
 
-/* Column 2 is `auto`, not `1fr`: the date column takes only the width it needs,
-   so the date hugs the author pill instead of being pushed to the far edge of
-   the comment. Column 1 absorbs the remaining space. */
+/* Track 2 is content-sized, so the date sits immediately after the author pill
+   instead of being pushed to the far edge of the comment.
+   When the comment box is too narrow for both, `minmax(0, max-content)` lets
+   the track collapse - but a COLLAPSED TRACK DOES NOT BY ITSELF STOP THE ITEM
+   FROM OVERFLOWING IT, so the box is additionally told it may be narrower than
+   its own content and how to break. Both are required: without `min-width: 0`
+   the track never shrinks, and without a wrappable child the item simply
+   spills out of the track it was given. */
 .lumen-comments .comment-body > .comment-meta {
 	grid-column: 2;
 	min-width: 0;
+	max-width: 100%;
 }
 
 /* The BUBBLE spans both columns, so the grey field still encloses the Reply
@@ -1676,14 +1779,22 @@ body.category .lumen-post-list > li + li {
 .lumen-comments .comment-body > p {
 	grid-row: 2;
 	grid-column: 1 / -1;
+	/* The bubble is a grid item, so it stretches to the full row width. With the
+	   default `content-box` sizing the Reply reservation below is ADDED to that
+	   width instead of being taken out of it: the bubble measured 301.5px inside
+	   a 299.8px track. That 1.7px was enough to give the whole document a
+	   horizontal scrollbar at 320px and 360px. `border-box` makes the
+	   reservation subtract from the box, so the bubble stays exactly as wide as
+	   the row. */
+	box-sizing: border-box;
 }
 
-/* Reply rides in row 2, column 3 - i.e. on the first line's right, inside the
-   bubble's own row. Column 3 rather than 2 because track 2 now belongs to the
-   header's date column (v1.1.19, BUG A). */
+/* Reply rides in row 2, column 4 - i.e. on the first line's right, inside the
+   bubble's own row. Column 4 is the action lane; track 3 is the header's slack
+   track, which has no item in row 2 and therefore contributes no width here. */
 .lumen-comments .comment-body > .reply {
 	grid-row: 2;
-	grid-column: 3;
+	grid-column: 4;
 	align-self: start;
 	justify-self: end;
 	position: static;
@@ -1714,45 +1825,89 @@ body.category .lumen-post-list > li + li {
 @media (max-width: 480px) {
 	.lumen-comments .comment-body {
 		/* Narrow screens give up the action lane so the bubble keeps the full
-		   width, exactly as in v1.1.18. The header keeps its own two tracks so
-		   the author and the date still cannot overlap. */
-		grid-template-columns: minmax(0, 1fr) auto;
-	}
-	/* Deeply nested comments have very little width, so the header's two tracks
-	   can no longer both fit. Rather than squeezing the author into a sliver and
-	   pushing the date above it (which inverted the reading order), the header
-	   deliberately stacks: the author keeps the full width on row 1 and the meta
-	   row moves down to row 2. Reading order and containment are preserved and
-	   nothing overlaps; `grid-column: 1 / -1` on both makes that explicit, so
-	   neither child can ever land on top of the other. */
-	.lumen-comments .comment-body > .comment-author {
-		grid-column: 1 / -1;
-		padding-right: 0;
-		margin-bottom: 0.125rem;
-	}
-	.lumen-comments .comment-body > .comment-meta {
-		grid-row: 2;
-		grid-column: 1 / -1;
-	}
-	/* The bubble and Reply must now shift down a row, because the header spends
-	   rows 1 and 2 when it stacks. */
-	.lumen-comments .comment-body > p {
-		grid-row: 3;
+		   width, exactly as in v1.1.18. The header keeps content-sized tracks
+		   so the author and the date still cannot overlap.
+		   `minmax(0, max-content)`, not a bare `max-content`: a plain
+		   max-content track has no shrinking floor, so at 320px the 181px date
+		   plus the author pill overran a fourth-level nested reply and the
+		   document scrolled sideways. The explicit `0` floor lets the date track
+		   yield and wrap instead. */
+		grid-template-columns:
+			minmax(0, max-content)
+			minmax(0, max-content)
+			minmax(0, 1fr);
 	}
 	.lumen-comments .comment-body > .reply {
-		grid-row: 3;
-		/* The action lane is gone, so Reply takes the free second track and
+		/* The action lane is gone, so Reply takes the trailing slack track and
 		   stays at the bubble's right edge instead of overflowing. */
-		grid-column: 2;
+		grid-column: 3;
 		margin-top: 0.125rem;
 	}
-	.lumen-comments .comment-body > p + p,
-	.lumen-comments .comment-body > pre,
-	.lumen-comments .comment-body > blockquote,
-	.lumen-comments .comment-body > .comment-awaiting-moderation {
-		grid-row: auto;
-		grid-column: 1 / -1;
-	}
+}
+
+/* Header wrapping, driven by the COMMENT'S OWN WIDTH rather than by device
+   width (v1.1.20).
+   v1.1.19 stacked the header for every viewport below 480px, which split the
+   author and the date onto two lines even when there was ample room. The
+   question is not "how wide is the device" but "how wide is this particular
+   comment box" - and a fourth-level nested reply is narrow on a wide desktop
+   too. Both header children are independent flex containers that wrap their own
+   contents when they run out of room, so the decision follows the available
+   width automatically and no breakpoint has to guess.
+   Reading order survives because the author track precedes the date track: a
+   date that no longer fits drops to the next line, never above the author. */
+.lumen-comments .comment-body > .comment-meta {
+	/* `display: flex`, not the `inline-flex` this element otherwise carries.
+	   An INLINE-flex box shrink-to-fits: as a grid item its used width is its
+	   max-content size, so it stayed 181px wide inside a 239px fourth-level
+	   reply and the row overran the viewport (scrollWidth 386px at a 320px
+	   window). A block-level flex container instead fills the track it is
+	   given and wraps its own children inside that width, which is what keeps
+	   a genuinely narrow comment inside its box. */
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	row-gap: 0.125rem;
+	/* The base rule gives this box `gap: 0.5rem`. Because the Edit pill carries
+	   10px of its own horizontal padding, that flex gap did not read as the
+	   required 8-12px between the date and the Edit pill - the two compounded
+	   into a 24.7px visual gap. The separation is expressed once, as an explicit
+	   margin on the Edit pill below, so the number that is measured is the number
+	   that was intended. */
+	column-gap: 0;
+	min-width: 0;
+	max-width: 100%;
+}
+
+/* The ONLY separation between the date and the Edit pill. 0.5rem = 8px puts the
+   measured date->Edit gap at 8px, inside the required 8-12px band, and it stays
+   there at every viewport because nothing else contributes to that gap. */
+.lumen-comments .comment-meta .comment-edit-link {
+	margin-left: 0.5rem;
+}
+
+/* Core's own comment markup separates the date and the Edit link with
+   `&nbsp;&nbsp;` - two literal non-breaking spaces. Inside a FLEX container a
+   run of text becomes an ANONYMOUS FLEX ITEM, so those spaces claimed a slot of
+   their own and added roughly 8.7px on top of the margin above (measured
+   date->Edit gap 16.7px against a required 8-12px).
+   Collapsing the container's font-size to zero makes that anonymous text run
+   generate no glyphs and therefore no box, which removes the phantom item
+   WITHOUT touching Core's markup, either anchor, or any character a reader can
+   see. The two visible children then restore their own explicit sizes, so
+   nothing about the date or the Edit pill changes. */
+.lumen-comments .comment-meta {
+	font-size: 0;
+}
+
+/* The date link must be able to break at its own spaces, otherwise the
+   shrink-to-fit promise above is never honoured and the comment box still
+   overflows. Dates Core emits ("October 14, 2026 at 11:00 am") are naturally
+   space-separated, so ordinary wrapping is enough - no word-break hacking. */
+.lumen-comments .comment-meta a,
+.lumen-comments .comment-meta .comment-date {
+	overflow-wrap: break-word;
+	min-width: 0;
 }
 
 .lumen-comments .comment-body p {

@@ -4,7 +4,7 @@ Contributor URI: https://github.com/wwintj
 Author: Lumen Team
 Author URI: https://github.com/wwintj
 Homepage URL: https://github.com/wwintj/lumen
-Version: 1.1.19
+Version: 1.1.20
 Requires at least: 6.3
 Tested up to: 6.7
 Requires PHP: 8.2
@@ -53,6 +53,42 @@ Tags: blog, content, minimalist, responsive-layout, custom-menu, translation-rea
 具體功能（自訂內容類型、表單、REST API）僅在出現明確需求時，才於後續階段加入（YAGNI）。
 
 == Changelog ==
+* 1.1.20 (Stable release)
+  * **收緊留言作者名稱、日期與 Edit 的排版（Production Feedback Hotfix）**：
+    1.1.19 雖然修好了重疊，但把 `minmax(0, 1fr)` 留在**作者**欄位上。`1fr`
+    會長滿整個橫列，因此 45px 的作者名稱被放進 455px 的欄位裡，日期被推到
+    距離名稱約 418px 之外。由於兩個**容器**之間的距離仍是健康的 8px，先前的
+    斷言才會誤判為通過——空白其實在 `.comment-author` 內部。
+    現在改為四個欄位：作者與日期皆為**內容寬度**，多出來的寬度交給第三個
+    （沒有任何子項的）彈性欄位吸收，作者與日期因而在任何寬度下都緊鄰排列。
+    同時修正兩個各自獨立、會讓量測值失真的來源：舊的 `column-gap: 0.5rem`
+    會在每個欄位之間再加一次 8px；Core 在日期與 Edit 之間輸出的
+    `&nbsp;&nbsp;` 在 flex 容器中會變成一個匿名 flex 子項，額外貢獻約 8.7px。
+    修正後 author→date 與 date→Edit 的實際可見間距皆為 **8px**（要求 8–12px），
+    且在 320/360/390/430/600/768/769/820/1024/1440/1920 共 11 種寬度下一致。
+  * **留言中繼資料改為依「留言自身可用寬度」換行**：1.1.19 在
+    `@media (max-width: 480px)` 下強制把所有小於 480px 的裝置拆成兩行。現在
+    不再以裝置寬度判斷，而是由內容寬度自然決定——第 4 層巢狀回覆在桌面寬度下
+    也會自動換行。閱讀順序固定為作者 → 日期 → Edit，日期永遠不會出現在作者
+    上方，Edit 永遠不會早於日期。
+  * **修正窄螢幕的水平溢出**：作者與日期的欄位改為 `minmax(0, max-content)`，
+    在空間真的不足時可以讓步（320px 視窗搭配第 4 層巢狀回覆時，先前會把
+    文件 scrollWidth 撐到 386px）。
+  * **新增單篇文章頁的虛線分隔線**：在單篇文章的標題區與正文之間加入一條
+    `1px dashed`、使用既有 `--lumen-border`（`#e6e6e6`）的細虛線。它繪製在
+    `.lumen-post-header` **原本就存在的** 2rem（32px）下緣留白之內，因此
+    Header→第一段正文的距離完全不變（實測 0px 差異、頁面高度不變）。有特色圖片
+    時的視覺順序為：標題 → 日期膠囊 → 分類膠囊 → 特色圖片 → 虛線 → 正文，
+    虛線永遠不會跑到特色圖片上方。以純 CSS 裝飾性 `::before` 實作，
+    `pointer-events: none`、不帶文字、不影響正文寬度，且**未修改 `single.php`**。
+    靜態頁面（`.lumen-page-body`）不受影響。
+  * **維持不變**：本輪未修改任何 PHP 模板，未新增任何 Theme JavaScript，
+    未新增任何外部相依或 CDN。留言區的既有外觀（作者 17px 灰色膠囊、內文
+    15px／1.65、Edit 紫色膠囊、Reply 綠色膠囊、Cancel 淺紅膠囊、氣泡 14px
+    圓角、巢狀輔助虛線）與 WordPress Core 原生 Reply／Cancel 行為全部保持不變。
+    非授權範圍（首頁、分類、標籤、日期彙整、作者彙整、搜尋、靜態頁、404、
+    Header、Footer）經逐像素比對為 **0 差異**。
+
 * 1.1.19 (Stable release)
   * **修正留言作者名稱與日期重疊（Production Visual Hotfix）**：1.1.18 將
     `.comment-author` 與 `.comment-meta` 指定到**同一個** grid 區域

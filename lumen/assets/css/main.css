@@ -375,9 +375,34 @@ body.admin-bar .lumen-site-header {
 }
 
 /* B. Category title: keeps the archived H1 typography and simply
-   inherits the site foreground token (--lumen-fg = #1B1B1B). */
+   inherits the site foreground token (--lumen-fg = #1B1B1B).
+
+   Title-to-pill spacing (8H-R1): the shared archive title rule carries
+   `margin-bottom: var(--lumen-space-3)` = 24px. Inside the intro panel
+   that reads as too much air before the statistics pill, so the
+   category archive halves it to 0.75rem (12px).
+
+   Why 12px rather than exactly 13px: the pill is an inline-flex box
+   inside the panel's inline formatting context, so its line box adds a
+   strut of roughly (28.9px line-height - 26.19px pill height) / 2 ~= 2px
+   above the pill. The measured DOM gap was therefore 26px, and 12px of
+   margin lands it at 14px -- 54% of the previous spacing, which is the
+   closest whole-token step to half.
+
+   Scope: the selector is `.lumen-category-intro .lumen-archive-title`.
+   It has the SAME specificity as the shared archive title rule and sits
+   later in this file, so it wins by source order for the category intro
+   only; `.lumen-category-intro` is emitted by the category archive body
+   class alone, so no other archive is affected. The shared
+   `.lumen-archive-wrap .lumen-archive-title` rule is deliberately NOT
+   touched, because tag, date, author and search archives all rely on
+   the 24px rhythm.
+
+   Only margin-bottom moves; the H1 keeps its family, size, weight,
+   line-height, letter-spacing and colour. */
 .lumen-category-intro .lumen-archive-title {
 	color: var(--lumen-fg);
+	margin-bottom: 0.75rem;
 }
 
 /* C. Muted dark lavender statistics pill ("Category · N posts").

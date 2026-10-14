@@ -4,7 +4,7 @@ Contributor URI: https://github.com/wwintj
 Author: Lumen Team
 Author URI: https://github.com/wwintj
 Homepage URL: https://github.com/wwintj/lumen
-Version: 1.1.8
+Version: 1.1.9
 Requires at least: 6.3
 Tested up to: 6.7
 Requires PHP: 8.2
@@ -14,7 +14,7 @@ Text Domain: lumen
 Domain Path: /
 Tags: blog, content, minimalist, responsive-layout, custom-menu, translation-ready, rss-icons
 
-極簡、對 SEO 友善的內容部落格佈景主題，專為中英雙語網站設計。1.1.8 為 Lumen 的正式穩定版本，在 1.1.0 的歸檔與搜尋核心正確性、文字優先閱讀排版，以及零 Theme JavaScript 設計之上，於 1.1.1 新增頁首圖示式可展開搜尋並統一 Header／Footer 閱讀字體，1.1.2 進一步調整頁首搜尋與導覽的版面、為列表加上日期與分類膠囊標籤，並將首頁分頁與單篇文章導覽改為純箭頭膠囊，1.1.6 精修分類頁頂部介紹區，1.1.7 進一步校正該介紹區的版式節奏，1.1.8 則讓分類頁第一篇文章與分隔線的間距對齊首頁節奏，並將統計膠囊改為低飽和暗紫色。
+極簡、對 SEO 友善的內容部落格佈景主題，專為中英雙語網站設計。1.1.9 為 Lumen 的正式穩定版本，在 1.1.0 的歸檔與搜尋核心正確性、文字優先閱讀排版，以及零 Theme JavaScript 設計之上，於 1.1.1 新增頁首圖示式可展開搜尋並統一 Header／Footer 閱讀字體，1.1.2 進一步調整頁首搜尋與導覽的版面、為列表加上日期與分類膠囊標籤，並將首頁分頁與單篇文章導覽改為純箭頭膠囊，1.1.6 精修分類頁頂部介紹區，1.1.7 進一步校正該介紹區的版式節奏，1.1.8 讓分類頁第一篇文章與分隔線的間距對齊首頁節奏並改為低飽和暗紫色統計膠囊，1.1.9 則收緊分類頁標題與統計膠囊之間的垂直留白。
 
 == Features ==
 * 語意化 HTML5 結構（header、nav、main、article、section、footer）。
@@ -53,6 +53,23 @@ Tags: blog, content, minimalist, responsive-layout, custom-menu, translation-rea
 具體功能（自訂內容類型、表單、REST API）僅在出現明確需求時，才於後續階段加入（YAGNI）。
 
 == Changelog ==
+* 1.1.9 (Stable release)
+  * 收緊分類頁「分類標題 → `Category · N posts` 統計膠囊」之間的垂直留白，
+    由原本的 24px 下邊距減半為 12px（`0.75rem`）。
+  * 此調整僅作用於分類頁介紹面板內的標題（`.lumen-category-intro .lumen-archive-title`），
+    共用的 `.lumen-archive-wrap .lumen-archive-title` 規則完全未動，
+    標籤／日期／作者／搜尋彙整頁仍維持原有 24px 節奏。
+  * 未新增或移除任何選擇器；僅在既有規則中新增一行 `margin-bottom` 宣告。
+  * 標題的字體、字級、字重、行高、字距與顏色（`#1b1b1b`）皆未變更。
+  * 暗紫色統計膠囊（`#d8cbea`／`#49375f`、`999px`、`4px 12px`、13px）
+    尺寸與顏色完全未變。
+  * 淺綠色介紹面板（`#eef6ef`）、圓角與內距未變；
+    面板上下對稱（24/24、20/20、18/18）與「分隔線 → 第一篇文章」
+    距離（桌機 32px、≤768px 為 28px）皆未改變。
+  * 文章列表日期膠囊（`#f0f1f2`／`#52565c`）與分類綠色膠囊
+    （`#e0f3e5`／`#176d39`）完全未變。
+  * 首頁、搜尋、單篇文章、404、標籤、日期、作者彙整頁逐像素與 1.1.8 相同。
+  * 本次僅修改 `lumen/assets/css/main.css`，未修改任何模板與 JavaScript。
 * 1.1.8 (Stable release)
   * 分類頁分隔線與第一篇文章之間的間距改為與首頁文章分隔線節奏一致：
     桌機（>768px）32px、行動裝置（≤768px）28px，實測 320–1920px 共 9 種寬度皆與首頁相同。

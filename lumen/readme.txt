@@ -3,7 +3,7 @@ Contributors: wwintj
 Requires at least: 6.3
 Tested up to: 7.1
 Requires PHP: 8.2
-Version: 1.3.8
+Version: 1.3.9
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Tags: blog, one-column, custom-menu, custom-logo, featured-images, threaded-comments, translation-ready, accessibility-ready
@@ -31,6 +31,10 @@ Lumen 零 JavaScript、不連外部字型服務：只有一個 CSS 檔和兩個�
 3. （選用）新增頁面，範本選「Archives (all posts by year)」，作為文章歸檔頁。
 
 == Changelog ==
+
+= 1.3.9 =
+* 頁首導覽與麵包屑的滑動膠囊改為紅底白字（原為淺灰底，對比不足）；膠囊滑走後，目前項目保留紅字。
+* 卡片的 READ MORE 左右內距縮為 4px，與上下留白一致。
 
 = 1.3.8 =
 * 修正膠囊與 READ MORE 中英文大寫偏上約 1px：行高改為整數像素。

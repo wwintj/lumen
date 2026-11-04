@@ -372,7 +372,8 @@ p {
 	color: var(--accent);
 }
 
-/* Header menu: a soft filled capsule marks "you are here" and slides to
+/* Header menu: an accent capsule (white text, like a category pill)
+   marks "you are here" and slides to
    whichever item the pointer is over, then back when it leaves. Built
    with CSS anchor positioning (no JS): the capsule is the nav's ::before,
    pinned to whichever link currently carries the anchor name. */
@@ -408,7 +409,7 @@ p {
 		left: anchor(left);
 		right: anchor(right);
 		bottom: anchor(bottom);
-		background: var(--bg-soft);
+		background: var(--accent);
 		border-radius: var(--round);
 		transition: opacity var(--speed);
 	}
@@ -434,12 +435,30 @@ p {
 	.lumen-nav .lumen-menu .current-menu-parent > a,
 	.lumen-nav .lumen-menu .current-menu-ancestor > a,
 	.lumen-nav .lumen-menu .current-post-ancestor > a {
-		background: var(--bg-soft);
+		background: var(--accent);
 	}
 
 	.lumen-nav .lumen-menu:has(a:hover) li:not(:hover) > a {
 		background: none;
 	}
+}
+
+/* Text on the capsule is the card colour; the current item, when the
+   capsule has slid away to a hovered one, keeps the accent text. */
+.lumen-nav .lumen-menu .current-menu-item > a,
+.lumen-nav .lumen-menu .current-menu-parent > a,
+.lumen-nav .lumen-menu .current-menu-ancestor > a,
+.lumen-nav .lumen-menu .current-post-ancestor > a,
+.lumen-nav .lumen-menu a:hover {
+	color: var(--card);
+}
+
+.lumen-nav .lumen-menu:has(a:hover) a:not(:hover) {
+	color: var(--accent);
+}
+
+.lumen-nav .lumen-menu:has(a:hover) li:not(.current-menu-item, .current-menu-parent, .current-menu-ancestor, .current-post-ancestor) > a:not(:hover) {
+	color: var(--fg-soft);
 }
 
 .lumen-search-toggle {
@@ -829,7 +848,7 @@ a.lumen-stat:hover {
 	margin-top: -2px;
 	/* Small, in Inter's true italic (Chinese labels stay upright), on the
 	   same soft grey as the menu's "you are here" capsule. */
-	padding-inline: 0.7rem;
+	padding-inline: 4px;
 	background: var(--bg-soft);
 	font-size: var(--text-2xs);
 	line-height: 13px;
@@ -934,7 +953,7 @@ a.lumen-stat:hover {
 	transition: color var(--speed);
 }
 
-/* Same sliding capsule as the header menu: it sits under the current
+/* Same sliding accent capsule as the header menu: it sits under the current
    place and slides to a crumb under the pointer. */
 .lumen-breadcrumbs {
 	position: relative;
@@ -961,7 +980,7 @@ a.lumen-stat:hover {
 		left: anchor(left);
 		right: anchor(right);
 		bottom: anchor(bottom);
-		background: var(--bg-soft);
+		background: var(--accent);
 		border-radius: var(--round);
 		transition: top var(--slide), left var(--slide), right var(--slide), bottom var(--slide);
 	}
@@ -980,7 +999,7 @@ a.lumen-stat:hover {
 @supports not (anchor-name: --a) {
 	.lumen-breadcrumbs [aria-current="page"],
 	.lumen-breadcrumbs a:hover {
-		background: var(--bg-soft);
+		background: var(--accent);
 	}
 
 	.lumen-breadcrumbs ol:has(a:hover) [aria-current="page"] {
@@ -989,7 +1008,7 @@ a.lumen-stat:hover {
 }
 
 .lumen-breadcrumbs a:hover {
-	color: var(--accent);
+	color: var(--card);
 }
 
 .lumen-breadcrumbs .lumen-icon {
@@ -999,6 +1018,12 @@ a.lumen-stat:hover {
 
 .lumen-breadcrumbs [aria-current="page"] {
 	font-weight: 600;
+	color: var(--card);
+	transition: color var(--speed);
+}
+
+/* The capsule has slid to a hovered crumb: the current one keeps red text. */
+.lumen-breadcrumbs ol:has(a:hover) [aria-current="page"] {
 	color: var(--accent);
 }
 

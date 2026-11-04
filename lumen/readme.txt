@@ -3,7 +3,7 @@ Contributors: wwintj
 Requires at least: 6.3
 Tested up to: 7.1
 Requires PHP: 8.2
-Version: 1.3.0
+Version: 1.3.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Tags: blog, one-column, custom-menu, custom-logo, featured-images, threaded-comments, translation-ready, accessibility-ready
@@ -16,7 +16,7 @@ Lumen 零 JavaScript、不載入網路字型，整個佈景主題只有一個 CS
 
 * 一行膠囊頁首；首頁與彙整頁為兩欄瀑布流描邊卡片。
 * 全站內容與頁首同寬；只用一種強調色；跟隨系統的自動深色模式。
-* 仿宋閱讀字型；中英混排自動留白。
+* 全站單一字體與統一字級；中英混排自動留白。
 * 文章頁的閱讀時間、標籤、分頁頁碼與附標題的上一篇／下一篇按鈕。
 * 分類頁大標題、篇數與麵包屑。
 * 「Archives (all posts by year)」頁面範本：依年份列出所有文章。
@@ -31,6 +31,11 @@ Lumen 零 JavaScript、不載入網路字型，整個佈景主題只有一個 CS
 3. （選用）新增頁面，範本選「Archives (all posts by year)」，作為文章歸檔頁。
 
 == Changelog ==
+
+= 1.3.1 =
+* 「Read more／繼續閱讀」按鈕文字強制置中（修正 Safari 上偏移）。
+* 全站統一為一種字體（系統無襯線）與五級字號；依新字體重新校正間距。
+* 文字顏色加深一點（#595959）；陰影減少（卡片 2px、膠囊與按鈕 1px）。
 
 = 1.3.0 =
 * 版面重新設計：一行膠囊頁首、兩欄瀑布流描邊卡片、與頁首同寬的全站內容、深色單行頁尾。

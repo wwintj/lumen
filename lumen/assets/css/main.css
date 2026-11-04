@@ -21,8 +21,8 @@
 	--bg-soft: #f3f3f3;
 	--card: #ffffff;
 	/* Greys rather than black, everywhere (text, outlines, footer). */
-	--fg: #616161;
-	--fg-soft: #6b6b6b;
+	--fg: #595959;
+	--fg-soft: #666666;
 	--muted: #757575;
 	--line: #8c8c8c;            /* outlines */
 	--rule: #e4e4e4;            /* hairline dividers */
@@ -37,16 +37,21 @@
 	--footer-fg: #f7f7f7;
 	--footer-muted: #e4e4e4;
 
-	--hard-sm: 2px 2px 0 var(--hard);
-	--hard-md: 3px 3px 0 var(--hard);
-	--hard-lg: 3px 3px 0 var(--hard);  /* header, cards, search box, images */
+	--hard-sm: 1px 1px 0 var(--hard);
+	--hard-md: 2px 2px 0 var(--hard);
+	--hard-lg: 2px 2px 0 var(--hard);  /* header, cards, search box, images */
 
-	--font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang TC", "PingFang SC", "Microsoft JhengHei", "Microsoft YaHei", sans-serif;
-	/* Headings: a slab serif for Latin, bold system sans for CJK (Chinese
-	   serif faces have no real bold and look thin next to the slab). */
-	--font-head: Rockwell, "Roboto Slab", "Zilla Slab", Georgia, "PingFang TC", "PingFang SC", "Noto Sans CJK TC", "Noto Sans CJK SC", "Microsoft JhengHei", "Microsoft YaHei", sans-serif;
-	/* Long-form reading text. */
-	--font-read: "FangSong", "STFangsong", "仿宋", "仿宋_GB2312", "Songti TC", "Songti SC", serif;
+	/* One typeface for everything (system sans: PingFang / Microsoft
+	   JhengHei for Chinese); monospace only for code. */
+	--font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang TC", "PingFang SC", "Noto Sans CJK TC", "Noto Sans CJK SC", "Microsoft JhengHei", "Microsoft YaHei", sans-serif;
+
+	/* One type scale. */
+	--text-sm: 0.875rem;                       /* 14px: meta, pills, buttons, labels */
+	--text-base: 1.0625rem;                    /* 17px: body, excerpts, menu */
+	--text-lg: 1.375rem;                       /* 22px: section headings */
+	--text-xl: clamp(1.5rem, 2.6vw, 1.75rem);  /* 24–28px: site title, card titles, h2 */
+	--text-2xl: clamp(1.9rem, 4.5vw, 2.5rem);  /* page and post titles */
+
 	--font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 
 	/* One spacing unit for the gaps between parts — vertical and horizontal
@@ -108,8 +113,8 @@ body {
 	min-height: 100vh;
 	display: flex;
 	flex-direction: column;
-	font-family: var(--font-ui);
-	font-size: 17px;
+	font-family: var(--font);
+	font-size: var(--text-base);
 	line-height: 1.7;
 	color: var(--fg);
 	background: var(--bg);
@@ -140,7 +145,6 @@ h4,
 h5,
 h6 {
 	margin: 0 0 0.6em;
-	font-family: var(--font-head);
 	font-weight: 700;
 	line-height: 1.35;
 }
@@ -269,8 +273,7 @@ p {
 
 .lumen-site-title {
 	display: inline-block;
-	font-family: var(--font-head);
-	font-size: clamp(1.4rem, 2.6vw, 1.75rem);
+	font-size: var(--text-xl);
 	font-weight: 700;
 	line-height: 1.25;
 	letter-spacing: -0.01em;
@@ -278,7 +281,7 @@ p {
 
 .lumen-tagline {
 	margin: 0;
-	font-size: clamp(0.9rem, 1.6vw, 1rem);
+	font-size: var(--text-base);
 	line-height: 1.5;
 	color: var(--fg-soft);
 }
@@ -306,7 +309,7 @@ p {
 .lumen-menu a {
 	display: block;
 	padding: 0.3rem 0.75rem;
-	font-size: 0.95rem;
+	font-size: var(--text-base);
 	line-height: 1.5;
 	color: var(--fg-soft);
 	border-radius: var(--round);
@@ -371,13 +374,6 @@ body:has(#lumen-search:popover-open) .lumen-search-toggle {
 		order: 2;
 	}
 
-	/* Optical centring on the one-line header: the slab font's box leaves
-	   more room below the letters than above, so the visible title sat
-	   5.4px high (measured from rendered pixels). */
-	.lumen-site-title {
-		position: relative;
-		top: 0.19em;
-	}
 
 	.lumen-nav {
 		grid-column: auto;
@@ -456,7 +452,7 @@ body:has(#lumen-search:popover-open) .lumen-search-toggle {
 	justify-content: center;
 	align-items: center;
 	gap: 0.25rem 0;
-	font-size: 0.95rem;
+	font-size: var(--text-sm);
 	line-height: 1.6;
 }
 
@@ -515,7 +511,7 @@ body:has(#lumen-search:popover-open) .lumen-search-toggle {
 .lumen-pill {
 	display: inline-block;
 	padding: 1px 11px;
-	font-size: 0.875rem;
+	font-size: var(--text-sm);
 	font-weight: 600;
 	line-height: 1.6;
 	letter-spacing: 0.02em;
@@ -551,7 +547,7 @@ a.lumen-pill--accent:hover {
 	flex-wrap: wrap;
 	align-items: center;
 	gap: var(--space);
-	font-size: 0.9rem;
+	font-size: var(--text-sm);
 }
 
 .lumen-stat {
@@ -573,10 +569,16 @@ a.lumen-stat:hover {
 /* Outlined pill button: "Read more", search, submit, back home. */
 .lumen-button,
 .wp-block-button__link {
-	display: inline-block;
+	/* Always centre the label, whatever text-align the parent sets (cards
+	   justify their text) and whatever whitespace the markup contains. */
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	white-space: nowrap;
 	padding: 0.35rem 1rem;
 	font: inherit;
-	font-size: 0.95rem;
+	font-size: var(--text-sm);
 	font-weight: 600;
 	line-height: 1.5;
 	color: var(--fg);
@@ -597,7 +599,7 @@ a.lumen-stat:hover {
 
 .lumen-button:active {
 	transform: translate(1px, 1px);
-	box-shadow: 1px 1px 0 var(--hard);
+	box-shadow: none;
 }
 
 /* 6. Lists & archive pages -------------------------------------------------- */
@@ -658,21 +660,25 @@ a.lumen-stat:hover {
 
    Optical correction: the title and excerpt fonts' metric boxes are taller
    than their visible strokes (especially for Chinese), so the gaps you see
-   came out uneven (pills→title 10px, title→meta 25.5px, meta→excerpt 21.5px).
+   came out uneven (pills→title 18px, title→meta 22.5px, meta→excerpt 21.5px).
    The em offsets below were measured from rendered pixels so every visible
    gap equals --space; being in em they scale with the font size. */
 .lumen-card-title,
 .lumen-entry-title {
-	margin-top: 0.14em;
-	margin-bottom: -0.41em;
+	margin-top: -0.15em;
+	margin-bottom: -0.3em;
 }
 
 .lumen-entry-title {
-	margin-bottom: -0.35em;
+	margin-bottom: -0.24em;
 }
 
 .lumen-card-excerpt {
-	margin-top: -0.47em;
+	margin-top: -0.44em;
+}
+
+.lumen-card > .lumen-button {
+	margin-top: -2px;
 }
 
 .lumen-card-title,
@@ -683,7 +689,7 @@ a.lumen-stat:hover {
 
 .lumen-card-title {
 	align-self: stretch;
-	font-size: clamp(1.4rem, 2.4vw, 1.75rem);
+	font-size: var(--text-xl);
 	line-height: 1.3;
 	text-wrap: pretty;
 	overflow-wrap: anywhere;
@@ -698,7 +704,7 @@ a.lumen-stat:hover {
 	align-self: stretch;
 	margin-bottom: 0;
 	overflow: hidden;
-	font-size: 1rem;
+	font-size: var(--text-base);
 	line-height: 1.7;
 	-webkit-box-orient: vertical;
 	-webkit-line-clamp: 2;
@@ -720,7 +726,7 @@ a.lumen-stat:hover {
 .lumen-page-title {
 	margin: 0;
 	min-width: 0;
-	font-size: clamp(2rem, 4.5vw, 2.75rem);
+	font-size: var(--text-2xl);
 	line-height: 1.25;
 	color: var(--fg-soft);
 }
@@ -731,7 +737,7 @@ a.lumen-stat:hover {
 	margin: 1.25rem 0 0;
 	padding: 0;
 	list-style: none;
-	font-size: 1.05rem;
+	font-size: var(--text-base);
 	color: var(--fg);
 }
 
@@ -822,12 +828,11 @@ a.lumen-stat:hover {
 	gap: 0.75rem;
 	margin: 0 0 0.75rem;
 	padding-bottom: 0.5rem;
-	font-size: 1.6rem;
+	font-size: var(--text-lg);
 }
 
 .lumen-year-count {
-	font-family: var(--font-ui);
-	font-size: 0.85rem;
+	font-size: var(--text-sm);
 	font-weight: 400;
 	color: var(--muted);
 }
@@ -846,7 +851,7 @@ a.lumen-stat:hover {
 }
 
 .lumen-year-list time {
-	font-size: 0.9rem;
+	font-size: var(--text-sm);
 	line-height: 1.7rem;
 	color: var(--muted);
 	font-variant-numeric: tabular-nums;
@@ -874,7 +879,7 @@ a.lumen-stat:hover {
 }
 
 .lumen-entry-title {
-	font-size: clamp(1.9rem, 4.5vw, 2.6rem);
+	font-size: var(--text-2xl);
 	line-height: 1.3;
 }
 
@@ -893,8 +898,7 @@ a.lumen-stat:hover {
 /* Long-form text. */
 .lumen-prose {
 	padding-top: 2rem;
-	font-family: var(--font-read);
-	font-size: 1.0625rem;
+	font-size: var(--text-base);
 	line-height: 1.9;
 }
 
@@ -908,19 +912,19 @@ a.lumen-stat:hover {
 
 .lumen-prose h2 {
 	margin: 2.2em 0 0.8em;
-	font-size: 1.5rem;
+	font-size: var(--text-xl);
 }
 
 .lumen-prose h3 {
 	margin: 2em 0 0.7em;
-	font-size: 1.3rem;
+	font-size: var(--text-lg);
 }
 
 .lumen-prose h4,
 .lumen-prose h5,
 .lumen-prose h6 {
 	margin: 1.8em 0 0.6em;
-	font-size: 1.1rem;
+	font-size: var(--text-base);
 }
 
 .lumen-prose a {
@@ -970,8 +974,7 @@ a.lumen-stat:hover {
 .lumen-prose figcaption,
 .lumen-prose .wp-caption-text {
 	margin-top: 0.5em;
-	font-family: var(--font-ui);
-	font-size: 0.85rem;
+	font-size: var(--text-sm);
 	color: var(--muted);
 	text-align: center;
 }
@@ -979,7 +982,7 @@ a.lumen-stat:hover {
 .lumen-prose table {
 	width: 100%;
 	border-collapse: collapse;
-	font-size: 0.95rem;
+	font-size: var(--text-sm);
 }
 
 .lumen-prose th,
@@ -1010,7 +1013,7 @@ pre {
 
 .lumen-prose pre {
 	padding: 1em 1.25em;
-	font-size: 0.85rem;
+	font-size: var(--text-sm);
 	line-height: 1.65;
 	background: var(--bg-soft);
 	border: 1px solid var(--rule);
@@ -1031,7 +1034,6 @@ pre {
 	flex-wrap: wrap;
 	gap: 0.5rem;
 	margin-top: 2rem;
-	font-family: var(--font-ui);
 }
 
 .lumen-page-links .post-page-numbers {
@@ -1039,7 +1041,7 @@ pre {
 	place-items: center;
 	min-width: 2.2rem;
 	padding: 1px 10px;
-	font-size: 0.9rem;
+	font-size: var(--text-sm);
 	font-weight: 600;
 	text-decoration: none;
 	background: var(--card);
@@ -1109,9 +1111,12 @@ pre {
 }
 
 .lumen-post-nav-button {
-	display: inline-block;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
 	padding: 0.2rem 0.9rem;
-	font-size: 0.85rem;
+	font-size: var(--text-sm);
 	line-height: 1.5;
 	white-space: nowrap;
 	color: var(--fg-soft);
@@ -1123,7 +1128,6 @@ pre {
 }
 
 .lumen-post-nav-title {
-	font-family: var(--font-head);
 	font-weight: 700;
 	line-height: 1.4;
 	overflow-wrap: anywhere;
@@ -1153,7 +1157,7 @@ pre {
 .lumen-comments-title,
 .comment-reply-title {
 	margin: 0 0 1.25rem;
-	font-size: 1.35rem;
+	font-size: var(--text-lg);
 }
 
 .lumen-comment-list,
@@ -1185,7 +1189,7 @@ pre {
 	align-items: center;
 	gap: 0.25rem 0.6rem;
 	margin-bottom: 0.45rem;
-	font-size: 0.82rem;
+	font-size: var(--text-sm);
 	color: var(--muted);
 }
 
@@ -1204,7 +1208,7 @@ pre {
 }
 
 .comment-author .fn {
-	font-size: 0.95rem;
+	font-size: var(--text-sm);
 	font-weight: 700;
 	color: var(--fg);
 	overflow-wrap: anywhere;
@@ -1234,8 +1238,7 @@ pre {
 .comment-reply-title small a {
 	display: inline-block;
 	padding: 0 10px;
-	font-family: var(--font-ui);
-	font-size: 0.78rem;
+	font-size: var(--text-sm);
 	font-weight: 600;
 	line-height: 1.7;
 	color: var(--fg-soft);
@@ -1262,8 +1265,7 @@ pre {
 
 .comment-content {
 	padding: 0.55rem 1rem;
-	font-family: var(--font-read);
-	font-size: 0.97rem;
+	font-size: var(--text-base);
 	line-height: 1.75;
 	background: var(--bg-soft);
 	border-radius: 14px;
@@ -1323,7 +1325,7 @@ textarea {
 	width: 100%;
 	padding: 0.55rem 0.9rem;
 	font: inherit;
-	font-size: 0.95rem;
+	font-size: var(--text-base);
 	color: var(--fg);
 	background: var(--card);
 	border: 1px solid var(--line);
@@ -1350,7 +1352,6 @@ textarea:focus {
 
 textarea {
 	min-height: 8rem;
-	font-family: var(--font-read);
 	line-height: 1.7;
 	border-radius: 14px;
 	resize: vertical;
@@ -1377,7 +1378,7 @@ textarea {
 	margin-left: -1px;
 	padding: 0 1.2rem;
 	font: inherit;
-	font-size: 0.95rem;
+	font-size: var(--text-sm);
 	font-weight: 600;
 	white-space: nowrap;
 	color: var(--fg);
@@ -1417,7 +1418,7 @@ textarea {
 .comment-form label {
 	display: block;
 	margin-bottom: 0.25rem;
-	font-size: 0.82rem;
+	font-size: var(--text-sm);
 	color: var(--muted);
 }
 

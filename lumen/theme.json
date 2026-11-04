@@ -12,12 +12,12 @@
 				{
 					"name": "Text",
 					"slug": "text",
-					"color": "#616161"
+					"color": "#595959"
 				},
 				{
 					"name": "Text soft",
 					"slug": "text-soft",
-					"color": "#6b6b6b"
+					"color": "#666666"
 				},
 				{
 					"name": "Muted",

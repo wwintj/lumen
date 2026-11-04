@@ -30,7 +30,6 @@ $lumen_excerpt = lumen_get_excerpt();
 		<p class="lumen-card-excerpt"><?php echo esc_html( $lumen_excerpt ); ?></p>
 	<?php endif; ?>
 
-	<a class="lumen-button" href="<?php the_permalink(); ?>">
-		<?php esc_html_e( 'Read more', 'lumen' ); ?><span class="screen-reader-text">: <?php the_title(); ?></span>
-	</a>
+	<?php // No whitespace inside the link: Safari can count it as a trailing space and push the text off-centre. ?>
+	<a class="lumen-button" href="<?php the_permalink(); ?>"><?php esc_html_e( 'Read more', 'lumen' ); ?><span class="screen-reader-text">: <?php the_title(); ?></span></a>
 </li>

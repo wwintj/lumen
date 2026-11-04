@@ -16,9 +16,9 @@ $lumen_found = (int) $GLOBALS['wp_query']->found_posts;
 ?>
 <div class="lumen-wide">
 	<header class="lumen-page-header">
-		<?php lumen_the_breadcrumbs(); ?>
+		<h1 class="screen-reader-text"><?php esc_html_e( 'Search', 'lumen' ); ?></h1>
 		<div class="lumen-page-heading">
-			<h1 class="lumen-page-title"><?php esc_html_e( 'Search', 'lumen' ); ?></h1>
+			<?php lumen_the_breadcrumbs(); ?>
 			<?php if ( '' !== $lumen_query ) : ?>
 				<span class="lumen-pill">
 					<?php

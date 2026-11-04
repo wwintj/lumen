@@ -42,7 +42,7 @@
 	/* The one accent colour. Used for exactly three things:
 	   1. category pills;
 	   2. the hover state of anything clickable (links, icons, buttons);
-	   3. the current item in the header menu ("you are here").
+	   3. "you are here": the current menu item and breadcrumb.
 	   Everything else is neutral. Never add a second red. */
 	--accent: #bf4f2c;
 	--footer-bg: #616161;
@@ -117,7 +117,6 @@
    buttons, breadcrumbs and comment actions. Chinese is unaffected. Titles,
    body text and dates keep their own case. */
 .lumen-site-title,
-.lumen-page-title,
 .lumen-menu a,
 .lumen-pill,
 .lumen-button,
@@ -638,7 +637,7 @@ a.lumen-stat:hover {
 	justify-content: center;
 	text-align: center;
 	white-space: nowrap;
-	padding: 0.35rem 1rem;
+	padding: 0 1rem; /* 23px tall */
 	font: inherit;
 	font-size: var(--text-sm);
 	font-weight: 600;
@@ -773,12 +772,15 @@ a.lumen-stat:hover {
 	line-clamp: 2;
 }
 
-/* Archive / search heading: big title, count, breadcrumbs. */
-/* Breadcrumbs → title + count → description / search, --space apart. */
+/* Archive / search heading: one row with the breadcrumb capsule and the
+   post count, then the description or search box, --space apart. The
+   page name lives in the breadcrumb (current item in the accent red); a
+   visually hidden <h1> keeps the heading structure. */
 .lumen-page-header {
 	display: grid;
 	justify-items: start;
 	gap: var(--space);
+	margin-top: calc(-1 * var(--space));
 	margin-bottom: calc(2 * var(--space));
 }
 
@@ -786,29 +788,25 @@ a.lumen-stat:hover {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
-	gap: 0.5rem 1rem;
+	gap: var(--space);
 }
 
-.lumen-page-title {
-	margin: 0;
-	min-width: 0;
-	font-size: var(--text-2xl);
-	line-height: 1.25;
-	color: var(--fg-soft);
-}
-
-/* Breadcrumbs: a small, quiet trail above the title — house icon for
-   Home, light chevrons, the current place in bold. */
+/* Breadcrumbs: an outlined capsule like the buttons — house icon for
+   Home, light chevrons, the current place in bold accent red. */
 .lumen-breadcrumbs ol {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
 	margin: 0;
-	padding: 0;
+	padding: 0.4rem 1.1rem;
 	list-style: none;
-	font-size: var(--text-sm);
+	font-size: var(--text-base);
 	line-height: 1.5;
 	color: var(--muted);
+	background: var(--card);
+	border: 1px solid var(--line);
+	border-radius: var(--round);
+	box-shadow: var(--hard-sm);
 }
 
 .lumen-breadcrumbs li {
@@ -827,7 +825,7 @@ a.lumen-stat:hover {
 .lumen-breadcrumbs a {
 	display: inline-flex;
 	align-items: center;
-	gap: 0.35rem;
+	gap: 0.4rem;
 	color: var(--muted);
 }
 
@@ -836,25 +834,13 @@ a.lumen-stat:hover {
 }
 
 .lumen-breadcrumbs .lumen-icon {
-	width: 0.95rem;
-	height: 0.95rem;
-}
-
-/* Trim line-height leading so the visible gaps match --space. */
-.lumen-breadcrumbs ol,
-.lumen-page-title {
-	text-box: trim-both text;
-}
-
-/* Capitals leave empty space above the letters; pull the heading row up
-   so the visible gap under the breadcrumbs is ~--space (measured). */
-.lumen-breadcrumbs + .lumen-page-heading {
-	margin-top: -0.75rem;
+	width: 1.05rem;
+	height: 1.05rem;
 }
 
 .lumen-breadcrumbs [aria-current="page"] {
 	font-weight: 600;
-	color: var(--fg);
+	color: var(--accent);
 }
 
 .lumen-page-description {
@@ -1217,7 +1203,7 @@ pre {
 	align-items: center;
 	justify-content: center;
 	text-align: center;
-	padding: 0.2rem 0.9rem;
+	padding: 0 0.9rem;
 	font-size: var(--text-sm);
 	line-height: 1.5;
 	white-space: nowrap;

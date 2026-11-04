@@ -3,7 +3,7 @@ Contributors: wwintj
 Requires at least: 6.3
 Tested up to: 7.1
 Requires PHP: 8.2
-Version: 1.3.2
+Version: 1.3.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Tags: blog, one-column, custom-menu, custom-logo, featured-images, threaded-comments, translation-ready, accessibility-ready
@@ -31,6 +31,10 @@ Lumen 零 JavaScript、不連外部字型服務：只有一個 CSS 檔和一個 
 3. （選用）新增頁面，範本選「Archives (all posts by year)」，作為文章歸檔頁。
 
 == Changelog ==
+
+= 1.3.3 =
+* 按鈕（READ MORE、上一篇／下一篇）高度壓縮為原來的 2/3。
+* 分類／標籤／搜尋頁：麵包屑改為描邊膠囊、字放大並上移，目前位置顯示強調色；去掉重複的大標題，篇數移到麵包屑右側同一行。
 
 = 1.3.2 =
 * 英文改用內建的 Inter 字型（只含英文字元，29 KB，不連外部服務）；中文仍用系統字體。

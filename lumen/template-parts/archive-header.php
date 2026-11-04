@@ -13,9 +13,10 @@ $lumen_object      = get_queried_object();
 $lumen_description = ( $lumen_object instanceof WP_Term ) ? $lumen_object->description : '';
 ?>
 <header class="lumen-page-header">
-	<?php lumen_the_breadcrumbs(); ?>
+	<?php // The breadcrumb names the page visually; the H1 stays for structure. ?>
+	<h1 class="screen-reader-text"><?php echo esc_html( lumen_get_archive_title() ); ?></h1>
 	<div class="lumen-page-heading">
-		<h1 class="lumen-page-title"><?php echo esc_html( lumen_get_archive_title() ); ?></h1>
+		<?php lumen_the_breadcrumbs(); ?>
 		<span class="lumen-pill"><?php echo esc_html( lumen_posts_count_label( $GLOBALS['wp_query']->found_posts ) ); ?></span>
 	</div>
 	<?php if ( '' !== trim( (string) $lumen_description ) ) : ?>

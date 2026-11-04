@@ -3,7 +3,7 @@ Contributors: wwintj
 Requires at least: 6.3
 Tested up to: 7.1
 Requires PHP: 8.2
-Version: 1.3.10
+Version: 1.3.11
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Tags: blog, one-column, custom-menu, custom-logo, featured-images, threaded-comments, translation-ready, accessibility-ready
@@ -31,6 +31,12 @@ Lumen 零 JavaScript、不連外部字型服務：只有一個 CSS 檔和兩個�
 3. （選用）新增頁面，範本選「Archives (all posts by year)」，作為文章歸檔頁。
 
 == Changelog ==
+
+= 1.3.11 =
+* 麵包屑放大為 13px（比卡片上的分類膠囊大一級），外框改為強調色，紅色目前項目貼齊外框、不留空隙；文章數膠囊同步為 13px、24px 高。
+* 分頁與文章內分頁的目前頁碼改為紅底白字；懸停時數字與外框變紅。
+* 卡片的 READ MORE 改為深灰底白字（與「置頂」同色）、正體，懸停時紅底白字。
+* 日期列改為 13px 半粗斜體，圖示線條加粗。
 
 = 1.3.10 =
 * 卡片的 READ MORE 改為與分類膠囊相同的尺寸（18px 高、左右 8px）。

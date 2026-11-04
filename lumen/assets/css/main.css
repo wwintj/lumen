@@ -68,7 +68,7 @@
 
 	/* One type scale. */
 	--text-2xs: 0.6875rem;                     /* 11px: pills, breadcrumbs, card "Read more" */
-	--text-xs: 0.8125rem;                      /* 13px */
+	--text-xs: 0.8125rem;                      /* 13px: breadcrumbs, post count, post meta */
 	--text-sm: 0.875rem;                       /* 14px: meta, pills, buttons, labels */
 	--text-base: 1.0625rem;                    /* 17px: body, excerpts, menu */
 	--text-lg: 1.375rem;                       /* 22px: section headings */
@@ -723,7 +723,8 @@ a.lumen-pill--accent:hover {
 	flex-wrap: wrap;
 	align-items: center;
 	gap: var(--space);
-	font-size: var(--text-sm);
+	font-size: var(--text-xs);
+	font-weight: 600;
 }
 
 .lumen-stat {
@@ -734,8 +735,9 @@ a.lumen-pill--accent:hover {
 }
 
 .lumen-stat .lumen-icon {
-	width: 1rem;
-	height: 1rem;
+	width: 0.9375rem;
+	height: 0.9375rem;
+	stroke-width: 2; /* matches the semibold text */
 }
 
 a.lumen-stat:hover {
@@ -846,14 +848,22 @@ a.lumen-stat:hover {
 
 .lumen-card > .lumen-button {
 	margin-top: -2px;
-	/* Small, in Inter's true italic (Chinese labels stay upright), on a
-	   soft grey; the same box as a category pill (18px tall, 8px sides). */
+	/* Small and upright; the same box as a category pill (18px tall, 8px
+	   sides). Filled like the
+	   "Pinned" pill (grey, white text); accent fill on hover. */
 	padding-inline: 8px;
-	background: var(--bg-soft);
+	color: var(--card);
+	background: var(--fg);
+	border-color: var(--fg);
+	transition: background-color var(--speed), border-color var(--speed);
 	font-size: var(--text-2xs);
 	line-height: 16px;
-	font-style: italic;
-	font-synthesis-style: none;
+}
+
+.lumen-card > .lumen-button:hover {
+	color: var(--card);
+	background: var(--accent);
+	border-color: var(--accent);
 }
 
 .lumen-card-title,
@@ -905,10 +915,12 @@ a.lumen-stat:hover {
 	gap: var(--space);
 }
 
-/* The count beside the breadcrumbs: as tall as their outline (22px). */
+/* The count beside the breadcrumbs: same type size, as tall as their
+   outline (24px). */
 .lumen-page-heading > .lumen-pill {
-	padding-inline: 10px;
-	line-height: 20px;
+	padding-inline: 12px;
+	font-size: var(--text-xs);
+	line-height: 22px;
 }
 
 /* Breadcrumbs: an outlined capsule matching the count pill beside it —
@@ -918,16 +930,17 @@ a.lumen-stat:hover {
 	flex-wrap: wrap;
 	align-items: center;
 	margin: 0;
-	/* Each crumb is the size of a category pill (18px tall, 8px sides), so
-	   the red "you are here" capsule matches the pills on the cards. A 1px
-	   inset lets it clear the outline: 22px in all, like the count beside. */
-	padding: 1px;
+	/* A step above the card pills (13px vs 11px): the breadcrumb names the
+	   page, so it outranks the labels on the cards below. An accent outline;
+	   the crumbs fill it edge to edge (22px), so the red capsule merges with
+	   it: 24px in all, like the count beside. */
+	padding: 0;
 	list-style: none;
-	font-size: var(--text-2xs);
-	line-height: 18px;
+	font-size: var(--text-xs);
+	line-height: 22px;
 	color: var(--muted);
 	background: var(--card);
-	border: 1px solid var(--line);
+	border: 1px solid var(--accent);
 	border-radius: var(--round);
 }
 
@@ -948,8 +961,8 @@ a.lumen-stat:hover {
 .lumen-breadcrumbs li > span {
 	display: inline-flex;
 	align-items: center;
-	gap: 0.25rem;
-	padding-inline: 8px;
+	gap: 0.3rem;
+	padding-inline: 10px;
 	border-radius: var(--round);
 }
 
@@ -1017,8 +1030,8 @@ a.lumen-stat:hover {
 }
 
 .lumen-breadcrumbs .lumen-icon {
-	width: 0.75rem;
-	height: 0.75rem;
+	width: 0.875rem;
+	height: 0.875rem;
 }
 
 .lumen-breadcrumbs [aria-current="page"] {
@@ -1090,14 +1103,21 @@ a.lumen-stat:hover {
 	border-radius: var(--round);
 }
 
+/* Hover: accent text and outline. The current page is "you are here":
+   an accent disc with white text, like the menu and breadcrumb capsules. */
 .lumen-pagination a.page-numbers:hover {
 	color: var(--accent);
+	border-color: var(--accent);
+}
+
+.lumen-pagination .page-numbers {
+	transition: color var(--speed), border-color var(--speed);
 }
 
 .lumen-pagination .page-numbers.current {
 	color: var(--card);
-	background: var(--fg);
-	border-color: var(--fg);
+	background: var(--accent);
+	border-color: var(--accent);
 }
 
 .lumen-pagination .page-numbers.dots {
@@ -1339,10 +1359,15 @@ pre {
 	border-radius: var(--round);
 }
 
+.lumen-page-links a.post-page-numbers:hover {
+	color: var(--accent);
+	border-color: var(--accent);
+}
+
 .lumen-page-links .post-page-numbers.current {
 	color: var(--card);
-	background: var(--fg);
-	border-color: var(--fg);
+	background: var(--accent);
+	border-color: var(--accent);
 }
 
 /* Tags */

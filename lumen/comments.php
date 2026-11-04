@@ -92,18 +92,20 @@ $lumen_form_args = array(
 			 * escaped display name removes the <a> for every comment in this
 			 * list (top-level and nested alike).
 			 *
-			 * get_comment_author_link() passes the already-linked HTML as the
-			 * first argument and the comment ID as the second, so the raw name
+			 * get_comment_author_link() passes ( $link, $author, $comment_id ).
+			 * The comment ID is the THIRD argument: reading it from the second
+			 * (the author name) silently fell back to the global comment, and a
+			 * numeric author name such as "42" resolved to comment #42. The raw name
 			 * is read back through Core's own get_comment_author() and escaped
 			 * once with esc_html() — no double-escaping, no HTML survives.
 			 *
 			 * This deliberately does NOT touch the stored comment_author_url
 			 * data or any user profile; it only changes what this list prints.
 			 */
-			$lumen_static_author = static function ( $link, $comment_id = 0 ) {
-				return esc_html( get_comment_author( (int) $comment_id ) );
+			$lumen_static_author = static function ( $link, $author = '', $comment_id = 0 ) {
+				return esc_html( get_comment_author( $comment_id ) );
 			};
-			add_filter( 'get_comment_author_link', $lumen_static_author, 10, 2 );
+			add_filter( 'get_comment_author_link', $lumen_static_author, 10, 3 );
 
 			wp_list_comments( array( 'avatar_size' => 48 ) );
 

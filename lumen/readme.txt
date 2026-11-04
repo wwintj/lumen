@@ -4,7 +4,7 @@ Contributor URI: https://github.com/wwintj
 Author: Lumen Team
 Author URI: https://github.com/wwintj
 Homepage URL: https://github.com/wwintj/lumen
-Version: 1.1.20
+Version: 1.1.21
 Requires at least: 6.3
 Tested up to: 6.7
 Requires PHP: 8.2
@@ -53,6 +53,31 @@ Tags: blog, content, minimalist, responsive-layout, custom-menu, translation-rea
 具體功能（自訂內容類型、表單、REST API）僅在出現明確需求時，才於後續階段加入（YAGNI）。
 
 == Changelog ==
+* 1.1.21 (Stable release)
+  * **修正 Primary／Footer 選單互相錯置**：`wp_nav_menu()` 使用了無效參數
+    `location`（正確為 `theme_location`），Core 會退回顯示第一個非空選單，
+    導致頁首實際顯示的是 Footer 選單。現在兩個位置各自顯示指定的選單，
+    且 `<ul>` 正確帶有 `lumen-nav-links` class（先前為空的 `class=""`）。
+  * **修正頁尾版權順序**：`bloginfo()` 會直接輸出，使站名出現在 © 之前
+    （`Lumen Review© 2026`）；改用 `get_bloginfo()`，輸出 `© 2026 Lumen Review`。
+    頁尾 RSS 連結改用 `get_feed_link()`。
+  * **修正留言作者名稱錯誤**：`get_comment_author_link` 過濾器的第 2 個參數是
+    作者名稱、第 3 個才是留言 ID；先前讀錯參數，純數字名稱（如 `42`）會被顯示為
+    「Anonymous」或其他留言的作者。
+  * **分頁文章**：單篇文章與頁面加入 `wp_link_pages()`，`<!--nextpage-->`
+    分頁內容不再只顯示第 1 頁；頁碼沿用灰色膠囊樣式。
+  * **頁面留言**：`page.php` 在該頁面開啟留言時輸出留言區（Core 預設頁面留言為關閉）。
+  * **單篇／頁面模板改用標準 Loop**（`have_posts()`／`the_post()`），讓依賴
+    `loop_start`／`the_post` 的外掛正常運作。
+  * **安全性與穩健性**：歸檔／搜尋摘要改為 `esc_html()` 輸出；分類膠囊改用
+    `get_the_category()`／`get_category_link()`（避免 `WP_Error` 轉字串的 fatal）；
+    `<time datetime>` 改用 `get_the_date( DATE_W3C )`（草稿不再產生錯誤時間）；
+    日期歸檔標題以 UTC 計算，避免時區造成前後一天的偏移。
+  * **無障礙**：部落格首頁加入視覺隱藏的 `<h1>`；首頁分頁 `<nav>` 加上
+    `aria-label`，且僅在多於一頁時輸出。
+  * **i18n**：「N posts」「N results for 'q'」改為完整可翻譯句子（`_n()` + `sprintf`）；
+    加入 `load_theme_textdomain()`；重新產生 `languages/lumen.pot`。
+  * `add_theme_support( 'html5' )` 清理為 Core 認可的值（留言區 markup 不變）。
 * 1.1.20 (Stable release)
   * **收緊留言作者名稱、日期與 Edit 的排版（Production Feedback Hotfix）**：
     1.1.19 雖然修好了重疊，但把 `minmax(0, 1fr)` 留在**作者**欄位上。`1fr`

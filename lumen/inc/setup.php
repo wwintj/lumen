@@ -16,6 +16,8 @@ if ( ! function_exists( 'lumen_setup' ) ) {
 	add_action( 'after_setup_theme', 'lumen_setup' );
 
 	function lumen_setup() {
+		load_theme_textdomain( 'lumen', LUMEN_DIR . '/languages' );
+
 		// --- Theme supports ----------------------------------------------
 		add_theme_support( 'title-tag' );
 		add_theme_support( 'post-thumbnails' );
@@ -30,22 +32,17 @@ if ( ! function_exists( 'lumen_setup' ) ) {
 		) );
 		add_theme_support( 'align-wide' );
 
+		// Only Core-recognised html5 feature keys. 'comment-list' and
+		// 'comment-form' are deliberately NOT declared: the comment styles in
+		// main.css are tuned to Core's classic comment markup (e.g. the
+		// .comment-meta.commentmetadata row and the "(Edit)" link).
 		add_theme_support( 'html5', array(
 			'search-form',
-			'nav',
-			'comments',
 			'gallery',
-			'figure',
-			'footnote',
-			'section',
-			'heading',
-			'address',
-			'header',
-			'main',
-			'aside',
-			'footer',
-			'article',
-			'embeds',
+			'caption',
+			'style',
+			'script',
+			'navigation-widgets',
 		) );
 
 		// --- Navigation menus --------------------------------------------

@@ -3,7 +3,7 @@
  * Lumen — template tags.
  *
  * Small, composable output helpers for the loop. All `lumen_`-prefixed.
- * These run in the main query loop context (the_post() already called).
+ * These run in the loop context (the_post() already called).
  *
  * @package lumen
  */
@@ -15,20 +15,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! function_exists( 'lumen_post_date' ) ) {
 	/**
 	 * Outputs the post date as a <time> element.
+	 *
+	 * Both values come from get_the_date(), which formats the local post_date
+	 * in the site timezone. The previous implementation parsed post_date_gmt,
+	 * which is '0000-00-00 00:00:00' for drafts and therefore produced a
+	 * bogus machine-readable datetime in previews.
 	 */
 	function lumen_post_date() {
-		$format = (string) get_option( 'date_format' );
-		if ( '' === $format ) {
-			$format = 'F j, Y';
+		$display_date = (string) get_the_date();
+		$datetime     = (string) get_the_date( DATE_W3C );
+		if ( '' === $display_date ) {
+			return;
 		}
-		// Version-robust date output: this WP version changed get_post_time() to
-		// ( $format, $gmt, $post, $translate ); the old ( $timestamp, $format )
-		// call is incompatible and yielded epoch dates. Use stable functions instead.
-		$post_id       = (int) get_the_ID();
-		$display_date  = (string) get_the_date( $format, $post_id );
-		$post_date_gmt = (string) get_post_field( 'post_date_gmt', $post_id );
-		$epoch         = $post_date_gmt ? (int) strtotime( $post_date_gmt ) : 0;
-		$datetime      = gmdate( 'c', $epoch );
 		echo '<time class="lumen-post-date" datetime="' . esc_attr( $datetime ) . '">' . esc_html( $display_date ) . '</time>';
 	}
 }
@@ -55,63 +53,36 @@ if ( ! function_exists( 'lumen_post_categories' ) ) {
 	/**
 	 * Outputs category links for the current post (or $post_id).
 	 *
+	 * Uses get_the_category() (object-cached, filtered) and get_category_link().
+	 * The previous version read the non-existent WP_Term::$ID property (a PHP
+	 * warning on every pill) and cast get_term_link() to string, which is a
+	 * fatal error whenever it returns a WP_Error.
+	 *
 	 * @param int|null $post_id
 	 */
 	function lumen_post_categories( $post_id = null ) {
-		$post_id = $post_id ? (int) $post_id : (int) get_the_ID();
-		if ( ! $post_id ) {
+		$terms = get_the_category( $post_id ? (int) $post_id : false );
+		if ( empty( $terms ) ) {
 			return;
 		}
-		// wp_get_post_terms() may return WP_Term objects or term IDs depending on
-		// version/args; normalize to WP_Term objects before output.
-		$terms = wp_get_post_terms( $post_id, 'category' );
-		if ( ! is_array( $terms ) || empty( $terms ) ) {
-			return;
-		}
-		$render_terms = array();
+
+		$items = array();
 		foreach ( $terms as $term ) {
-			if ( $term instanceof WP_Term ) {
-				$render_terms[] = $term;
-			} else {
-				$t = get_term( (int) $term, 'category' );
-				if ( $t instanceof WP_Term ) {
-					$render_terms[] = $t;
-				}
-			}
-		}
-		if ( empty( $render_terms ) ) {
-			return;
-		}
-		echo '<span class="lumen-post-cats">';
-		foreach ( $render_terms as $term ) {
 			$name = (string) $term->name;
 			if ( '' === $name ) {
 				continue;
 			}
-			// $term->link is unreliable in some WP versions/contexts (empty),
-			// which caused categories to be silently dropped. Generate the
-			// archive link via core, falling back to a slug-based URL.
-			$term_id = $term instanceof WP_Term ? (int) $term->ID : 0;
-			$link    = '' ;
-			if ( $term_id ) {
-				$link = (string) get_term_link( $term_id, 'category' );
-			}
+			$link = get_category_link( $term );
 			if ( '' === $link ) {
-				$link = (string) get_term_link( $term, 'category' );
-			}
-			if ( '' === $link ) {
-				$slug = isset( $term->slug ) ? (string) $term->slug : '';
-				if ( '' !== $slug ) {
-					$link = home_url( '/?' . 'category_name=' . rawurlencode( $slug ) );
-				}
-			}
-			if ( '' === $link ) {
-				echo '<span class="lumen-post-cat">' . esc_html( $name ) . '</span>';
+				$items[] = '<span class="lumen-post-cat">' . esc_html( $name ) . '</span>';
 			} else {
-				echo '<a class="lumen-post-cat" href="' . esc_url( $link ) . '">' . esc_html( $name ) . '</a>';
+				$items[] = '<a class="lumen-post-cat" href="' . esc_url( $link ) . '">' . esc_html( $name ) . '</a>';
 			}
 		}
-		echo '</span>';
+
+		if ( $items ) {
+			echo '<span class="lumen-post-cats">' . implode( '', $items ) . '</span>';
+		}
 	}
 }
 
@@ -224,25 +195,30 @@ if ( ! function_exists( 'lumen_archive_title' ) ) {
 		}
 
 		// Date archives (year / month / day), localized via wp_date().
+		// Timestamps are built and formatted in UTC so the site timezone can
+		// never shift the label to the neighbouring day/month/year.
 		if ( is_date() ) {
-			$year     = (int) ( $GLOBALS['wp_query']->query_vars['year'] ?? 0 );
-			$monthnum = (int) ( $GLOBALS['wp_query']->query_vars['monthnum'] ?? 0 );
-			$day      = (int) ( $GLOBALS['wp_query']->query_vars['day'] ?? 0 );
-			if ( $year > 0 && $monthnum === 0 && $day === 0 ) {
-				return esc_html( wp_date( 'Y', mktime( 12, 0, 0, 1, 1, $year ) ) );
+			$year     = (int) get_query_var( 'year' );
+			$monthnum = (int) get_query_var( 'monthnum' );
+			$day      = (int) get_query_var( 'day' );
+			$utc      = new DateTimeZone( 'UTC' );
+			if ( $year > 0 && 0 === $monthnum && 0 === $day ) {
+				return esc_html( wp_date( _x( 'Y', 'yearly archives date format', 'lumen' ), gmmktime( 12, 0, 0, 1, 1, $year ), $utc ) );
 			}
-			if ( $year > 0 && $monthnum > 0 && $day === 0 ) {
-				return esc_html( wp_date( 'F Y', mktime( 12, 0, 0, $monthnum, 1, $year ) ) );
+			if ( $year > 0 && $monthnum > 0 && 0 === $day ) {
+				return esc_html( wp_date( _x( 'F Y', 'monthly archives date format', 'lumen' ), gmmktime( 12, 0, 0, $monthnum, 1, $year ), $utc ) );
 			}
 			if ( $year > 0 && $monthnum > 0 && $day > 0 ) {
-				return esc_html( wp_date( 'F j, Y', mktime( 12, 0, 0, $monthnum, $day, $year ) ) );
+				return esc_html( wp_date( (string) get_option( 'date_format', 'F j, Y' ), gmmktime( 12, 0, 0, $monthnum, $day, $year ), $utc ) );
 			}
 		}
 
 		// Fallback: core archive title (returns a string; no echo side effect).
-		$title = get_the_archive_title();
-		if ( '' !== (string) $title ) {
-			return esc_html( (string) $title );
+		// get_the_archive_title() wraps its prefix in a <span>; strip markup
+		// so it is not printed as literal "<span>" text after escaping.
+		$title = trim( wp_strip_all_tags( (string) get_the_archive_title() ) );
+		if ( '' !== $title ) {
+			return esc_html( $title );
 		}
 
 		return '';
@@ -339,8 +315,8 @@ if ( ! function_exists( 'lumen_posts_count_label' ) ) {
 	 */
 	function lumen_posts_count_label( $count ) {
 		$count = (int) $count;
-		$posts = (string) _n( 'post', 'posts', $count, 'lumen' );
-		return number_format_i18n( $count ) . ' ' . $posts;
+		/* translators: %s: number of posts. */
+		return sprintf( _n( '%s post', '%s posts', $count, 'lumen' ), number_format_i18n( $count ) );
 	}
 }
 
@@ -357,9 +333,15 @@ if ( ! function_exists( 'lumen_search_results_label' ) ) {
 	 * @return string
 	 */
 	function lumen_search_results_label( $count, $query ) {
-		$count   = (int) $count;
-		$results = (string) _n( 'result', 'results', $count, 'lumen' );
-		return number_format_i18n( $count ) . ' ' . $results . " for '" . esc_html( $query ) . "'";
+		$count = (int) $count;
+		return esc_html(
+			sprintf(
+				/* translators: 1: number of results, 2: search query. */
+				_n( "%1\$s result for '%2\$s'", "%1\$s results for '%2\$s'", $count, 'lumen' ),
+				number_format_i18n( $count ),
+				$query
+			)
+		);
 	}
 }
 

@@ -28,7 +28,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					</div>
 				<?php else : ?>
 					<a class="lumen-site-title" href="<?php echo esc_url( home_url( '/' ) ); ?>">
-						<?php esc_html( bloginfo( 'name', false ) ); ?>
+						<?php echo esc_html( get_bloginfo( 'name' ) ); ?>
 					</a>
 				<?php endif; ?>
 			</div>

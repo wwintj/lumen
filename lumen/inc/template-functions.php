@@ -14,12 +14,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 if ( ! function_exists( 'lumen_render_nav' ) ) {
 	function lumen_render_nav( $location = 'primary' ) {
+		// NB: the arg is 'theme_location'. A bare 'location' key is ignored by
+		// wp_nav_menu(), which then falls back to the first non-empty menu, so
+		// the header and footer would both render the same menu.
 		if ( has_nav_menu( $location ) ) {
 			wp_nav_menu( array(
-				'location'  => $location,
-				'menu_wrap' => '<ul class="lumen-nav-links">',
-				'container' => false,
-				'menu_class' => false,
+				'theme_location' => $location,
+				'container'      => false,
+				'menu_class'     => 'lumen-nav-links',
+				'fallback_cb'    => false,
 			) );
 		}
 	}
@@ -273,18 +276,25 @@ if ( ! function_exists( 'lumen_comment_edit_link' ) ) {
 	 * own comment tables call the link through different code paths and are
 	 * unaffected.
 	 *
-	 * @param string $link    Core's rendered edit link.
-	 * @param string $before  Markup Core puts before the link.
-	 * @param string $after   Markup Core puts after the link.
+	 * @param string $link       Core's rendered edit link.
+	 * @param int    $comment_id Comment ID.
+	 * @param string $text       The link text Core was given.
 	 * @return string
 	 */
-	function lumen_comment_edit_link( $link, $before = '', $after = '' ) {
+	function lumen_comment_edit_link( $link, $comment_id = 0, $text = '' ) {
 		// Strip the literal parentheses Core wraps the word in. Both the ASCII
 		// pair and the fullwidth pair are handled so a localised string such as
 		// "（編集）" reduces to "編集" rather than keeping its brackets.
-		$label = preg_replace( '/[（(]\s*|\s*[)）]/u', '', $link );
+		// Only the link text (between > and </a>) is touched, never the href.
+		$label = preg_replace_callback(
+			'#>([^<]*)</a>#u',
+			static function ( $m ) {
+				return '>' . preg_replace( '/^\s*[（(]\s*|\s*[)）]\s*$/u', '', $m[1] ) . '</a>';
+			},
+			$link
+		);
 
-		return false !== $label ? $label : $link;
+		return is_string( $label ) ? $label : $link;
 	}
 }
 

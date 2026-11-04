@@ -57,7 +57,8 @@ elseif ( ! have_posts() ) :
 			$query = (string) get_search_query();
 			if ( '' !== $query ) {
 				// Search empty: "No results for 'query'".
-				printf( __( 'No results for %s', 'lumen' ), esc_html( $query ) );
+				/* translators: %s: search query. */
+				printf( esc_html__( 'No results for %s', 'lumen' ), esc_html( $query ) );
 			} else {
 				echo esc_html__( 'No results found.', 'lumen' );
 			}

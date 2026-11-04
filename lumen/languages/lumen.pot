@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the Lumen theme.
 msgid ""
 msgstr ""
-"Project-Id-Version: Lumen 1.1.3\n"
+"Project-Id-Version: Lumen 1.1.21\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/theme/lumen\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-29T14:40:15+00:00\n"
+"POT-Creation-Date: 2026-11-04T14:24:30+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: lumen\n"
@@ -20,9 +20,8 @@ msgid "Lumen"
 msgstr ""
 
 #. Theme URI of the theme
-#. Author URI of the theme
 #: style.css
-msgid "https://lumen.example/"
+msgid "https://github.com/wwintj/lumen"
 msgstr ""
 
 #. Description of the theme
@@ -33,6 +32,11 @@ msgstr ""
 #. Author of the theme
 #: style.css
 msgid "Lumen Team"
+msgstr ""
+
+#. Author URI of the theme
+#: style.css
+msgid "https://github.com/wwintj"
 msgstr ""
 
 #: 404.php:18
@@ -47,21 +51,16 @@ msgstr ""
 msgid "Back to home"
 msgstr ""
 
-#: comments.php:52
-#: comments.php:64
-msgid "Comments are closed."
-msgstr ""
-
-#: comments.php:57
+#: comments.php:70
 msgid "Comments"
 msgstr ""
 
-#: comments.php:59
-msgid "No comments yet. Be the first to start the conversation."
+#: comments.php:143
+msgid "Comments are closed."
 msgstr ""
 
 #: footer.php:17
-#: inc/setup.php:54
+#: inc/setup.php:51
 msgid "Footer menu"
 msgstr ""
 
@@ -78,93 +77,129 @@ msgstr ""
 msgid "Skip to content"
 msgstr ""
 
-#: header.php:36
-#: inc/setup.php:53
-msgid "Primary menu"
-msgstr ""
-
-#: home.php:30
-#: inc/template-functions.php:39
-#: single.php:46
-msgid "Previous"
-msgstr ""
-
-#: home.php:34
-#: inc/template-functions.php:40
-#: single.php:47
-msgid "Next"
-msgstr ""
-
-#: home.php:44
-msgid "Previous page"
-msgstr ""
-
-#: home.php:51
-msgid "Next page"
-msgstr ""
-
-#: single.php:55
-msgid "Previous post"
-msgstr ""
-
-#: single.php:56
-msgid "Next post"
-msgstr ""
-
-#: inc/template-functions.php:95
-msgid "Search articles…"
-msgstr ""
-
-#: inc/template-functions.php:80
-msgid "Site search"
-msgstr ""
-
-#: home.php:41
-#: template-parts/post-list.php:66
-msgid "No posts found."
-msgstr ""
-
-#: inc/template-functions.php:50
-#: inc/template-functions.php:52
+#: header.php:62
+#: inc/template-functions.php:100
+#: inc/template-functions.php:110
 #: search.php:17
 msgid "Search"
 msgstr ""
 
-#: inc/template-tags.php:280
+#: header.php:70
+#: inc/setup.php:50
+msgid "Primary menu"
+msgstr ""
+
+#: home.php:50
+msgid "Posts navigation"
+msgstr ""
+
+#: home.php:54
+msgid "Previous page"
+msgstr ""
+
+#: home.php:61
+msgid "Next page"
+msgstr ""
+
+#: home.php:71
+#: template-parts/post-list.php:67
+msgid "No posts found."
+msgstr ""
+
+#: inc/template-functions.php:42
+msgid "Previous"
+msgstr ""
+
+#: inc/template-functions.php:43
+msgid "Next"
+msgstr ""
+
+#: inc/template-functions.php:83
+msgid "Site search"
+msgstr ""
+
+#: inc/template-functions.php:96
+msgid "Search articles…"
+msgstr ""
+
+#: inc/template-functions.php:200
+msgid "Leave a Reply"
+msgstr ""
+
+#: inc/template-functions.php:201
+#, php-format
+msgid "Leave a Reply to %s"
+msgstr ""
+
+#: inc/template-functions.php:213
+msgid "Cancel"
+msgstr ""
+
+#: inc/template-functions.php:252
+msgid "Write your comment..."
+msgstr ""
+
+#: inc/template-tags.php:206
+msgctxt "yearly archives date format"
+msgid "Y"
+msgstr ""
+
+#: inc/template-tags.php:209
+msgctxt "monthly archives date format"
+msgid "F Y"
+msgstr ""
+
+#: inc/template-tags.php:256
 msgid "Category"
 msgstr ""
 
-#: inc/template-tags.php:283
+#: inc/template-tags.php:259
 msgid "Tag"
 msgstr ""
 
-#: inc/template-tags.php:290
+#: inc/template-tags.php:266
 msgid "Author"
 msgstr ""
 
-#: inc/template-tags.php:342
-msgid "post"
-msgid_plural "posts"
+#. translators: %s: number of posts.
+#: inc/template-tags.php:319
+#, php-format
+msgid "%s post"
+msgid_plural "%s posts"
 msgstr[0] ""
 msgstr[1] ""
 
-#: inc/template-tags.php:361
-msgid "result"
-msgid_plural "results"
+#. translators: 1: number of results, 2: search query.
+#: inc/template-tags.php:340
+#, php-format
+msgid "%1$s result for '%2$s'"
+msgid_plural "%1$s results for '%2$s'"
 msgstr[0] ""
 msgstr[1] ""
 
-#: index.php:31
-#: index.php:34
-msgid "Latest posts"
+#: page.php:24
+msgid "Page sections"
 msgstr ""
 
-#: template-parts/post-list.php:60
+#: single.php:46
+msgid "Post pages"
+msgstr ""
+
+#: single.php:69
+msgid "Previous post"
+msgstr ""
+
+#: single.php:70
+msgid "Next post"
+msgstr ""
+
+#. translators: %s: search query.
+#: template-parts/post-list.php:61
 #, php-format
 msgid "No results for %s"
 msgstr ""
 
-#: template-parts/post-list.php:62
+#: template-parts/post-list.php:63
 msgid "No results found."
 msgstr ""
 

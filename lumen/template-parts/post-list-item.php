@@ -36,7 +36,7 @@ $card_class = $search ? 'lumen-post-card lumen-list-search' : 'lumen-post-card';
 		<?php lumen_list_meta(); ?>
 		<?php
 		if ( $excerpt = lumen_list_excerpt( $context ) ) {
-			echo '<p class="lumen-post-excerpt">' . $excerpt . '</p>';
+			echo '<p class="lumen-post-excerpt">' . esc_html( $excerpt ) . '</p>';
 		}
 		?>
 	<?php else : ?>
@@ -49,7 +49,7 @@ $card_class = $search ? 'lumen-post-card lumen-list-search' : 'lumen-post-card';
 		</h2>
 		<?php
 		if ( $excerpt = lumen_list_excerpt( $context ) ) {
-			echo '<p class="lumen-post-excerpt">' . $excerpt . '</p>';
+			echo '<p class="lumen-post-excerpt">' . esc_html( $excerpt ) . '</p>';
 		}
 		?>
 	<?php endif; ?>

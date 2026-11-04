@@ -3,8 +3,7 @@
  * Lumen — archive / fallback template.
  *
  * Template hierarchy:
- *   - Home (latest posts): home.php
- *   - Posts page: the page selected in Settings → Reading (page.php)
+ *   - Home / posts page ( is_home() ): home.php
  *   - category / tag / author / date / taxonomy archives: index.php (fallback)
  *   - search: search.php
  *
@@ -36,22 +35,10 @@ $is_category_intro = is_category();
 		 * category branch below can place them side by side without
 		 * duplicating or reordering any of the lookup logic.
 		 */
-		$archive_title = '';
-
-		if ( is_home() && ! is_front_page() ) :
-			// Dedicated "posts page" (Settings → Reading → Posts page).
-			$page_for_posts = (int) get_option( 'page_for_posts' );
-			$archive_title  = $page_for_posts
-				? get_the_title( $page_for_posts )
-				: __( 'Latest posts', 'lumen' );
-		elseif ( is_home() && is_front_page() ) :
-			// Front page displaying the latest posts (no posts page).
-			$archive_title  = __( 'Latest posts', 'lumen' );
-		elseif ( is_archive() ) :
-			// category / tag / author / date / taxonomy archives.
-			// Clean context title via core term/author/date APIs.
-			$archive_title  = lumen_archive_title();
-		endif;
+		// home.php handles is_home(), so this template only ever renders
+		// archives (category / tag / author / date / taxonomy) or, as the last
+		// fallback, anything else. lumen_archive_title() returns escaped text.
+		$archive_title = is_archive() ? lumen_archive_title() : '';
 
 		$found_posts = 0;
 		$context     = '';
@@ -81,7 +68,7 @@ $is_category_intro = is_category();
 		<h1 class="lumen-archive-title">
 			<?php
 			if ( '' !== $archive_title ) {
-				echo ( string ) $archive_title;
+				echo $archive_title; // phpcs:ignore WordPress.Security.EscapeOutput -- escaped in lumen_archive_title().
 			}
 			?>
 		</h1>

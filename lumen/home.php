@@ -16,6 +16,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 <?php get_header(); ?>
 
 <section class="lumen-home-wrap">
+	<?php
+	// One H1 per page: the blog home has no visible heading, so it gets a
+	// visually hidden one (the posts page title, or the site name).
+	$lumen_home_heading = ( ! is_front_page() && get_option( 'page_for_posts' ) )
+		? get_the_title( (int) get_option( 'page_for_posts' ) )
+		: get_bloginfo( 'name' );
+	?>
+	<h1 class="visually-hidden"><?php echo esc_html( $lumen_home_heading ); ?></h1>
+
 	<?php if ( have_posts() ) : ?>
 
 		<div class="lumen-home-list">
@@ -37,7 +46,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 		 * the link is never an unnamed control.
 		 */
 		?>
-		<nav class="lumen-home-pagination">
+		<?php if ( $GLOBALS['wp_query']->max_num_pages > 1 ) : ?>
+		<nav class="lumen-home-pagination" aria-label="<?php echo esc_attr__( 'Posts navigation', 'lumen' ); ?>">
 			<div class="lumen-pager lumen-pager-prev">
 				<?php
 				previous_posts_link(
@@ -53,6 +63,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				?>
 			</div>
 		</nav>
+		<?php endif; ?>
 
 	<?php else : ?>
 

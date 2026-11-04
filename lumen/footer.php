@@ -21,12 +21,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<?php printf(
 						esc_html__( '© %1$s %2$s', 'lumen' ),
 						esc_html( current_time( 'Y' ) ),
-						esc_html( bloginfo( 'name', false ) )
+						esc_html( get_bloginfo( 'name' ) )
 					); ?>
 				</p>
 			</div>
 			<a class="lumen-footer-feed"
-				href="<?php echo esc_url( home_url( '/?feed=rss2' ) ); ?>"
+				href="<?php echo esc_url( get_feed_link() ); ?>"
 				rel="alternate"
 				aria-label="<?php echo esc_attr__( 'RSS feed', 'lumen' ); ?>">RSS</a>
 		</div>

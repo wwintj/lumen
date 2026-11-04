@@ -10,7 +10,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 ?>
 <?php get_header(); ?>
-<article class="lumen-post">
+<?php while ( have_posts() ) : the_post(); ?>
+<article id="post-<?php the_ID(); ?>" class="lumen-post">
 	<header class="lumen-post-header">
 		<h1 class="lumen-post-title"><?php the_title(); ?></h1>
 
@@ -39,6 +40,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<div class="lumen-post-body">
 		<?php
 		the_content();
+
+		// Multi-page posts (<!--nextpage-->) were silently truncated to page 1.
+		wp_link_pages( array(
+			'before' => '<nav class="lumen-page-links" aria-label="' . esc_attr__( 'Post pages', 'lumen' ) . '">',
+			'after'  => '</nav>',
+		) );
 		?>
 	</div>
 </article>
@@ -73,5 +80,6 @@ if ( comments_open() || get_comments_number() ) {
     comments_template();
 }
 ?>
+<?php endwhile; ?>
 
 <?php get_footer(); ?>

@@ -2963,3 +2963,37 @@ figcaption,
 		font-size: 1.375rem;
 	}
 }
+
+/* ============================================================
+   Multi-page post / page links (wp_link_pages, <!--nextpage-->)
+   Same grey pill language as the single-post date pill.
+   ============================================================ */
+.lumen-page-links {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	margin-top: 2rem;
+}
+
+.lumen-page-links .post-page-numbers {
+	display: inline-block;
+	min-width: 2rem;
+	padding: 4px 10px;
+	font-size: 13px;
+	line-height: 1.4;
+	text-align: center;
+	color: #52565c;
+	background: #f0f1f2;
+	border-radius: 999px;
+	text-decoration: none;
+	font-variant-numeric: tabular-nums;
+}
+
+.lumen-page-links a.post-page-numbers:hover {
+	color: var(--lumen-fg);
+}
+
+.lumen-page-links .post-page-numbers.current {
+	color: var(--lumen-bg);
+	background: var(--lumen-fg);
+}

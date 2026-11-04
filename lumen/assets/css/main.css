@@ -846,12 +846,12 @@ a.lumen-stat:hover {
 
 .lumen-card > .lumen-button {
 	margin-top: -2px;
-	/* Small, in Inter's true italic (Chinese labels stay upright), on the
-	   same soft grey as the menu's "you are here" capsule. */
-	padding-inline: 4px;
+	/* Small, in Inter's true italic (Chinese labels stay upright), on a
+	   soft grey; the same box as a category pill (18px tall, 8px sides). */
+	padding-inline: 8px;
 	background: var(--bg-soft);
 	font-size: var(--text-2xs);
-	line-height: 13px;
+	line-height: 16px;
 	font-style: italic;
 	font-synthesis-style: none;
 }
@@ -905,6 +905,12 @@ a.lumen-stat:hover {
 	gap: var(--space);
 }
 
+/* The count beside the breadcrumbs: as tall as their outline (22px). */
+.lumen-page-heading > .lumen-pill {
+	padding-inline: 10px;
+	line-height: 20px;
+}
+
 /* Breadcrumbs: an outlined capsule matching the count pill beside it —
    house icon for Home, light chevrons, the current place in accent red. */
 .lumen-breadcrumbs ol {
@@ -912,14 +918,13 @@ a.lumen-stat:hover {
 	flex-wrap: wrap;
 	align-items: center;
 	margin: 0;
-	/* Same box as .lumen-pill (the post count beside it): same height,
-	   padding and font size. */
-	/* 1px inset so the sliding fill (below) clears the outline; the items
-	   carry the side padding. Total height stays 18px, like the pill. */
+	/* Each crumb is the size of a category pill (18px tall, 8px sides), so
+	   the red "you are here" capsule matches the pills on the cards. A 1px
+	   inset lets it clear the outline: 22px in all, like the count beside. */
 	padding: 1px;
 	list-style: none;
 	font-size: var(--text-2xs);
-	line-height: 14px;
+	line-height: 18px;
 	color: var(--muted);
 	background: var(--card);
 	border: 1px solid var(--line);
@@ -944,7 +949,7 @@ a.lumen-stat:hover {
 	display: inline-flex;
 	align-items: center;
 	gap: 0.25rem;
-	padding-inline: 7px;
+	padding-inline: 8px;
 	border-radius: var(--round);
 }
 

@@ -2,7 +2,7 @@
    Lumen — all theme styles.
 
    One visual language everywhere: white outlined shapes (no shadows), grey
-   text, one accent colour, a dark footer band.
+   text, one accent colour, an accent footer band.
 
    1. Tokens (light + dark)      7. Single post / page
    2. Base & typography          8. Comments
@@ -42,21 +42,23 @@
 	--bg: #fdfdfd;
 	--bg-soft: #f3f3f3;
 	--card: #ffffff;
-	/* Greys rather than black, everywhere (text, outlines, footer). */
+	/* Greys rather than black, everywhere (text, outlines). */
 	--fg: #595959;
 	--fg-soft: #666666;
 	--muted: #757575;
 	--line: #8c8c8c;            /* outlines */
 	--rule: #e4e4e4;            /* hairline dividers */
 	/* The one accent colour. Used for exactly three things:
-	   1. category pills;
+	   1. category pills (and the footer band, which matches them);
 	   2. the hover state of anything clickable (links, icons, buttons);
 	   3. "you are here": the current menu item and breadcrumb.
 	   Everything else is neutral. Never add a second red. */
 	--accent: #bf4f2c;
-	--footer-bg: #616161;
-	--footer-fg: #f7f7f7;
-	--footer-muted: #e4e4e4;
+	/* Footer band = a category pill: accent fill, text in the card colour
+	   (links slightly softer, full strength on hover). */
+	--footer-bg: var(--accent);
+	--footer-fg: var(--card);
+	--footer-muted: color-mix(in srgb, var(--card) 82%, var(--accent));
 
 
 	/* One typeface stack for everything: Inter for English, the system
@@ -97,9 +99,6 @@
 		--line: #5a5d62;
 		--rule: #2e3033;
 		--accent: #d97859;
-		--footer-bg: #0d0e0f;
-		--footer-fg: #e9e8e4;
-		--footer-muted: #94938e;
 	}
 
 	img:not([src$=".svg"]) {
@@ -581,7 +580,7 @@ body:has(#lumen-search:popover-open) .lumen-search-toggle {
 	}
 }
 
-/* Footer: one centred line on a dark full-width band. */
+/* Footer: one centred line on a full-width accent band. */
 .lumen-footer {
 	padding-block: 0.375rem;
 	color: var(--footer-fg);
@@ -628,6 +627,7 @@ body:has(#lumen-search:popover-open) .lumen-search-toggle {
 .lumen-footer-nav .lumen-menu a {
 	padding: 0;
 	font-size: inherit;
+	line-height: inherit; /* same baseline as the copyright and RSS */
 	color: var(--footer-muted);
 	background: none;
 	border-radius: 0;
@@ -657,7 +657,7 @@ body:has(#lumen-search:popover-open) .lumen-search-toggle {
 	padding: 0 8px;
 	font-size: var(--text-2xs);
 	font-weight: 600;
-	line-height: 1.45;
+	line-height: 16px; /* whole pixels: keeps Latin capitals centred (measured) */
 	letter-spacing: 0.02em;
 	font-variant-numeric: tabular-nums;
 	white-space: nowrap;
@@ -832,7 +832,7 @@ a.lumen-stat:hover {
 	padding-inline: 0.7rem;
 	background: var(--bg-soft);
 	font-size: var(--text-2xs);
-	line-height: 1.2;
+	line-height: 13px;
 	font-style: italic;
 	font-synthesis-style: none;
 }

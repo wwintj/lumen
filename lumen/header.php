@@ -28,10 +28,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<?php else : ?>
 				<a class="lumen-site-title" href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home"><?php echo esc_html( get_bloginfo( 'name' ) ); ?></a>
 			<?php endif; ?>
+			<?php if ( '' !== get_bloginfo( 'description' ) ) : ?>
+				<p class="lumen-tagline"><?php echo esc_html( get_bloginfo( 'description' ) ); ?></p>
+			<?php endif; ?>
 		</div>
 
-		<button type="button" class="lumen-search-toggle" popovertarget="lumen-search" aria-label="<?php esc_attr_e( 'Search', 'lumen' ); ?>">
-			<?php echo lumen_search_icon(); // phpcs:ignore WordPress.Security.EscapeOutput -- static SVG. ?>
+		<button type="button" class="lumen-search-toggle" popovertarget="lumen-search" aria-label="<?php esc_attr_e( 'Search', 'lumen' ); ?>" title="<?php esc_attr_e( 'Search', 'lumen' ); ?>">
+			<?php echo lumen_icon( 'search' ); // phpcs:ignore WordPress.Security.EscapeOutput -- static SVG. ?>
 		</button>
 
 		<?php if ( has_nav_menu( 'primary' ) ) : ?>

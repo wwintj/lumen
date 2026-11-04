@@ -54,9 +54,6 @@ msgstr "搜尋文章…"
 msgid "Tags"
 msgstr "標籤"
 
-msgid "%s min read"
-msgid_plural "%s min read"
-msgstr[0] "約 %s 分鐘"
 
 msgctxt "monthly archives date format"
 msgid "F Y"
@@ -116,3 +113,22 @@ msgstr "安靜、以文字為主的個人部落格佈景主題，適合中英文
 
 msgid "Reply"
 msgstr "回覆"
+
+msgid "%s min"
+msgid_plural "%s min"
+msgstr[0] "%s 分鐘"
+
+msgid "Read more"
+msgstr "繼續閱讀"
+
+msgid "comments"
+msgstr "則留言"
+
+msgid "Home"
+msgstr "首頁"
+
+msgid "Author"
+msgstr "作者"
+
+msgid "Breadcrumb"
+msgstr "目前位置"

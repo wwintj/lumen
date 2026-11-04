@@ -2,14 +2,14 @@
 # This file is distributed under the GNU General Public License v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Lumen 1.2.0\n"
+"Project-Id-Version: Lumen 1.3.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/theme/lumen\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-04T14:51:41+00:00\n"
+"POT-Creation-Date: 2026-11-04T19:28:04+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: lumen\n"
@@ -26,7 +26,7 @@ msgstr ""
 
 #. Description of the theme
 #: style.css
-msgid "A quiet, text-first personal blog theme for Chinese and English writing. Zero JavaScript, no web fonts, automatic dark mode, reading time, tag pills, and a year-by-year archive page."
+msgid "A personal blog theme for Chinese and English writing: outlined cards in a two-column masonry, a one-line capsule header, one accent colour, automatic dark mode, reading time, and a year-by-year archive page. Zero JavaScript, no web fonts."
 msgstr ""
 
 #. Author of the theme
@@ -67,7 +67,7 @@ msgstr ""
 msgid "Comments are closed."
 msgstr ""
 
-#: footer.php:18
+#: footer.php:23
 #: inc/setup.php:49
 msgid "Footer menu"
 msgstr ""
@@ -76,14 +76,15 @@ msgstr ""
 msgid "Skip to content"
 msgstr ""
 
-#: header.php:33
-#: inc/template-tags.php:57
+#: header.php:36
 #: inc/template-tags.php:69
+#: inc/template-tags.php:80
+#: inc/template-tags.php:224
 #: search.php:20
 msgid "Search"
 msgstr ""
 
-#: header.php:38
+#: header.php:41
 #: inc/setup.php:48
 msgid "Primary menu"
 msgstr ""
@@ -106,53 +107,70 @@ msgstr ""
 msgid "Write your comment…"
 msgstr ""
 
-#: inc/template-tags.php:64
+#: inc/template-tags.php:76
 msgid "Search posts…"
 msgstr ""
 
-#: inc/template-tags.php:111
+#: inc/template-tags.php:110
+#: inc/template-tags.php:206
 msgid "Tags"
 msgstr ""
 
 #. translators: %s: number of minutes.
-#: inc/template-tags.php:156
+#: inc/template-tags.php:154
 #, php-format
-msgid "%s min read"
-msgid_plural "%s min read"
+msgid "%s min"
+msgid_plural "%s min"
 msgstr[0] ""
 msgstr[1] ""
 
-#: inc/template-tags.php:211
+#: inc/template-tags.php:180
+msgid "comments"
+msgstr ""
+
+#: inc/template-tags.php:194
+msgid "Home"
+msgstr ""
+
+#: inc/template-tags.php:215
+msgid "Author"
+msgstr ""
+
+#: inc/template-tags.php:230
+msgid "Breadcrumb"
+msgstr ""
+
+#: inc/template-tags.php:301
 msgctxt "monthly archives date format"
 msgid "F Y"
 msgstr ""
 
-#: inc/template-tags.php:214
+#: inc/template-tags.php:304
 msgctxt "yearly archives date format"
 msgid "Y"
 msgstr ""
 
 #. translators: %s: number of posts.
-#: inc/template-tags.php:229
+#: inc/template-tags.php:319
 #, php-format
 msgid "%s post"
 msgid_plural "%s posts"
 msgstr[0] ""
 msgstr[1] ""
 
-#: inc/template-tags.php:241
+#: inc/template-tags.php:331
 msgid "Previous page"
 msgstr ""
 
-#: inc/template-tags.php:242
+#: inc/template-tags.php:332
 msgid "Next page"
 msgstr ""
 
-#: inc/template-tags.php:243
+#: inc/template-tags.php:333
 msgid "Page"
 msgstr ""
 
-#: inc/template-tags.php:255
+#: inc/template-tags.php:345
 msgid "Post pages"
 msgstr ""
 
@@ -186,15 +204,19 @@ msgstr ""
 msgid "More posts"
 msgstr ""
 
-#: template-parts/post-item.php:17
+#: template-parts/post-item.php:20
 msgid "Pinned"
 msgstr ""
 
-#: template-parts/post-list.php:28
+#: template-parts/post-item.php:34
+msgid "Read more"
+msgstr ""
+
+#: template-parts/post-list.php:42
 msgid "Nothing matched your search. Try different words."
 msgstr ""
 
-#: template-parts/post-list.php:30
+#: template-parts/post-list.php:44
 msgid "No posts yet."
 msgstr ""
 
@@ -220,22 +242,7 @@ msgstr ""
 
 #: theme.json
 msgctxt "Color name"
-msgid "Green"
-msgstr ""
-
-#: theme.json
-msgctxt "Color name"
-msgid "Green soft"
-msgstr ""
-
-#: theme.json
-msgctxt "Color name"
-msgid "Purple"
-msgstr ""
-
-#: theme.json
-msgctxt "Color name"
-msgid "Purple soft"
+msgid "Accent"
 msgstr ""
 
 #: theme.json

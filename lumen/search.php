@@ -14,12 +14,12 @@ get_header();
 $lumen_query = get_search_query( false );
 $lumen_found = (int) $GLOBALS['wp_query']->found_posts;
 ?>
-<div class="lumen-column">
-	<header class="lumen-archive-header lumen-archive-header--plain">
-		<div class="lumen-archive-heading">
-			<h1 class="lumen-archive-title"><?php esc_html_e( 'Search', 'lumen' ); ?></h1>
+<div class="lumen-wide">
+	<header class="lumen-page-header">
+		<div class="lumen-page-heading">
+			<h1 class="lumen-page-title"><?php esc_html_e( 'Search', 'lumen' ); ?></h1>
 			<?php if ( '' !== $lumen_query ) : ?>
-				<span class="lumen-pill lumen-pill--purple">
+				<span class="lumen-pill">
 					<?php
 					echo esc_html(
 						sprintf(
@@ -33,6 +33,7 @@ $lumen_found = (int) $GLOBALS['wp_query']->found_posts;
 				</span>
 			<?php endif; ?>
 		</div>
+		<?php lumen_the_breadcrumbs(); ?>
 		<?php lumen_search_form( 'page' ); ?>
 	</header>
 

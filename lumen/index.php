@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 get_header();
 ?>
-<div class="lumen-column">
+<div class="lumen-wide">
 	<?php
 	if ( is_archive() ) {
 		get_template_part( 'template-parts/archive-header' );

@@ -16,12 +16,11 @@ while ( have_posts() ) :
 	?>
 	<article id="post-<?php the_ID(); ?>" <?php post_class( 'lumen-column lumen-entry' ); ?>>
 		<header class="lumen-entry-header">
+			<?php if ( has_category() ) : ?>
+				<div class="lumen-pills"><?php lumen_the_category_pills(); ?></div>
+			<?php endif; ?>
 			<h1 class="lumen-entry-title"><?php the_title(); ?></h1>
-			<div class="lumen-meta">
-				<?php lumen_the_date_pill(); ?>
-				<?php lumen_the_category_pills(); ?>
-				<?php lumen_the_reading_time_pill(); ?>
-			</div>
+			<?php lumen_the_post_meta(); ?>
 		</header>
 
 		<?php if ( has_post_thumbnail() ) : ?>
@@ -48,8 +47,9 @@ while ( have_posts() ) :
 		<?php
 		the_post_navigation(
 			array(
-				'prev_text'          => '<span class="lumen-post-nav-label">' . esc_html__( '← Previous', 'lumen' ) . '</span><span class="lumen-post-nav-title">%title</span>',
-				'next_text'          => '<span class="lumen-post-nav-label">' . esc_html__( 'Next →', 'lumen' ) . '</span><span class="lumen-post-nav-title">%title</span>',
+				// A pill button with the post title shown underneath it.
+				'prev_text'          => '<span class="lumen-post-nav-button">' . esc_html__( '← Previous', 'lumen' ) . '</span><span class="lumen-post-nav-title">%title</span>',
+				'next_text'          => '<span class="lumen-post-nav-button">' . esc_html__( 'Next →', 'lumen' ) . '</span><span class="lumen-post-nav-title">%title</span>',
 				'screen_reader_text' => __( 'More posts', 'lumen' ),
 				'aria_label'         => __( 'More posts', 'lumen' ),
 				'class'              => 'lumen-post-nav',

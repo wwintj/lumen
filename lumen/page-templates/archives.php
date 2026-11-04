@@ -39,8 +39,8 @@ while ( have_posts() ) :
 	<article id="post-<?php the_ID(); ?>" <?php post_class( 'lumen-column lumen-entry' ); ?>>
 		<header class="lumen-entry-header">
 			<h1 class="lumen-entry-title"><?php the_title(); ?></h1>
-			<div class="lumen-meta">
-				<span class="lumen-pill lumen-pill--purple"><?php echo esc_html( lumen_posts_count_label( count( $lumen_posts ) ) ); ?></span>
+			<div class="lumen-pills">
+				<span class="lumen-pill"><?php echo esc_html( lumen_posts_count_label( count( $lumen_posts ) ) ); ?></span>
 			</div>
 		</header>
 

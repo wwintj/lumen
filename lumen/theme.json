@@ -9,27 +9,56 @@
 			"defaultGradients": false,
 			"defaultPalette": false,
 			"palette": [
-				{ "name": "Text", "slug": "text", "color": "#1b1b1b" },
-				{ "name": "Text soft", "slug": "text-soft", "color": "#4b4b4b" },
-				{ "name": "Muted", "slug": "muted", "color": "#6e6e6e" },
-				{ "name": "Background soft", "slug": "background-soft", "color": "#f4f4f4" },
-				{ "name": "Green", "slug": "green", "color": "#176d39" },
-				{ "name": "Green soft", "slug": "green-soft", "color": "#e0f3e5" },
-				{ "name": "Purple", "slug": "purple", "color": "#49375f" },
-				{ "name": "Purple soft", "slug": "purple-soft", "color": "#d8cbea" }
+				{
+					"name": "Text",
+					"slug": "text",
+					"color": "#616161"
+				},
+				{
+					"name": "Text soft",
+					"slug": "text-soft",
+					"color": "#6b6b6b"
+				},
+				{
+					"name": "Muted",
+					"slug": "muted",
+					"color": "#757575"
+				},
+				{
+					"name": "Background soft",
+					"slug": "background-soft",
+					"color": "#f3f3f3"
+				},
+				{
+					"name": "Accent",
+					"slug": "accent",
+					"color": "#bf4f2c"
+				}
 			]
 		},
 		"layout": {
-			"contentSize": "720px",
-			"wideSize": "1180px"
+			"contentSize": "1040px",
+			"wideSize": "1040px"
 		},
 		"typography": {
 			"customFontSize": false,
 			"defaultFontSizes": false,
 			"fontSizes": [
-				{ "name": "Small", "slug": "small", "size": "0.875rem" },
-				{ "name": "Normal", "slug": "normal", "size": "1.0625rem" },
-				{ "name": "Large", "slug": "large", "size": "1.3rem" }
+				{
+					"name": "Small",
+					"slug": "small",
+					"size": "0.875rem"
+				},
+				{
+					"name": "Normal",
+					"slug": "normal",
+					"size": "1.0625rem"
+				},
+				{
+					"name": "Large",
+					"slug": "large",
+					"size": "1.3rem"
+				}
 			]
 		}
 	}

@@ -33,21 +33,33 @@ function lumen_render_nav( $location ) {
 }
 
 /**
- * Inline magnifier icon (decorative).
+ * Small decorative line icons (inline SVG, 20×20 grid, currentColor).
  *
- * @return string
+ * Always paired with visible or screen-reader text, so they are aria-hidden.
+ *
+ * @param string $name search | time | comment | user | calendar.
+ * @return string SVG markup.
  */
-function lumen_search_icon() {
-	return '<svg class="lumen-icon" viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" focusable="false">'
-		. '<circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.6"/>'
-		. '<line x1="12.6" y1="12.6" x2="17.5" y2="17.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>'
+function lumen_icon( $name ) {
+	$paths = array(
+		'search'   => '<circle cx="8.5" cy="8.5" r="5.5"/><path d="M12.6 12.6 17.5 17.5"/>',
+		'time'     => '<path d="M5 2.5h10M5 17.5h10M6 2.5c0 4 8 5 8 7.5s-8 3.5-8 7.5M14 2.5c0 4-8 5-8 7.5s8 3.5 8 7.5"/>',
+		'comment'  => '<path d="M10 3.5c4.1 0 7 2.5 7 5.6s-2.9 5.6-7 5.6c-.9 0-1.7-.1-2.5-.3L4 16.5l.9-3C3.7 12.5 3 11 3 9.1 3 6 5.9 3.5 10 3.5Z"/>',
+		'user'     => '<circle cx="10" cy="6.5" r="3.5"/><path d="M3.5 17.5c.6-3.4 3.2-5.5 6.5-5.5s5.9 2.1 6.5 5.5"/>',
+		'calendar' => '<rect x="3" y="4.5" width="14" height="12.5" rx="1.5"/><path d="M3 8.5h14M7 2.5v4M13 2.5v4"/>',
+	);
+	if ( ! isset( $paths[ $name ] ) ) {
+		return '';
+	}
+	return '<svg class="lumen-icon lumen-icon--' . esc_attr( $name ) . '" viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">'
+		. $paths[ $name ]
 		. '</svg>';
 }
 
 /**
  * Print the search form.
  *
- * @param string $context 'page' (with a submit button) or 'popover' (input only).
+ * @param string $context 'page' or 'popover' (the header dropdown; autofocuses).
  */
 function lumen_search_form( $context = 'page' ) {
 	$is_popover = ( 'popover' === $context );
@@ -65,26 +77,13 @@ function lumen_search_form( $context = 'page' ) {
 			autocomplete="off"
 			<?php echo $is_popover ? 'autofocus' : ''; ?>
 		>
-		<?php if ( ! $is_popover ) : ?>
-			<button type="submit" class="lumen-button"><?php esc_html_e( 'Search', 'lumen' ); ?></button>
-		<?php endif; ?>
+		<button type="submit" class="lumen-search-submit"><?php esc_html_e( 'Search', 'lumen' ); ?></button>
 	</form>
 	<?php
 }
 
 /**
- * Print the post date as a pill.
- */
-function lumen_the_date_pill() {
-	printf(
-		'<time class="lumen-pill" datetime="%1$s">%2$s</time>',
-		esc_attr( get_the_date( DATE_W3C ) ),
-		esc_html( get_the_date() )
-	);
-}
-
-/**
- * Print the post's categories as green pills.
+ * Print the post's categories as outlined accent pills.
  */
 function lumen_the_category_pills() {
 	$categories = get_the_category();
@@ -93,7 +92,7 @@ function lumen_the_category_pills() {
 	}
 	foreach ( $categories as $category ) {
 		printf(
-			'<a class="lumen-pill lumen-pill--green" href="%1$s">%2$s</a>',
+			'<a class="lumen-pill lumen-pill--accent" href="%1$s">%2$s</a>',
 			esc_url( get_category_link( $category ) ),
 			esc_html( $category->name )
 		);
@@ -144,20 +143,102 @@ function lumen_reading_minutes( $post = null ) {
 }
 
 /**
- * Print the reading time as a pill.
+ * Localised short reading time, e.g. "3 min".
+ *
+ * @return string
  */
-function lumen_the_reading_time_pill() {
+function lumen_reading_time_short() {
 	$minutes = lumen_reading_minutes();
-	printf(
-		'<span class="lumen-pill">%s</span>',
-		esc_html(
-			sprintf(
-				/* translators: %s: number of minutes. */
-				_n( '%s min read', '%s min read', $minutes, 'lumen' ),
-				number_format_i18n( $minutes )
-			)
-		)
+	return sprintf(
+		/* translators: %s: number of minutes. */
+		_n( '%s min', '%s min', $minutes, 'lumen' ),
+		number_format_i18n( $minutes )
 	);
+}
+
+/**
+ * Print the meta row: date · reading time · comments (icons + text).
+ *
+ * Used on post cards and in the single post header.
+ */
+function lumen_the_post_meta() {
+	$comments = (int) get_comments_number();
+	?>
+	<div class="lumen-post-meta">
+		<time class="lumen-stat" datetime="<?php echo esc_attr( get_the_date( DATE_W3C ) ); ?>">
+			<?php echo lumen_icon( 'calendar' ); // phpcs:ignore WordPress.Security.EscapeOutput -- static SVG. ?>
+			<?php echo esc_html( get_the_date() ); ?>
+		</time>
+		<span class="lumen-stat">
+			<?php echo lumen_icon( 'time' ); // phpcs:ignore WordPress.Security.EscapeOutput -- static SVG. ?>
+			<?php echo esc_html( lumen_reading_time_short() ); ?>
+		</span>
+		<?php if ( comments_open() || $comments ) : ?>
+			<a class="lumen-stat" href="<?php echo esc_url( is_singular() ? '#comments' : get_comments_link() ); ?>">
+				<?php echo lumen_icon( 'comment' ); // phpcs:ignore WordPress.Security.EscapeOutput -- static SVG. ?>
+				<?php echo esc_html( number_format_i18n( $comments ) ); ?>
+				<span class="screen-reader-text"><?php esc_html_e( 'comments', 'lumen' ); ?></span>
+			</a>
+		<?php endif; ?>
+	</div>
+	<?php
+}
+
+/**
+ * Print a breadcrumb trail for archive and search pages.
+ *
+ * Home / [parent categories /] current. Tags, authors and dates get a
+ * plain-text type label in the middle (e.g. Home / Tags / design).
+ */
+function lumen_the_breadcrumbs() {
+	$items  = array( array( __( 'Home', 'lumen' ), home_url( '/' ) ) );
+	$object = get_queried_object();
+
+	if ( is_category() && $object instanceof WP_Term ) {
+		foreach ( array_reverse( get_ancestors( $object->term_id, 'category', 'taxonomy' ) ) as $ancestor_id ) {
+			$ancestor = get_term( $ancestor_id, 'category' );
+			if ( $ancestor instanceof WP_Term ) {
+				$items[] = array( $ancestor->name, get_category_link( $ancestor ) );
+			}
+		}
+		$items[] = array( $object->name, '' );
+	} elseif ( is_tag() && $object instanceof WP_Term ) {
+		$items[] = array( __( 'Tags', 'lumen' ), '' );
+		$items[] = array( $object->name, '' );
+	} elseif ( is_tax() && $object instanceof WP_Term ) {
+		$taxonomy = get_taxonomy( $object->taxonomy );
+		if ( $taxonomy ) {
+			$items[] = array( $taxonomy->labels->name, '' );
+		}
+		$items[] = array( $object->name, '' );
+	} elseif ( is_author() && $object instanceof WP_User ) {
+		$items[] = array( __( 'Author', 'lumen' ), '' );
+		$items[] = array( $object->display_name, '' );
+	} elseif ( is_date() ) {
+		$year = (int) get_query_var( 'year' );
+		if ( is_month() || is_day() ) {
+			$items[] = array( (string) $year, get_year_link( $year ) );
+		}
+		$items[] = array( lumen_get_archive_title(), '' );
+	} elseif ( is_search() ) {
+		$items[] = array( __( 'Search', 'lumen' ), '' );
+	} elseif ( is_post_type_archive() ) {
+		$items[] = array( lumen_get_archive_title(), '' );
+	}
+
+	$last = count( $items ) - 1;
+	echo '<nav class="lumen-breadcrumbs" aria-label="' . esc_attr__( 'Breadcrumb', 'lumen' ) . '"><ol>';
+	foreach ( $items as $i => $item ) {
+		list( $label, $url ) = $item;
+		if ( $i === $last ) {
+			echo '<li><span aria-current="page">' . esc_html( $label ) . '</span></li>';
+		} elseif ( '' !== $url ) {
+			echo '<li><a href="' . esc_url( $url ) . '">' . esc_html( $label ) . '</a></li>';
+		} else {
+			echo '<li>' . esc_html( $label ) . '</li>';
+		}
+	}
+	echo '</ol></nav>';
 }
 
 /**
@@ -266,3 +347,4 @@ function lumen_the_page_links() {
 		)
 	);
 }
+

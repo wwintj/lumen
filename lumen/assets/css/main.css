@@ -1,11 +1,15 @@
 /* ==========================================================================
-   Lumen 1.2 — all theme styles.
+   Lumen — all theme styles.
 
-   1. Tokens (light + dark)     6. Lists & archives
-   2. Base & typography         7. Single post / page
-   3. Layout                    8. Comments
-   4. Header, search, footer    9. Forms & buttons
-   5. Pills & meta             10. Blocks, utilities, print
+   One visual language everywhere: white outlined shapes with a flat offset
+   shadow, dark text, one red accent (categories), a dark footer band.
+
+   1. Tokens (light + dark)      7. Single post / page
+   2. Base & typography          8. Comments
+   3. Layout                     9. Forms & buttons
+   4. Header, search, footer    10. Blocks, utilities, print
+   5. Pills, meta, buttons
+   6. Lists & archive pages
    ========================================================================== */
 
 /* 1. Tokens ---------------------------------------------------------------- */
@@ -14,36 +18,44 @@
 	color-scheme: light dark;
 
 	--bg: #fdfdfd;
-	--bg-soft: #f4f4f4;
-	--fg: #1b1b1b;
-	--fg-soft: #4b4b4b;
-	--muted: #6e6e6e;
-	--border: #e6e6e6;
+	--bg-soft: #f3f3f3;
+	--card: #ffffff;
+	/* Greys rather than black, everywhere (text, outlines, footer). */
+	--fg: #616161;
+	--fg-soft: #6b6b6b;
+	--muted: #757575;
+	--line: #8c8c8c;            /* outlines */
+	--rule: #e4e4e4;            /* hairline dividers */
+	--hard: #d9d9d9;            /* flat offset shadow */
+	/* The one accent colour. Used for exactly three things:
+	   1. category pills;
+	   2. the hover state of anything clickable (links, icons, buttons);
+	   3. the current item in the header menu ("you are here").
+	   Everything else is neutral. Never add a second red. */
+	--accent: #bf4f2c;
+	--footer-bg: #616161;
+	--footer-fg: #f7f7f7;
+	--footer-muted: #e4e4e4;
 
-	--pill-bg: #f0f1f2;
-	--pill-fg: #52565c;
-	--green-bg: #e0f3e5;
-	--green-bg-hover: #d3ebda;
-	--green-fg: #176d39;
-	--purple-bg: #d8cbea;
-	--purple-fg: #49375f;
-	--red-bg: #fbe8e8;
-	--red-fg: #a33737;
-	--panel: #eef6ef;
-	--bubble: #f3f4f5;
-	--field: #f7f8f8;
-	--popover: #ffffff;
-	--backdrop: rgb(248 249 248 / 0.68);
-	--shadow: 0 1px 2px rgb(16 24 20 / 0.04), 0 4px 14px rgb(16 24 20 / 0.05);
+	--hard-sm: 2px 2px 0 var(--hard);
+	--hard-md: 3px 3px 0 var(--hard);
+	--hard-lg: 3px 3px 0 var(--hard);  /* header, cards, search box, images */
 
 	--font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang TC", "PingFang SC", "Microsoft JhengHei", "Microsoft YaHei", sans-serif;
+	/* Headings: a slab serif for Latin, bold system sans for CJK (Chinese
+	   serif faces have no real bold and look thin next to the slab). */
+	--font-head: Rockwell, "Roboto Slab", "Zilla Slab", Georgia, "PingFang TC", "PingFang SC", "Noto Sans CJK TC", "Noto Sans CJK SC", "Microsoft JhengHei", "Microsoft YaHei", sans-serif;
+	/* Long-form reading text. */
 	--font-read: "FangSong", "STFangsong", "仿宋", "仿宋_GB2312", "Songti TC", "Songti SC", serif;
 	--font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 
-	--column: 720px;
-	--wide: 1180px;
+	/* One spacing unit for the gaps between parts — vertical and horizontal
+	   alike (pills, meta items, the rows of a card) — and the card padding. */
+	--space: 14px;
+
+	--wide: 1040px;
 	--gutter: clamp(1.25rem, 4vw, 2rem);
-	--radius: 4px;
+	--radius: 18px;
 	--round: 999px;
 	--speed: 160ms;
 }
@@ -51,44 +63,31 @@
 @media (prefers-color-scheme: dark) {
 	:root {
 		--bg: #161718;
-		--bg-soft: #202224;
-		--fg: #e7e6e2;
-		--fg-soft: #bdbcb7;
-		--muted: #93928d;
-		--border: #2d2f32;
-
-		--pill-bg: #26282b;
-		--pill-fg: #b9bdc3;
-		--green-bg: #1c3324;
-		--green-bg-hover: #234030;
-		--green-fg: #8fd6a6;
-		--purple-bg: #332a44;
-		--purple-fg: #d3c2ee;
-		--red-bg: #3a2225;
-		--red-fg: #f2a7a7;
-		--panel: #19231c;
-		--bubble: #212326;
-		--field: #1d1f21;
-		--popover: #222427;
-		--backdrop: rgb(10 11 12 / 0.6);
-		--shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 6px 20px rgb(0 0 0 / 0.35);
+		--bg-soft: #222426;
+		--card: #1c1e20;
+		--fg: #e9e8e4;
+		--fg-soft: #c0bfba;
+		--muted: #94938e;
+		--line: #5a5d62;
+		--rule: #2e3033;
+		--hard: #050505;
+		--accent: #d97859;
+		--footer-bg: #0d0e0f;
+		--footer-fg: #e9e8e4;
+		--footer-muted: #94938e;
 	}
 
 	img:not([src$=".svg"]) {
 		filter: brightness(0.92);
 	}
 
-	/* Editor palette colours used inside posts (higher specificity than the
-	   :root rules WordPress prints for them). */
+	/* Editor palette colours used inside posts (beats WordPress's :root). */
 	html:root {
 		--wp--preset--color--text: var(--fg);
 		--wp--preset--color--text-soft: var(--fg-soft);
 		--wp--preset--color--muted: var(--muted);
 		--wp--preset--color--background-soft: var(--bg-soft);
-		--wp--preset--color--green: var(--green-fg);
-		--wp--preset--color--green-soft: var(--green-bg);
-		--wp--preset--color--purple: var(--purple-fg);
-		--wp--preset--color--purple-soft: var(--purple-bg);
+		--wp--preset--color--accent: var(--accent);
 	}
 }
 
@@ -102,7 +101,6 @@
 
 html {
 	-webkit-text-size-adjust: 100%;
-	scroll-padding-top: 5rem;
 }
 
 body {
@@ -132,11 +130,7 @@ video {
 a {
 	color: inherit;
 	text-decoration: none;
-	transition: color var(--speed), background-color var(--speed);
-}
-
-a:hover {
-	color: var(--fg-soft);
+	transition: color var(--speed), background-color var(--speed), box-shadow var(--speed), transform var(--speed);
 }
 
 h1,
@@ -146,10 +140,9 @@ h4,
 h5,
 h6 {
 	margin: 0 0 0.6em;
-	font-family: var(--font-read);
-	font-weight: 400;
-	line-height: 1.45;
-	text-wrap: balance;
+	font-family: var(--font-head);
+	font-weight: 700;
+	line-height: 1.35;
 }
 
 p {
@@ -162,25 +155,72 @@ p {
 }
 
 ::selection {
-	background: var(--green-bg);
-	color: var(--fg);
+	color: var(--card);
+	background: var(--fg);
 }
 
 /* 3. Layout ----------------------------------------------------------------- */
 
 .lumen-main {
 	flex: 1;
-	padding-block: 2.5rem 4rem;
+	padding-block: 2.75rem 4.5rem;
 }
 
 .lumen-main:focus {
 	outline: none;
 }
 
-.lumen-column {
-	width: min(100% - 2 * var(--gutter), var(--column));
+/* Every page — lists, posts, pages, the archives page, 404 — uses the
+   header's width (--wide), so all content lines up with the header. */
+
+.lumen-column,
+.lumen-wide {
+	width: min(100% - 2 * var(--gutter), var(--wide));
 	margin-inline: auto;
 }
+
+.lumen-column {
+	/* Lets children size things against the full container (100cqw). */
+	container-type: inline-size;
+}
+
+.lumen-column > * {
+	margin-inline: auto;
+}
+
+/* Section dividers: one style site-wide (1px solid --rule), centred on the
+   reading column and always the full container width, so they line up with
+   the header's left and right edges even though the text is narrower. */
+.lumen-prose,
+.lumen-post-nav,
+.lumen-comments,
+.lumen-year-title {
+	position: relative;
+}
+
+.lumen-prose::before,
+.lumen-post-nav::before,
+.lumen-comments::before,
+.lumen-year-title::after {
+	content: "";
+	position: absolute;
+	left: 50%;
+	translate: -50% 0;
+	width: 100cqw;
+	border-top: 1px solid var(--rule);
+	pointer-events: none;
+}
+
+.lumen-prose::before,
+.lumen-post-nav::before,
+.lumen-comments::before {
+	top: 0;
+}
+
+.lumen-year-title::after {
+	bottom: 0;
+}
+
 
 /* 4. Header, search, footer ------------------------------------------------- */
 
@@ -190,37 +230,19 @@ p {
 	left: 1rem;
 	z-index: 100;
 	padding: 0.75rem 1.25rem;
-	color: var(--bg);
+	color: var(--card);
 	background: var(--fg);
-	border-radius: 0 0 var(--radius) var(--radius);
+	border-radius: 0 0 12px 12px;
 }
 
 .lumen-skip-link:focus {
 	top: 0;
 }
 
+/* Floating outlined capsule on one line: title + tagline left, menu and
+   search right. On narrow screens the parts wrap onto extra lines. */
 .lumen-header {
-	position: sticky;
-	top: 0;
-	z-index: 50;
-	background: var(--bg);
-	border-bottom: 1px solid var(--border);
-}
-
-.admin-bar .lumen-header {
-	top: 32px;
-}
-
-@media (max-width: 782px) {
-	.admin-bar .lumen-header {
-		top: 46px;
-	}
-}
-
-@media (max-width: 600px) {
-	.admin-bar .lumen-header {
-		top: 0;
-	}
+	padding-top: clamp(1rem, 3vw, 1.75rem);
 }
 
 .lumen-header-inner {
@@ -229,24 +251,41 @@ p {
 	display: grid;
 	grid-template-columns: 1fr auto;
 	align-items: center;
-	gap: 0.25rem 0.5rem;
-	padding-block: 0.75rem;
+	gap: 0.5rem 1rem;
+	padding: 1rem 1.25rem 1rem 1.5rem;
+	background: var(--card);
+	border: 1px solid var(--line);
+	border-radius: 28px;
+	box-shadow: var(--hard-lg);
 }
 
 .lumen-brand {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.25rem 1rem;
 	min-width: 0;
 }
 
 .lumen-site-title {
-	font-family: var(--font-read);
-	font-size: 1.5rem;
-	line-height: 1.4;
-	letter-spacing: -0.02em;
+	display: inline-block;
+	font-family: var(--font-head);
+	font-size: clamp(1.4rem, 2.6vw, 1.75rem);
+	font-weight: 700;
+	line-height: 1.25;
+	letter-spacing: -0.01em;
+}
+
+.lumen-tagline {
+	margin: 0;
+	font-size: clamp(0.9rem, 1.6vw, 1rem);
+	line-height: 1.5;
+	color: var(--fg-soft);
 }
 
 .custom-logo {
 	display: block;
-	max-height: 40px;
+	max-height: 56px;
 	width: auto;
 }
 
@@ -258,7 +297,7 @@ p {
 .lumen-menu {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 0.25rem 0.75rem;
+	gap: 0.25rem 0.5rem;
 	margin: 0;
 	padding: 0;
 	list-style: none;
@@ -266,23 +305,21 @@ p {
 
 .lumen-menu a {
 	display: block;
-	padding: 0.25rem 0.5rem;
-	font-family: var(--font-read);
-	font-size: 1rem;
+	padding: 0.3rem 0.75rem;
+	font-size: 0.95rem;
 	line-height: 1.5;
 	color: var(--fg-soft);
-	border-radius: var(--radius);
+	border-radius: var(--round);
 }
 
-.lumen-menu a:hover {
-	color: var(--fg);
-	background: var(--bg-soft);
-}
-
+/* Hover, and the "you are here" item (the current page, or the category
+   of the post being read), both use the accent red; no background. */
+.lumen-menu a:hover,
 .lumen-menu .current-menu-item > a,
 .lumen-menu .current-menu-parent > a,
-.lumen-menu .current-menu-ancestor > a {
-	color: var(--fg);
+.lumen-menu .current-menu-ancestor > a,
+.lumen-menu .current-post-ancestor > a {
+	color: var(--accent);
 }
 
 .lumen-search-toggle {
@@ -294,16 +331,30 @@ p {
 	color: var(--fg-soft);
 	background: none;
 	border: 0;
-	border-radius: var(--radius);
+	border-radius: 50%;
 	cursor: pointer;
 }
 
-.lumen-search-toggle:hover {
-	color: var(--fg);
+/* Hover / open / keyboard focus: the magnifier turns the accent red. */
+.lumen-search-toggle:hover,
+.lumen-search-toggle:focus-visible,
+body:has(#lumen-search:popover-open) .lumen-search-toggle {
+	color: var(--accent);
+}
+
+.lumen-search-toggle {
+	transition: color var(--speed);
+}
+
+/* A slightly heavier stroke so the red icon reads as strongly as the
+   bold red text of the category pills. */
+.lumen-search-toggle .lumen-icon {
+	stroke-width: 2;
 }
 
 .lumen-icon {
 	display: block;
+	flex: none;
 	width: 1.25rem;
 	height: 1.25rem;
 }
@@ -311,15 +362,21 @@ p {
 @media (min-width: 768px) {
 	.lumen-header-inner {
 		grid-template-columns: 1fr auto auto;
-		min-height: 4.75rem;
-		padding-block: 0;
-		column-gap: 1rem;
+		column-gap: 1.25rem;
+		padding: 0.9rem 1.75rem 0.9rem 2.5rem;
+		border-radius: var(--round);
 	}
 
 	.lumen-search-toggle {
 		order: 2;
-		width: 2.25rem;
-		height: 2.25rem;
+	}
+
+	/* Optical centring on the one-line header: the slab font's box leaves
+	   more room below the letters than above, so the visible title sat
+	   5.4px high (measured from rendered pixels). */
+	.lumen-site-title {
+		position: relative;
+		top: 0.19em;
 	}
 
 	.lumen-nav {
@@ -327,48 +384,55 @@ p {
 		order: 1;
 		margin: 0;
 	}
+}
 
-	.lumen-menu {
-		column-gap: 1.25rem;
+/* Search dropdown: a native [popover] (no JS) anchored under the magnifier
+   with CSS anchor positioning. Esc or a click elsewhere closes it. */
+.lumen-search-toggle {
+	anchor-name: --lumen-search-toggle;
+}
+
+.lumen-search-popover {
+	position: fixed;
+	inset: auto;
+	width: min(24rem, 100vw - 2rem);
+	margin: 0;
+	padding: var(--space);
+	color: var(--fg);
+	background: var(--card);
+	border: 1px solid var(--line);
+	border-radius: var(--radius);
+	box-shadow: var(--hard-lg);
+}
+
+@supports (anchor-name: --a) {
+	.lumen-search-popover {
+		position-anchor: --lumen-search-toggle;
+		top: calc(anchor(bottom) + 10px);
+		right: anchor(right);
+		position-try-fallbacks: flip-inline;
 	}
 }
 
-/* Search popover (native [popover], no JS). */
-.lumen-search-popover {
-	position: fixed;
-	inset: 0;
-	width: min(26.25rem, 100vw - 2rem);
-	height: fit-content;
-	margin: auto;
-	padding: 0;
-	color: var(--fg);
-	background: var(--popover);
-	border: 0;
-	border-radius: var(--round);
-	box-shadow: var(--shadow);
+/* Browsers without anchor positioning: top-right, under the header. */
+@supports not (anchor-name: --a) {
+	.lumen-search-popover {
+		top: 6.5rem;
+		right: max(1rem, (100vw - var(--wide)) / 2);
+	}
+}
+
+/* Phones: full width with a 1rem margin, still just below the magnifier. */
+@media (max-width: 600px) {
+	.lumen-search-popover {
+		left: 1rem;
+		right: 1rem;
+		width: auto;
+	}
 }
 
 .lumen-search-popover::backdrop {
-	background: var(--backdrop);
-	-webkit-backdrop-filter: blur(6px);
-	backdrop-filter: blur(6px);
-}
-
-.lumen-search-popover:focus-within {
-	box-shadow: var(--shadow), inset 0 0 0 1.5px var(--green-fg);
-}
-
-.lumen-search-form--popover {
-	margin: 0;
-}
-
-.lumen-search-form--popover .lumen-search-input {
-	height: 3rem;
-	padding: 0 1.25rem;
 	background: transparent;
-	border: 0;
-	border-radius: var(--round);
-	outline: none;
 }
 
 @supports not selector(:popover-open) {
@@ -377,13 +441,11 @@ p {
 	}
 }
 
-/* Footer */
+/* Footer: one centred line on a dark full-width band. */
 .lumen-footer {
-	border-top: 1px solid var(--border);
-	padding-block: 1.5rem;
-	font-family: var(--font-read);
-	font-size: 0.9rem;
-	color: var(--muted);
+	padding-block: 0.375rem;
+	color: var(--footer-fg);
+	background: var(--footer-bg);
 }
 
 .lumen-footer-inner {
@@ -391,177 +453,330 @@ p {
 	margin-inline: auto;
 	display: flex;
 	flex-wrap: wrap;
+	justify-content: center;
 	align-items: center;
-	justify-content: space-between;
-	gap: 0.75rem 2rem;
-}
-
-.lumen-footer-main {
-	display: flex;
-	flex-direction: column;
-	gap: 0.25rem;
-}
-
-.lumen-footer-nav {
-	margin-inline: -0.5rem;
-}
-
-.lumen-footer-nav .lumen-menu a {
+	gap: 0.25rem 0;
 	font-size: 0.95rem;
-	padding-block: 0.15rem;
+	line-height: 1.6;
+}
+
+/* "·" between the groups (copyright · menu items · RSS). */
+.lumen-footer-inner > * + *::before,
+.lumen-footer-nav li + li::before {
+	content: "·";
+	margin-inline: 0.6rem;
+	color: var(--footer-muted);
+}
+
+.lumen-footer-nav,
+.lumen-footer-nav .lumen-menu,
+.lumen-footer-nav li {
+	display: inline-flex;
+	align-items: center;
+}
+
+.lumen-footer-nav .lumen-menu {
+	flex-wrap: wrap;
+	gap: 0;
 }
 
 .lumen-copyright {
 	margin: 0;
 }
 
-.lumen-footer-link {
-	padding: 0.15rem 0.5rem;
-	border-radius: var(--radius);
+.lumen-footer a,
+.lumen-footer-nav .lumen-menu a {
+	padding: 0;
+	font-size: inherit;
+	color: var(--footer-muted);
+	background: none;
+	border-radius: 0;
 }
 
-.lumen-footer-link:hover {
-	color: var(--fg);
-	background: var(--bg-soft);
+.lumen-footer a:hover,
+.lumen-footer-nav .lumen-menu a:hover {
+	color: var(--footer-fg);
+	background: none;
 }
 
-/* 5. Pills & meta ----------------------------------------------------------- */
+/* 5. Pills, meta, buttons --------------------------------------------------- */
 
-.lumen-meta {
+.lumen-pills {
 	display: flex;
 	flex-wrap: wrap;
-	align-items: center;
-	gap: 0.4rem;
-	margin-bottom: 0.5rem;
+	gap: var(--space);
 }
 
+.lumen-pills:empty {
+	display: none;
+}
+
+/* Outlined pill with a small flat shadow. */
 .lumen-pill {
 	display: inline-block;
-	padding: 4px 10px;
-	font-family: var(--font-read);
-	font-size: 13px;
-	line-height: 1.4;
+	padding: 1px 11px;
+	font-size: 0.875rem;
+	font-weight: 600;
+	line-height: 1.6;
+	letter-spacing: 0.02em;
 	font-variant-numeric: tabular-nums;
 	white-space: nowrap;
-	color: var(--pill-fg);
-	background: var(--pill-bg);
+	color: var(--fg-soft);
+	background: var(--card);
+	border: 1px solid var(--line);
 	border-radius: var(--round);
+	box-shadow: var(--hard-sm);
 }
 
 a.lumen-pill:hover {
+	color: var(--accent);
+	transform: translate(-1px, -1px);
+	box-shadow: var(--hard-md);
+}
+
+.lumen-pill--accent,
+a.lumen-pill--accent:hover {
+	color: var(--accent);
+}
+
+.lumen-pill--strong {
+	color: var(--card);
+	background: var(--fg);
+	border-color: var(--fg);
+}
+
+/* Icon + text pairs: date, reading time, comments. */
+.lumen-post-meta {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--space);
+	font-size: 0.9rem;
+}
+
+.lumen-stat {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3rem;
+	color: var(--fg-soft);
+}
+
+.lumen-stat .lumen-icon {
+	width: 1rem;
+	height: 1rem;
+}
+
+a.lumen-stat:hover {
+	color: var(--accent);
+}
+
+/* Outlined pill button: "Read more", search, submit, back home. */
+.lumen-button,
+.wp-block-button__link {
+	display: inline-block;
+	padding: 0.35rem 1rem;
+	font: inherit;
+	font-size: 0.95rem;
+	font-weight: 600;
+	line-height: 1.5;
 	color: var(--fg);
+	background: var(--card);
+	border: 1px solid var(--line);
+	border-radius: var(--round);
+	box-shadow: var(--hard-sm);
+	cursor: pointer;
+	transition: transform var(--speed), box-shadow var(--speed);
 }
 
-.lumen-pill--green {
-	color: var(--green-fg);
-	background: var(--green-bg);
+.lumen-button:hover,
+.wp-block-button__link:hover {
+	color: var(--accent);
+	transform: translate(-1px, -1px);
+	box-shadow: var(--hard-md);
 }
 
-a.lumen-pill--green:hover {
-	color: var(--green-fg);
-	background: var(--green-bg-hover);
+.lumen-button:active {
+	transform: translate(1px, 1px);
+	box-shadow: 1px 1px 0 var(--hard);
 }
 
-.lumen-pill--purple {
-	color: var(--purple-fg);
-	background: var(--purple-bg);
+/* 6. Lists & archive pages -------------------------------------------------- */
+
+/* Masonry: two independent columns (see template-parts/post-list.php).
+   Each card is as tall as its own content. */
+.lumen-cards {
+	--masonry-gap: 1.75rem;
+	display: flex;
+	flex-direction: column;
+	gap: var(--masonry-gap);
 }
 
-/* 6. Lists & archives ------------------------------------------------------- */
-
-.lumen-post-list {
+.lumen-cards-col {
+	display: contents;
 	margin: 0;
 	padding: 0;
 	list-style: none;
 }
 
-.lumen-post-item {
-	padding-block: 2rem;
-	border-bottom: 1px solid var(--border);
+.lumen-cards .lumen-card {
+	order: var(--i);
 }
 
-.lumen-post-item:first-child {
-	padding-top: 0;
+@media (min-width: 860px) {
+	.lumen-cards {
+		--masonry-gap: 2.25rem;
+		flex-direction: row;
+		align-items: flex-start;
+	}
+
+	.lumen-cards-col {
+		display: flex;
+		flex: 1 1 0;
+		flex-direction: column;
+		gap: var(--masonry-gap);
+		min-width: 0;
+	}
 }
 
-.lumen-post-item-title {
-	margin: 0 0 0.5rem;
-	font-size: 1.5rem;
-	line-height: 1.55;
+.lumen-card {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: var(--space);
+	min-width: 0;
+	padding: var(--space);
+	/* Justified title and excerpt: text runs edge to edge, so the space on
+	   the right matches the padding on the left. The last line stays left. */
+	text-align: justify;
+	background: var(--card);
+	border: 1px solid var(--line);
+	border-radius: var(--radius);
+	box-shadow: var(--hard-lg);
 }
 
-.lumen-post-item-title a:hover {
-	color: var(--fg-soft);
+/* Trim line-height leading so the gaps between boxes equal --space.
+
+   Optical correction: the title and excerpt fonts' metric boxes are taller
+   than their visible strokes (especially for Chinese), so the gaps you see
+   came out uneven (pills→title 10px, title→meta 25.5px, meta→excerpt 21.5px).
+   The em offsets below were measured from rendered pixels so every visible
+   gap equals --space; being in em they scale with the font size. */
+.lumen-card-title,
+.lumen-entry-title {
+	margin-top: 0.14em;
+	margin-bottom: -0.41em;
 }
 
-.lumen-post-item-excerpt {
-	margin: 0;
-	font-family: var(--font-read);
+.lumen-entry-title {
+	margin-bottom: -0.35em;
+}
+
+.lumen-card-excerpt {
+	margin-top: -0.47em;
+}
+
+.lumen-card-title,
+.lumen-card .lumen-post-meta,
+.lumen-card-excerpt {
+	text-box: trim-both text;
+}
+
+.lumen-card-title {
+	align-self: stretch;
+	font-size: clamp(1.4rem, 2.4vw, 1.75rem);
+	line-height: 1.3;
+	text-wrap: pretty;
+	overflow-wrap: anywhere;
+}
+
+.lumen-card-title a:hover {
+	color: var(--accent);
+}
+
+.lumen-card-excerpt {
+	display: -webkit-box;
+	align-self: stretch;
+	margin-bottom: 0;
+	overflow: hidden;
 	font-size: 1rem;
-	line-height: 1.85;
-	color: var(--fg-soft);
+	line-height: 1.7;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+	line-clamp: 2;
 }
 
-.lumen-archive-header {
-	/* The panel bleeds into the side gutter so its text lines up with the
-	   reading column, but always keeps at least 8px of page margin. */
-	--bleed: min(32px, calc((100vw - min(100vw - 2 * var(--gutter), var(--column))) / 2 - 8px));
-	margin-bottom: 2rem;
-	padding: 14px var(--bleed);
-	margin-inline: calc(-1 * var(--bleed));
-	background: var(--panel);
-	border-radius: 16px;
+/* Archive / search heading: big title, count, breadcrumbs. */
+.lumen-page-header {
+	margin-bottom: 2.25rem;
 }
 
-.lumen-archive-header--plain {
-	padding: 0;
-	margin-inline: 0;
-	background: none;
-}
-
-.lumen-archive-heading {
+.lumen-page-heading {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
 	gap: 0.5rem 1rem;
 }
 
-.lumen-archive-title {
+.lumen-page-title {
 	margin: 0;
-	font-size: clamp(1.75rem, 3vw, 2.25rem);
-	line-height: 1.5;
 	min-width: 0;
-}
-
-.lumen-archive-description {
-	margin-top: 0.75rem;
-	font-family: var(--font-read);
+	font-size: clamp(2rem, 4.5vw, 2.75rem);
+	line-height: 1.25;
 	color: var(--fg-soft);
 }
 
-.lumen-archive-description p:last-child {
+.lumen-breadcrumbs ol {
+	display: flex;
+	flex-wrap: wrap;
+	margin: 1.25rem 0 0;
+	padding: 0;
+	list-style: none;
+	font-size: 1.05rem;
+	color: var(--fg);
+}
+
+.lumen-breadcrumbs li + li::before {
+	content: "/";
+	margin-inline: 0.55rem;
+	color: var(--muted);
+}
+
+.lumen-breadcrumbs a {
+	color: var(--muted);
+}
+
+.lumen-breadcrumbs a:hover {
+	color: var(--accent);
+}
+
+.lumen-page-description {
+	margin-top: 0.75rem;
+	color: var(--fg-soft);
+}
+
+.lumen-page-description p:last-child {
 	margin-bottom: 0;
 }
 
-.lumen-archive-header--plain .lumen-search-form {
-	margin-top: 1.25rem;
+.lumen-page-header .lumen-search-form {
+	max-width: 36rem;
+	margin-top: 1.5rem;
 }
 
 .lumen-empty {
-	font-family: var(--font-read);
 	color: var(--muted);
 }
 
 /* Pagination (lists and comments). */
 .lumen-pagination {
-	margin-top: 2.5rem;
+	margin-top: 3rem;
 }
 
 .lumen-pagination .nav-links {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: center;
-	gap: 0.5rem;
+	gap: 0.6rem;
 }
 
 .lumen-pagination .page-numbers {
@@ -570,23 +785,30 @@ a.lumen-pill--green:hover {
 	min-width: 2.5rem;
 	height: 2.5rem;
 	padding-inline: 0.75rem;
+	font-weight: 600;
 	font-variant-numeric: tabular-nums;
-	color: var(--pill-fg);
-	background: var(--pill-bg);
+	background: var(--card);
+	border: 1px solid var(--line);
 	border-radius: var(--round);
+	box-shadow: var(--hard-sm);
 }
 
 .lumen-pagination a.page-numbers:hover {
-	color: var(--fg);
+	color: var(--accent);
+	transform: translate(-1px, -1px);
+	box-shadow: var(--hard-md);
 }
 
 .lumen-pagination .page-numbers.current {
-	color: var(--bg);
+	color: var(--card);
 	background: var(--fg);
+	border-color: var(--fg);
 }
 
 .lumen-pagination .page-numbers.dots {
 	background: none;
+	border: 0;
+	box-shadow: none;
 }
 
 /* Archive page template: posts by year. */
@@ -600,13 +822,13 @@ a.lumen-pill--green:hover {
 	gap: 0.75rem;
 	margin: 0 0 0.75rem;
 	padding-bottom: 0.5rem;
-	font-size: 1.5rem;
-	border-bottom: 1px solid var(--border);
+	font-size: 1.6rem;
 }
 
 .lumen-year-count {
 	font-family: var(--font-ui);
-	font-size: 0.8rem;
+	font-size: 0.85rem;
+	font-weight: 400;
 	color: var(--muted);
 }
 
@@ -621,31 +843,39 @@ a.lumen-pill--green:hover {
 	grid-template-columns: 3.5rem 1fr;
 	gap: 1rem;
 	padding-block: 0.4rem;
-	font-family: var(--font-read);
 }
 
 .lumen-year-list time {
-	font-family: var(--font-ui);
-	font-size: 0.85rem;
+	font-size: 0.9rem;
 	line-height: 1.7rem;
 	color: var(--muted);
 	font-variant-numeric: tabular-nums;
 }
 
 .lumen-year-list a:hover {
-	color: var(--fg-soft);
+	color: var(--accent);
 }
 
 /* 7. Single post / page ----------------------------------------------------- */
 
+.lumen-entry-header > .lumen-pills {
+	justify-self: start;
+}
+
+.lumen-entry-title,
+.lumen-entry-header .lumen-post-meta {
+	text-box: trim-both text;
+}
+
 .lumen-entry-header {
+	display: grid;
+	gap: var(--space);
 	margin-bottom: 2rem;
 }
 
 .lumen-entry-title {
-	margin: 0 0 0.75rem;
-	font-size: clamp(1.75rem, 4vw, 2.25rem);
-	line-height: 1.5;
+	font-size: clamp(1.9rem, 4.5vw, 2.6rem);
+	line-height: 1.3;
 }
 
 .lumen-featured {
@@ -655,16 +885,17 @@ a.lumen-pill--green:hover {
 .lumen-featured img {
 	display: block;
 	width: 100%;
+	border: 1px solid var(--line);
 	border-radius: var(--radius);
+	box-shadow: var(--hard-lg);
 }
 
 /* Long-form text. */
 .lumen-prose {
+	padding-top: 2rem;
 	font-family: var(--font-read);
 	font-size: 1.0625rem;
 	line-height: 1.9;
-	padding-top: 2rem;
-	border-top: 1px dashed var(--border);
 }
 
 .lumen-prose > * {
@@ -693,13 +924,12 @@ a.lumen-pill--green:hover {
 }
 
 .lumen-prose a {
-	text-decoration: underline;
-	text-decoration-color: var(--muted);
-	text-decoration-thickness: 1px;
+	text-decoration: underline 1px var(--muted);
 	text-underline-offset: 0.2em;
 }
 
 .lumen-prose a:hover {
+	color: var(--accent);
 	text-decoration-color: currentColor;
 }
 
@@ -718,9 +948,9 @@ a.lumen-pill--green:hover {
 
 .lumen-prose blockquote {
 	margin-inline: 0;
-	padding-left: 1.25em;
+	padding: 0.25em 0 0.25em 1.25em;
 	color: var(--fg-soft);
-	border-left: 2px solid var(--border);
+	border-left: 3px solid var(--line);
 }
 
 .lumen-prose blockquote > :last-child {
@@ -729,17 +959,18 @@ a.lumen-pill--green:hover {
 
 .lumen-prose hr {
 	border: 0;
-	border-top: 1px solid var(--border);
+	border-top: 1px solid var(--rule);
 	margin-block: 2.5em;
 }
 
 .lumen-prose img {
-	border-radius: var(--radius);
+	border-radius: 10px;
 }
 
 .lumen-prose figcaption,
 .lumen-prose .wp-caption-text {
 	margin-top: 0.5em;
+	font-family: var(--font-ui);
 	font-size: 0.85rem;
 	color: var(--muted);
 	text-align: center;
@@ -755,7 +986,7 @@ a.lumen-pill--green:hover {
 .lumen-prose td {
 	padding: 0.5em 0.75em;
 	text-align: left;
-	border: 1px solid var(--border);
+	border: 1px solid var(--rule);
 }
 
 .lumen-prose th {
@@ -774,7 +1005,7 @@ pre {
 	padding: 0.1em 0.35em;
 	font-size: 0.88em;
 	background: var(--bg-soft);
-	border-radius: var(--radius);
+	border-radius: 4px;
 }
 
 .lumen-prose pre {
@@ -782,7 +1013,8 @@ pre {
 	font-size: 0.85rem;
 	line-height: 1.65;
 	background: var(--bg-soft);
-	border-radius: 8px;
+	border: 1px solid var(--rule);
+	border-radius: 12px;
 	overflow-x: auto;
 	tab-size: 4;
 }
@@ -805,18 +1037,21 @@ pre {
 .lumen-page-links .post-page-numbers {
 	display: inline-grid;
 	place-items: center;
-	min-width: 2rem;
-	padding: 2px 10px;
-	font-size: 13px;
+	min-width: 2.2rem;
+	padding: 1px 10px;
+	font-size: 0.9rem;
+	font-weight: 600;
 	text-decoration: none;
-	color: var(--pill-fg);
-	background: var(--pill-bg);
+	background: var(--card);
+	border: 1px solid var(--line);
 	border-radius: var(--round);
+	box-shadow: var(--hard-sm);
 }
 
 .lumen-page-links .post-page-numbers.current {
-	color: var(--bg);
+	color: var(--card);
 	background: var(--fg);
+	border-color: var(--fg);
 }
 
 /* Tags */
@@ -827,64 +1062,80 @@ pre {
 .lumen-tags {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 0.5rem;
+	gap: var(--space);
 	margin: 0;
 	padding: 0;
 	list-style: none;
 }
 
-/* Previous / next post, with titles. */
+/* Previous / next post: an outlined pill button with the post title
+   below it — previous on the left, next on the right. */
 .lumen-post-nav {
 	margin-top: 3rem;
 	padding-top: 2rem;
-	border-top: 1px solid var(--border);
 }
 
 .lumen-post-nav .nav-links {
-	display: grid;
-	grid-template-columns: 1fr;
-	gap: 0.75rem;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	gap: var(--space) calc(2 * var(--space));
 }
 
-@media (min-width: 600px) {
-	.lumen-post-nav .nav-links {
-		grid-template-columns: 1fr 1fr;
-	}
+.lumen-post-nav .nav-previous,
+.lumen-post-nav .nav-next {
+	flex: 1 1 14rem;
+	min-width: 0;
+}
 
-	.lumen-post-nav .nav-next {
-		grid-column: 2;
-		text-align: right;
-	}
+.lumen-post-nav .nav-next {
+	margin-left: auto;
+	text-align: right;
 }
 
 .lumen-post-nav a {
-	display: flex;
+	display: inline-flex;
 	flex-direction: column;
-	gap: 0.25rem;
-	height: 100%;
-	padding: 0.9rem 1.1rem;
-	background: var(--bg-soft);
-	border-radius: 12px;
+	gap: 0.6rem;
+	max-width: 100%;
 }
 
-.lumen-post-nav a:hover {
-	color: inherit;
-	background: var(--pill-bg);
+.lumen-post-nav .nav-previous a {
+	align-items: flex-start;
 }
 
-.lumen-post-nav-label {
-	font-size: 0.8rem;
-	color: var(--muted);
+.lumen-post-nav .nav-next a {
+	align-items: flex-end;
+}
+
+.lumen-post-nav-button {
+	display: inline-block;
+	padding: 0.2rem 0.9rem;
+	font-size: 0.85rem;
+	line-height: 1.5;
+	white-space: nowrap;
+	color: var(--fg-soft);
+	background: var(--card);
+	border: 1px solid var(--line);
+	border-radius: var(--round);
+	box-shadow: var(--hard-sm);
+	transition: color var(--speed);
 }
 
 .lumen-post-nav-title {
-	font-family: var(--font-read);
-	line-height: 1.5;
+	font-family: var(--font-head);
+	font-weight: 700;
+	line-height: 1.4;
+	overflow-wrap: anywhere;
+}
+
+/* Hover: only the button text turns red; nothing moves. */
+.lumen-post-nav a:hover .lumen-post-nav-button {
+	color: var(--accent);
 }
 
 /* 404 */
 .lumen-not-found p {
-	font-family: var(--font-read);
 	color: var(--fg-soft);
 }
 
@@ -897,13 +1148,12 @@ pre {
 .lumen-comments {
 	margin-top: 3rem;
 	padding-top: 2rem;
-	border-top: 1px solid var(--border);
 }
 
 .lumen-comments-title,
 .comment-reply-title {
 	margin: 0 0 1.25rem;
-	font-size: 1.25rem;
+	font-size: 1.35rem;
 }
 
 .lumen-comment-list,
@@ -920,22 +1170,22 @@ pre {
 }
 
 .lumen-comment-list > li + li {
-	border-top: 1px dashed var(--border);
+	border-top: 1px solid var(--rule);
 }
 
 .lumen-comment-list .children {
 	margin-left: 1rem;
 	padding-left: 1rem;
-	border-left: 1px dashed var(--border);
+	border-left: 1px solid var(--rule);
 }
 
 .comment-meta {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
-	gap: 0.25rem 0.5rem;
-	margin-bottom: 0.4rem;
-	font-size: 0.8rem;
+	gap: 0.25rem 0.6rem;
+	margin-bottom: 0.45rem;
+	font-size: 0.82rem;
 	color: var(--muted);
 }
 
@@ -949,12 +1199,13 @@ pre {
 .comment-author .avatar {
 	width: 28px;
 	height: 28px;
+	border: 1px solid var(--line);
 	border-radius: 50%;
 }
 
 .comment-author .fn {
 	font-size: 0.95rem;
-	font-weight: 500;
+	font-weight: 700;
 	color: var(--fg);
 	overflow-wrap: anywhere;
 }
@@ -969,33 +1220,52 @@ pre {
 
 .comment-metadata {
 	display: flex;
-	gap: 0.5rem;
+	align-items: center;
+	gap: 0.6rem;
 }
 
 .comment-metadata a:hover {
-	color: var(--fg);
+	color: var(--accent);
 }
 
-.comment-metadata .edit-link a {
-	padding: 1px 8px;
-	color: var(--purple-fg);
-	background: var(--purple-bg);
+/* Small outlined pills for comment actions. */
+.comment-metadata .edit-link a,
+.comment-reply-link,
+.comment-reply-title small a {
+	display: inline-block;
+	padding: 0 10px;
+	font-family: var(--font-ui);
+	font-size: 0.78rem;
+	font-weight: 600;
+	line-height: 1.7;
+	color: var(--fg-soft);
+	background: var(--card);
+	border: 1px solid var(--line);
 	border-radius: var(--round);
+	box-shadow: var(--hard-sm);
+}
+
+.comment-metadata .edit-link a:hover,
+.comment-reply-link:hover,
+.comment-reply-title small a:hover {
+	color: var(--accent);
+	transform: translate(-1px, -1px);
+	box-shadow: var(--hard-md);
 }
 
 .comment-awaiting-moderation {
 	flex-basis: 100%;
 	margin: 0;
 	font-style: normal;
-	color: var(--red-fg);
+	color: var(--muted);
 }
 
 .comment-content {
-	padding: 0.5rem 0.95rem;
+	padding: 0.55rem 1rem;
 	font-family: var(--font-read);
-	font-size: 0.95rem;
-	line-height: 1.7;
-	background: var(--bubble);
+	font-size: 0.97rem;
+	line-height: 1.75;
+	background: var(--bg-soft);
 	border-radius: 14px;
 }
 
@@ -1009,35 +1279,19 @@ pre {
 }
 
 .comment-body .reply {
-	margin-top: 0.35rem;
+	margin-top: 0.45rem;
 	text-align: right;
-}
-
-.comment-reply-link {
-	display: inline-block;
-	padding: 1px 12px;
-	font-size: 0.75rem;
-	font-weight: 500;
-	color: var(--green-fg);
-	background: var(--green-bg);
-	border-radius: var(--round);
-}
-
-.comment-reply-link:hover {
-	color: var(--green-fg);
-	background: var(--green-bg-hover);
 }
 
 .lumen-comments-closed {
 	margin-top: 1.5rem;
-	font-family: var(--font-read);
 	color: var(--muted);
 }
 
 .comment-respond {
 	margin-top: 2rem;
 	padding-top: 1.5rem;
-	border-top: 1px dashed var(--border);
+	border-top: 1px solid var(--rule);
 }
 
 .lumen-comment-list .comment-respond {
@@ -1059,16 +1313,6 @@ pre {
 	gap: 0.5rem 0.75rem;
 }
 
-.comment-reply-title small a {
-	display: inline-block;
-	padding: 1px 12px;
-	font-family: var(--font-ui);
-	font-size: 0.75rem;
-	color: var(--red-fg);
-	background: var(--red-bg);
-	border-radius: var(--round);
-}
-
 /* 9. Forms & buttons -------------------------------------------------------- */
 
 input[type="text"],
@@ -1077,20 +1321,26 @@ input[type="url"],
 input[type="search"],
 textarea {
 	width: 100%;
-	padding: 0.55rem 0.85rem;
+	padding: 0.55rem 0.9rem;
 	font: inherit;
 	font-size: 0.95rem;
 	color: var(--fg);
-	background: var(--field);
-	border: 1px solid var(--border);
-	border-radius: 10px;
+	background: var(--card);
+	border: 1px solid var(--line);
+	border-radius: 12px;
+	box-shadow: var(--hard-sm);
 }
 
-input:focus-visible,
-textarea:focus-visible {
+/* Focused fields: no black outline ring — the field's own outline darkens
+   and its flat shadow grows, like the hover state of buttons. */
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="url"]:focus,
+input[type="search"]:focus,
+textarea:focus {
 	outline: none;
-	border-color: var(--green-fg);
-	box-shadow: 0 0 0 1px var(--green-fg);
+	border-color: var(--fg);
+	box-shadow: var(--hard-md);
 }
 
 ::placeholder {
@@ -1106,40 +1356,58 @@ textarea {
 	resize: vertical;
 }
 
-.lumen-button,
-.wp-block-button__link {
-	display: inline-block;
-	padding: 0.45rem 1.2rem;
-	font: inherit;
-	font-size: 0.875rem;
-	font-weight: 500;
-	color: var(--green-fg);
-	background: var(--green-bg);
-	border: 0;
+/* Search form: input and button joined into one outlined capsule. */
+.lumen-search-form {
+	display: flex;
+	margin: 0;
 	border-radius: var(--round);
+	box-shadow: var(--hard-sm);
+}
+
+.lumen-search-form .lumen-search-input {
+	flex: 1;
+	min-width: 0;
+	padding-inline: 1.1rem;
+	border-radius: var(--round) 0 0 var(--round);
+	box-shadow: none;
+}
+
+.lumen-search-submit {
+	flex: none;
+	margin-left: -1px;
+	padding: 0 1.2rem;
+	font: inherit;
+	font-size: 0.95rem;
+	font-weight: 600;
+	white-space: nowrap;
+	color: var(--fg);
+	background: var(--card);
+	border: 1px solid var(--line);
+	border-radius: 0 var(--round) var(--round) 0;
 	cursor: pointer;
 }
 
-.lumen-button:hover,
-.wp-block-button__link:hover {
-	color: var(--green-fg);
-	background: var(--green-bg-hover);
+.lumen-search-submit:hover {
+	color: var(--accent);
 }
 
-.lumen-search-form--page {
-	display: flex;
-	gap: 0.5rem;
-	margin: 0;
+/* The capsule shows focus as a whole (same cue as other fields). */
+.lumen-search-form .lumen-search-input:focus {
+	box-shadow: none;
 }
 
-.lumen-search-form--page .lumen-search-input {
-	border-radius: var(--round);
-	padding-inline: 1.1rem;
+.lumen-search-form:focus-within {
+	box-shadow: var(--hard-md);
+}
+
+.lumen-search-submit:focus-visible {
+	outline: none;
+	color: var(--accent);
 }
 
 .comment-form {
 	display: grid;
-	gap: 0.75rem;
+	gap: 0.85rem;
 }
 
 .comment-form p {
@@ -1148,8 +1416,8 @@ textarea {
 
 .comment-form label {
 	display: block;
-	margin-bottom: 0.2rem;
-	font-size: 0.8rem;
+	margin-bottom: 0.25rem;
+	font-size: 0.82rem;
 	color: var(--muted);
 }
 
@@ -1162,7 +1430,7 @@ textarea {
 }
 
 .comment-form .required {
-	color: var(--red-fg);
+	color: var(--muted);
 }
 
 .comment-form-cookies-consent {
@@ -1177,6 +1445,7 @@ textarea {
 
 .comment-form-cookies-consent input {
 	margin-top: 0.3rem;
+	accent-color: var(--fg);
 }
 
 @media (min-width: 600px) {
@@ -1197,14 +1466,17 @@ textarea {
 
 /* 10. Blocks, utilities, print ---------------------------------------------- */
 
-.alignwide {
-	width: min(100vw - 2 * var(--gutter), var(--wide));
-	margin-inline: calc(50% - min(50vw - var(--gutter), var(--wide) / 2));
+/* Wide blocks span the full container; full-width blocks the viewport.
+   Both are centred on the reading column. */
+.lumen-prose .alignwide {
+	width: 100cqw;
+	max-width: none;
+	margin-inline: calc((100% - 100cqw) / 2);
 }
 
-.alignfull {
+.lumen-prose .alignfull {
 	width: 100vw;
-	max-width: 100vw;
+	max-width: none;
 	margin-inline: calc(50% - 50vw);
 }
 
@@ -1228,18 +1500,9 @@ textarea {
 }
 
 .wp-block-image,
-.wp-caption {
-	max-width: 100%;
-}
-
+.wp-caption,
 .wp-block-embed iframe {
 	max-width: 100%;
-}
-
-.sticky,
-.bypostauthor,
-.gallery-caption {
-	/* Required class names; no extra styling. */
 }
 
 .screen-reader-text {
@@ -1268,7 +1531,6 @@ textarea {
 	*::after {
 		transition: none !important;
 		animation: none !important;
-		scroll-behavior: auto !important;
 	}
 }
 

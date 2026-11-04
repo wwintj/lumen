@@ -237,7 +237,7 @@ function lumen_the_breadcrumbs() {
 		} elseif ( '' !== $url ) {
 			echo '<li><a href="' . esc_url( $url ) . '">' . $icon . esc_html( $label ) . '</a></li>'; // phpcs:ignore WordPress.Security.EscapeOutput -- static SVG icon.
 		} else {
-			echo '<li>' . esc_html( $label ) . '</li>';
+			echo '<li><span>' . esc_html( $label ) . '</span></li>';
 		}
 	}
 	echo '</ol></nav>';

@@ -373,6 +373,76 @@ p {
 	color: var(--accent);
 }
 
+/* Header menu: a soft filled capsule marks "you are here" and slides to
+   whichever item the pointer is over, then back when it leaves. Built
+   with CSS anchor positioning (no JS): the capsule is the nav's ::before,
+   pinned to whichever link currently carries the anchor name. */
+.lumen-nav {
+	position: relative;
+	isolation: isolate;
+}
+
+.lumen-nav .lumen-menu a {
+	transition: color var(--speed);
+}
+
+@supports (anchor-name: --a) {
+	.lumen-nav .lumen-menu .current-menu-item > a,
+	.lumen-nav .lumen-menu .current-menu-parent > a,
+	.lumen-nav .lumen-menu .current-menu-ancestor > a,
+	.lumen-nav .lumen-menu .current-post-ancestor > a,
+	.lumen-nav .lumen-menu a:hover {
+		anchor-name: --lumen-nav-here;
+	}
+
+	/* While another item is hovered, the current one lets go of the name. */
+	.lumen-nav .lumen-menu:has(a:hover) a:not(:hover) {
+		anchor-name: none;
+	}
+
+	.lumen-nav::before {
+		content: "";
+		position: absolute;
+		z-index: -1;
+		position-anchor: --lumen-nav-here;
+		top: anchor(top);
+		left: anchor(left);
+		right: anchor(right);
+		bottom: anchor(bottom);
+		background: var(--bg-soft);
+		border-radius: var(--round);
+		transition: opacity var(--speed);
+	}
+
+	/* Slide only when there is a current item to slide from and back to;
+	   elsewhere (e.g. the home page) it fades in under the hovered item
+	   instead of flying in from the corner. */
+	.lumen-nav:has(.current-menu-item, .current-menu-parent, .current-menu-ancestor, .current-post-ancestor)::before {
+		--slide: 240ms cubic-bezier(0.3, 0.7, 0.2, 1);
+		transition: top var(--slide), left var(--slide), right var(--slide), bottom var(--slide), opacity var(--speed);
+	}
+
+	/* Nothing current and nothing hovered (e.g. the home page): hide it. */
+	.lumen-nav:not(:has(.current-menu-item, .current-menu-parent, .current-menu-ancestor, .current-post-ancestor, a:hover))::before {
+		opacity: 0;
+	}
+}
+
+/* Browsers without anchor positioning: the same capsule, without the slide. */
+@supports not (anchor-name: --a) {
+	.lumen-nav .lumen-menu a:hover,
+	.lumen-nav .lumen-menu .current-menu-item > a,
+	.lumen-nav .lumen-menu .current-menu-parent > a,
+	.lumen-nav .lumen-menu .current-menu-ancestor > a,
+	.lumen-nav .lumen-menu .current-post-ancestor > a {
+		background: var(--bg-soft);
+	}
+
+	.lumen-nav .lumen-menu:has(a:hover) li:not(:hover) > a {
+		background: none;
+	}
+}
+
 .lumen-search-toggle {
 	display: inline-grid;
 	place-items: center;
@@ -601,9 +671,21 @@ a.lumen-pill:hover {
 	color: var(--accent);
 }
 
-.lumen-pill--accent,
+/* Category pills: filled with the accent, text in the card colour; on
+   hover they invert to an accent outline. */
+.lumen-pill--accent {
+	color: var(--card);
+	background: var(--accent);
+	border-color: var(--accent);
+}
+
 a.lumen-pill--accent:hover {
 	color: var(--accent);
+	background: var(--card);
+}
+
+.lumen-pill--accent {
+	transition: color var(--speed), background-color var(--speed);
 }
 
 .lumen-pill--strong {
@@ -745,8 +827,10 @@ a.lumen-stat:hover {
 
 .lumen-card > .lumen-button {
 	margin-top: -2px;
-	/* Small, in Inter's true italic (Chinese labels stay upright). */
+	/* Small, in Inter's true italic (Chinese labels stay upright), on the
+	   same soft grey as the menu's "you are here" capsule. */
 	padding-inline: 0.7rem;
+	background: var(--bg-soft);
 	font-size: var(--text-2xs);
 	line-height: 1.2;
 	font-style: italic;
@@ -784,13 +868,14 @@ a.lumen-stat:hover {
 }
 
 /* Archive / search heading: one row with the breadcrumb capsule and the
-   post count, then the description or search box, --space apart. The
+   post count, with the description above or the search box below, all
+   2 × --space apart (the same gap as down to the cards). The
    page name lives in the breadcrumb (current item in the accent red); a
    visually hidden <h1> keeps the heading structure. */
 .lumen-page-header {
 	display: grid;
 	justify-items: start;
-	gap: var(--space);
+	gap: calc(2 * var(--space));
 	margin-bottom: calc(2 * var(--space));
 }
 
@@ -810,10 +895,12 @@ a.lumen-stat:hover {
 	margin: 0;
 	/* Same box as .lumen-pill (the post count beside it): same height,
 	   padding and font size. */
-	padding: 0 8px;
+	/* 1px inset so the sliding fill (below) clears the outline; the items
+	   carry the side padding. Total height stays 18px, like the pill. */
+	padding: 1px;
 	list-style: none;
 	font-size: var(--text-2xs);
-	line-height: 1.45;
+	line-height: 14px;
 	color: var(--muted);
 	background: var(--card);
 	border: 1px solid var(--line);
@@ -827,17 +914,78 @@ a.lumen-stat:hover {
 
 .lumen-breadcrumbs li + li::before {
 	content: "›";
-	margin-inline: 0.35rem;
+	margin-inline: 3px;
 	font-size: 1.15em;
 	line-height: 1;
 	color: var(--line);
 }
 
-.lumen-breadcrumbs a {
+.lumen-breadcrumbs a,
+.lumen-breadcrumbs li > span {
 	display: inline-flex;
 	align-items: center;
 	gap: 0.25rem;
+	padding-inline: 7px;
+	border-radius: var(--round);
+}
+
+.lumen-breadcrumbs a {
 	color: var(--muted);
+	transition: color var(--speed);
+}
+
+/* Same sliding capsule as the header menu: it sits under the current
+   place and slides to a crumb under the pointer. */
+.lumen-breadcrumbs {
+	position: relative;
+	isolation: isolate;
+}
+
+@supports (anchor-name: --a) {
+	.lumen-breadcrumbs [aria-current="page"],
+	.lumen-breadcrumbs a:hover {
+		anchor-name: --lumen-crumb-here;
+	}
+
+	.lumen-breadcrumbs ol:has(a:hover) [aria-current="page"] {
+		anchor-name: none;
+	}
+
+	.lumen-breadcrumbs::before {
+		--slide: 240ms cubic-bezier(0.3, 0.7, 0.2, 1);
+		content: "";
+		position: absolute;
+		z-index: -1;
+		position-anchor: --lumen-crumb-here;
+		top: anchor(top);
+		left: anchor(left);
+		right: anchor(right);
+		bottom: anchor(bottom);
+		background: var(--bg-soft);
+		border-radius: var(--round);
+		transition: top var(--slide), left var(--slide), right var(--slide), bottom var(--slide);
+	}
+
+	/* The ol's own white fill would cover the capsule: let it through. */
+	.lumen-breadcrumbs ol {
+		background: none;
+	}
+
+	.lumen-breadcrumbs {
+		background: var(--card);
+		border-radius: var(--round);
+	}
+}
+
+@supports not (anchor-name: --a) {
+	.lumen-breadcrumbs [aria-current="page"],
+	.lumen-breadcrumbs a:hover {
+		background: var(--bg-soft);
+	}
+
+	.lumen-breadcrumbs ol:has(a:hover) [aria-current="page"] {
+		background: none;
+	}
 }
 
 .lumen-breadcrumbs a:hover {
@@ -881,7 +1029,6 @@ a.lumen-stat:hover {
 .lumen-page-header .lumen-search-form {
 	width: 100%;
 	max-width: 36rem;
-	margin-top: var(--space);
 }
 
 .lumen-empty {

@@ -3,7 +3,7 @@ Contributors: wwintj
 Requires at least: 6.3
 Tested up to: 7.1
 Requires PHP: 8.2
-Version: 1.3.6
+Version: 1.3.7
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Tags: blog, one-column, custom-menu, custom-logo, featured-images, threaded-comments, translation-ready, accessibility-ready
@@ -31,6 +31,12 @@ Lumen 零 JavaScript、不連外部字型服務：只有一個 CSS 檔和兩個�
 3. （選用）新增頁面，範本選「Archives (all posts by year)」，作為文章歸檔頁。
 
 == Changelog ==
+
+= 1.3.7 =
+* 頁首導覽與麵包屑：目前項目墊一塊淺灰膠囊，滑鼠移到其他項目時膠囊滑過去（CSS 錨點定位，無 JS）。
+* 分類膠囊改為強調色底、白字，懸停時反轉為白底紅字。
+* 卡片的 READ MORE 加上淺灰底色。
+* 分類描述、麵包屑、卡片之間的間距統一為 28px。
 
 = 1.3.6 =
 * 頁首高度縮小為約 2/3（約 75px → 50px）。

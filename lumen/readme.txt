@@ -3,7 +3,7 @@ Contributors: wwintj
 Requires at least: 6.3
 Tested up to: 7.1
 Requires PHP: 8.2
-Version: 1.3.4
+Version: 1.3.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Tags: blog, one-column, custom-menu, custom-logo, featured-images, threaded-comments, translation-ready, accessibility-ready
@@ -31,6 +31,11 @@ Lumen 零 JavaScript、不連外部字型服務：只有一個 CSS 檔和兩個�
 3. （選用）新增頁面，範本選「Archives (all posts by year)」，作為文章歸檔頁。
 
 == Changelog ==
+
+= 1.3.5 =
+* 去掉全站所有陰影；懸停只變色、不位移；輸入框聚焦改為邊框變深。
+* 頁首導覽改為 14px 半粗體。
+* 卡片的 READ MORE 縮小為 13px 並使用 Inter 真斜體。
 
 = 1.3.4 =
 * 文章頁：分類膠囊移到日期列下方。

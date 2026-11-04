@@ -67,6 +67,17 @@ function lumen_enqueue_assets() {
 add_action( 'wp_enqueue_scripts', 'lumen_enqueue_assets' );
 
 /**
+ * Preload the English font so text does not re-flow when it arrives.
+ */
+function lumen_preload_font() {
+	printf(
+		'<link rel="preload" href="%s" as="font" type="font/woff2" crossorigin>' . "\n",
+		esc_url( LUMEN_URI . '/assets/fonts/InterVariable-latin.woff2' )
+	);
+}
+add_action( 'wp_head', 'lumen_preload_font', 1 );
+
+/**
  * Browser UI colour for light and dark schemes.
  */
 function lumen_theme_color_meta() {

@@ -19,7 +19,12 @@ Lumen 佈景主題的程式碼、樣式、翻譯檔與文件採用 **GPL-2.0-or-
 
 ## 第三方
 
-佈景主題不包含第三方程式庫、字型或圖示檔；放大鏡圖示為佈景主題內建的 inline SVG。
+**Inter 字型**（英文字元使用）：`lumen/assets/fonts/InterVariable-latin.woff2`
+是 [Inter 4.1](https://github.com/rsms/inter)（Copyright © 2016 The Inter Project Authors）的子集版本，
+只保留拉丁字元與字重 400–700。Inter 以 **SIL Open Font License 1.1** 授權，未宣告保留字型名稱；
+授權全文隨附於 `lumen/assets/fonts/Inter-LICENSE.txt`，並隨佈景主題 ZIP 一起散布。
+
+除此之外，佈景主題不包含第三方程式庫或圖示檔；圖示為佈景主題內建的 inline SVG。
 
 ## 免責
 

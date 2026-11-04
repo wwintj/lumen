@@ -14,6 +14,18 @@
 
 /* 1. Tokens ---------------------------------------------------------------- */
 
+/* English text: Inter (SIL OFL 1.1, assets/fonts/Inter-LICENSE.txt), trimmed
+   to Latin characters and weights 400–700 (29 KB). unicode-range keeps it off
+   Chinese text, which falls through to the system Chinese font. */
+@font-face {
+	font-family: "Lumen Latin";
+	src: url("../fonts/InterVariable-latin.woff2") format("woff2");
+	font-weight: 400 700;
+	font-style: normal;
+	font-display: swap;
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-2025, U+2027-206F, U+2074, U+20AC, U+2122, U+2190-2193, U+2212, U+2215;
+}
+
 :root {
 	color-scheme: light dark;
 
@@ -41,9 +53,10 @@
 	--hard-md: 2px 2px 0 var(--hard);
 	--hard-lg: 2px 2px 0 var(--hard);  /* header, cards, search box, images */
 
-	/* One typeface for everything (system sans: PingFang / Microsoft
-	   JhengHei for Chinese); monospace only for code. */
-	--font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang TC", "PingFang SC", "Noto Sans CJK TC", "Noto Sans CJK SC", "Microsoft JhengHei", "Microsoft YaHei", sans-serif;
+	/* One typeface stack for everything: Inter for English, the system
+	   Chinese sans (PingFang / Microsoft JhengHei) for Chinese; monospace
+	   only for code. */
+	--font: "Lumen Latin", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang TC", "PingFang SC", "Noto Sans CJK TC", "Noto Sans CJK SC", "Microsoft JhengHei", "Microsoft YaHei", sans-serif;
 
 	/* One type scale. */
 	--text-sm: 0.875rem;                       /* 14px: meta, pills, buttons, labels */
@@ -97,6 +110,28 @@
 }
 
 /* 2. Base & typography ------------------------------------------------------ */
+
+/* Navigation-type labels show English in capitals, however they were typed
+   in the admin: site title, archive titles (category, tag, …), menus,
+   pills (categories, tags, counts),
+   buttons, breadcrumbs and comment actions. Chinese is unaffected. Titles,
+   body text and dates keep their own case. */
+.lumen-site-title,
+.lumen-page-title,
+.lumen-menu a,
+.lumen-pill,
+.lumen-button,
+.wp-block-button__link,
+.lumen-search-submit,
+.lumen-post-nav-button,
+.lumen-breadcrumbs,
+.lumen-copyright,
+.comment-reply-link,
+.comment-metadata .edit-link a,
+.comment-reply-title small a {
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+}
 
 *,
 *::before,
@@ -379,6 +414,33 @@ body:has(#lumen-search:popover-open) .lumen-search-toggle {
 		grid-column: auto;
 		order: 1;
 		margin: 0;
+	}
+
+	/* Keep the header on one line: if space runs out, the tagline is
+	   shortened with "…" rather than pushing onto a second row. */
+	.lumen-brand {
+		flex-wrap: nowrap;
+	}
+
+	.lumen-site-title {
+		flex: none;
+	}
+
+	.lumen-tagline {
+		min-width: 0;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+
+	.lumen-nav .lumen-menu {
+		flex-wrap: nowrap;
+		column-gap: 0.25rem;
+	}
+
+	.lumen-nav .lumen-menu a {
+		padding-inline: 0.6rem;
+		white-space: nowrap;
 	}
 }
 
@@ -666,11 +728,11 @@ a.lumen-stat:hover {
 .lumen-card-title,
 .lumen-entry-title {
 	margin-top: -0.15em;
-	margin-bottom: -0.3em;
+	margin-bottom: -0.35em;
 }
 
 .lumen-entry-title {
-	margin-bottom: -0.24em;
+	margin-bottom: -0.28em;
 }
 
 .lumen-card-excerpt {
@@ -712,8 +774,12 @@ a.lumen-stat:hover {
 }
 
 /* Archive / search heading: big title, count, breadcrumbs. */
+/* Breadcrumbs → title + count → description / search, --space apart. */
 .lumen-page-header {
-	margin-bottom: 2.25rem;
+	display: grid;
+	justify-items: start;
+	gap: var(--space);
+	margin-bottom: calc(2 * var(--space));
 }
 
 .lumen-page-heading {
@@ -731,23 +797,37 @@ a.lumen-stat:hover {
 	color: var(--fg-soft);
 }
 
+/* Breadcrumbs: a small, quiet trail above the title — house icon for
+   Home, light chevrons, the current place in bold. */
 .lumen-breadcrumbs ol {
 	display: flex;
 	flex-wrap: wrap;
-	margin: 1.25rem 0 0;
+	align-items: center;
+	margin: 0;
 	padding: 0;
 	list-style: none;
-	font-size: var(--text-base);
-	color: var(--fg);
-}
-
-.lumen-breadcrumbs li + li::before {
-	content: "/";
-	margin-inline: 0.55rem;
+	font-size: var(--text-sm);
+	line-height: 1.5;
 	color: var(--muted);
 }
 
+.lumen-breadcrumbs li {
+	display: inline-flex;
+	align-items: center;
+}
+
+.lumen-breadcrumbs li + li::before {
+	content: "›";
+	margin-inline: 0.6rem;
+	font-size: 1.15em;
+	line-height: 1;
+	color: var(--line);
+}
+
 .lumen-breadcrumbs a {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
 	color: var(--muted);
 }
 
@@ -755,8 +835,29 @@ a.lumen-stat:hover {
 	color: var(--accent);
 }
 
+.lumen-breadcrumbs .lumen-icon {
+	width: 0.95rem;
+	height: 0.95rem;
+}
+
+/* Trim line-height leading so the visible gaps match --space. */
+.lumen-breadcrumbs ol,
+.lumen-page-title {
+	text-box: trim-both text;
+}
+
+/* Capitals leave empty space above the letters; pull the heading row up
+   so the visible gap under the breadcrumbs is ~--space (measured). */
+.lumen-breadcrumbs + .lumen-page-heading {
+	margin-top: -0.75rem;
+}
+
+.lumen-breadcrumbs [aria-current="page"] {
+	font-weight: 600;
+	color: var(--fg);
+}
+
 .lumen-page-description {
-	margin-top: 0.75rem;
 	color: var(--fg-soft);
 }
 
@@ -765,8 +866,9 @@ a.lumen-stat:hover {
 }
 
 .lumen-page-header .lumen-search-form {
+	width: 100%;
 	max-width: 36rem;
-	margin-top: 1.5rem;
+	margin-top: var(--space);
 }
 
 .lumen-empty {
@@ -1139,12 +1241,31 @@ pre {
 }
 
 /* 404 */
-.lumen-not-found p {
+/* Title + text, then search, then "back home": header rows 14px apart,
+   blocks 28px apart (2 × --space). */
+.lumen-not-found {
+	display: grid;
+	row-gap: calc(2 * var(--space));
+}
+
+.lumen-not-found > * {
+	margin: 0;
+}
+
+.lumen-not-found-text {
+	margin: 0.25em 0 0; /* measured: brings the visible gap under the title to ~14px */
 	color: var(--fg-soft);
+	text-box: trim-both text;
 }
 
 .lumen-not-found .lumen-search-form {
-	margin-block: 1.5rem;
+	width: 100%;
+	max-width: 36rem;
+	justify-self: start;
+}
+
+.lumen-not-found-home {
+	justify-self: start;
 }
 
 /* 8. Comments --------------------------------------------------------------- */

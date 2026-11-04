@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<a class="lumen-site-title" href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home"><?php echo esc_html( get_bloginfo( 'name' ) ); ?></a>
 			<?php endif; ?>
 			<?php if ( '' !== get_bloginfo( 'description' ) ) : ?>
-				<p class="lumen-tagline"><?php echo esc_html( get_bloginfo( 'description' ) ); ?></p>
+				<p class="lumen-tagline" title="<?php echo esc_attr( get_bloginfo( 'description' ) ); ?>"><?php echo esc_html( get_bloginfo( 'description' ) ); ?></p>
 			<?php endif; ?>
 		</div>
 

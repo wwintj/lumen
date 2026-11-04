@@ -37,7 +37,7 @@ function lumen_render_nav( $location ) {
  *
  * Always paired with visible or screen-reader text, so they are aria-hidden.
  *
- * @param string $name search | time | comment | user | calendar.
+ * @param string $name search | time | comment | user | calendar | home.
  * @return string SVG markup.
  */
 function lumen_icon( $name ) {
@@ -47,6 +47,7 @@ function lumen_icon( $name ) {
 		'comment'  => '<path d="M10 3.5c4.1 0 7 2.5 7 5.6s-2.9 5.6-7 5.6c-.9 0-1.7-.1-2.5-.3L4 16.5l.9-3C3.7 12.5 3 11 3 9.1 3 6 5.9 3.5 10 3.5Z"/>',
 		'user'     => '<circle cx="10" cy="6.5" r="3.5"/><path d="M3.5 17.5c.6-3.4 3.2-5.5 6.5-5.5s5.9 2.1 6.5 5.5"/>',
 		'calendar' => '<rect x="3" y="4.5" width="14" height="12.5" rx="1.5"/><path d="M3 8.5h14M7 2.5v4M13 2.5v4"/>',
+		'home'     => '<path d="M3 9.2 10 3.5l7 5.7V17a.5.5 0 0 1-.5.5H12.5v-5h-5v5H3.5A.5.5 0 0 1 3 17V9.2Z"/>',
 	);
 	if ( ! isset( $paths[ $name ] ) ) {
 		return '';
@@ -230,10 +231,11 @@ function lumen_the_breadcrumbs() {
 	echo '<nav class="lumen-breadcrumbs" aria-label="' . esc_attr__( 'Breadcrumb', 'lumen' ) . '"><ol>';
 	foreach ( $items as $i => $item ) {
 		list( $label, $url ) = $item;
+		$icon = ( 0 === $i ) ? lumen_icon( 'home' ) : '';
 		if ( $i === $last ) {
 			echo '<li><span aria-current="page">' . esc_html( $label ) . '</span></li>';
 		} elseif ( '' !== $url ) {
-			echo '<li><a href="' . esc_url( $url ) . '">' . esc_html( $label ) . '</a></li>';
+			echo '<li><a href="' . esc_url( $url ) . '">' . $icon . esc_html( $label ) . '</a></li>'; // phpcs:ignore WordPress.Security.EscapeOutput -- static SVG icon.
 		} else {
 			echo '<li>' . esc_html( $label ) . '</li>';
 		}

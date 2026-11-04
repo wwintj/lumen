@@ -3,7 +3,7 @@ Contributors: wwintj
 Requires at least: 6.3
 Tested up to: 7.1
 Requires PHP: 8.2
-Version: 1.3.1
+Version: 1.3.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Tags: blog, one-column, custom-menu, custom-logo, featured-images, threaded-comments, translation-ready, accessibility-ready
@@ -12,7 +12,7 @@ Tags: blog, one-column, custom-menu, custom-logo, featured-images, threaded-comm
 
 == Description ==
 
-Lumen 零 JavaScript、不載入網路字型，整個佈景主題只有一個 CSS 檔。
+Lumen 零 JavaScript、不連外部字型服務：只有一個 CSS 檔和一個 29 KB 的英文字型檔（Inter，SIL OFL 1.1）。
 
 * 一行膠囊頁首；首頁與彙整頁為兩欄瀑布流描邊卡片。
 * 全站內容與頁首同寬；只用一種強調色；跟隨系統的自動深色模式。
@@ -31,6 +31,12 @@ Lumen 零 JavaScript、不載入網路字型，整個佈景主題只有一個 CS
 3. （選用）新增頁面，範本選「Archives (all posts by year)」，作為文章歸檔頁。
 
 == Changelog ==
+
+= 1.3.2 =
+* 英文改用內建的 Inter 字型（只含英文字元，29 KB，不連外部服務）；中文仍用系統字體。
+* 站名、選單、分類與標籤、按鈕、麵包屑、彙整頁標題等英文一律顯示大寫；桌面頁首保持一行。
+* 修正 404 頁標題與文字重疊。
+* 麵包屑移到標題上方並重新設計（首頁圖示、› 分隔、目前位置加粗）。
 
 = 1.3.1 =
 * 「Read more／繼續閱讀」按鈕文字強制置中（修正 Safari 上偏移）。

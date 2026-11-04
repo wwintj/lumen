@@ -16,11 +16,11 @@ while ( have_posts() ) :
 	?>
 	<article id="post-<?php the_ID(); ?>" <?php post_class( 'lumen-column lumen-entry' ); ?>>
 		<header class="lumen-entry-header">
+			<h1 class="lumen-entry-title"><?php the_title(); ?></h1>
+			<?php lumen_the_post_meta(); ?>
 			<?php if ( has_category() ) : ?>
 				<div class="lumen-pills"><?php lumen_the_category_pills(); ?></div>
 			<?php endif; ?>
-			<h1 class="lumen-entry-title"><?php the_title(); ?></h1>
-			<?php lumen_the_post_meta(); ?>
 		</header>
 
 		<?php if ( has_post_thumbnail() ) : ?>

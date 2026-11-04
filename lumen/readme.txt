@@ -3,7 +3,7 @@ Contributors: wwintj
 Requires at least: 6.3
 Tested up to: 7.1
 Requires PHP: 8.2
-Version: 1.3.3
+Version: 1.3.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Tags: blog, one-column, custom-menu, custom-logo, featured-images, threaded-comments, translation-ready, accessibility-ready
@@ -12,7 +12,7 @@ Tags: blog, one-column, custom-menu, custom-logo, featured-images, threaded-comm
 
 == Description ==
 
-Lumen 零 JavaScript、不連外部字型服務：只有一個 CSS 檔和一個 29 KB 的英文字型檔（Inter，SIL OFL 1.1）。
+Lumen 零 JavaScript、不連外部字型服務：只有一個 CSS 檔和兩個共約 60 KB 的英文字型檔（Inter 正體與斜體，SIL OFL 1.1）。
 
 * 一行膠囊頁首；首頁與彙整頁為兩欄瀑布流描邊卡片。
 * 全站內容與頁首同寬；只用一種強調色；跟隨系統的自動深色模式。
@@ -31,6 +31,12 @@ Lumen 零 JavaScript、不連外部字型服務：只有一個 CSS 檔和一個 
 3. （選用）新增頁面，範本選「Archives (all posts by year)」，作為文章歸檔頁。
 
 == Changelog ==
+
+= 1.3.4 =
+* 文章頁：分類膠囊移到日期列下方。
+* 全站頁首到內容的距離統一為 28px。
+* 日期列的英文與數字改用 Inter 真斜體（中文維持直體）。
+* 分類／標籤頁：簡介移到麵包屑上方並放大兩級（28px）；麵包屑縮小為與篇數膠囊同高、不加粗。
 
 = 1.3.3 =
 * 按鈕（READ MORE、上一篇／下一篇）高度壓縮為原來的 2/3。

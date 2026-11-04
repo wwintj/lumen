@@ -15,13 +15,23 @@
 /* 1. Tokens ---------------------------------------------------------------- */
 
 /* English text: Inter (SIL OFL 1.1, assets/fonts/Inter-LICENSE.txt), trimmed
-   to Latin characters and weights 400–700 (29 KB). unicode-range keeps it off
-   Chinese text, which falls through to the system Chinese font. */
+   to Latin characters and weights 400–700 — upright 29 KB, true italic
+   31 KB (used by the date row). unicode-range keeps it off Chinese text,
+   which falls through to the system Chinese font. */
 @font-face {
 	font-family: "Lumen Latin";
 	src: url("../fonts/InterVariable-latin.woff2") format("woff2");
 	font-weight: 400 700;
 	font-style: normal;
+	font-display: swap;
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-2025, U+2027-206F, U+2074, U+20AC, U+2122, U+2190-2193, U+2212, U+2215;
+}
+
+@font-face {
+	font-family: "Lumen Latin";
+	src: url("../fonts/InterVariable-Italic-latin.woff2") format("woff2");
+	font-weight: 400 700;
+	font-style: italic;
 	font-display: swap;
 	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-2025, U+2027-206F, U+2074, U+20AC, U+2122, U+2190-2193, U+2212, U+2215;
 }
@@ -199,9 +209,10 @@ p {
 
 /* 3. Layout ----------------------------------------------------------------- */
 
+/* Every page starts the same distance below the header: 2 × --space. */
 .lumen-main {
 	flex: 1;
-	padding-block: 2.75rem 4.5rem;
+	padding-block: calc(2 * var(--space)) 4.5rem;
 }
 
 .lumen-main:focus {
@@ -602,8 +613,12 @@ a.lumen-pill--accent:hover {
 	border-color: var(--fg);
 }
 
-/* Icon + text pairs: date, reading time, comments. */
+/* Icon + text pairs: date, reading time, comments. English and digits use
+   Inter's true italic; synthesis is off so Chinese (e.g. 分鐘) stays upright
+   instead of being slanted artificially. */
 .lumen-post-meta {
+	font-style: italic;
+	font-synthesis-style: none;
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
@@ -780,7 +795,6 @@ a.lumen-stat:hover {
 	display: grid;
 	justify-items: start;
 	gap: var(--space);
-	margin-top: calc(-1 * var(--space));
 	margin-bottom: calc(2 * var(--space));
 }
 
@@ -791,17 +805,19 @@ a.lumen-stat:hover {
 	gap: var(--space);
 }
 
-/* Breadcrumbs: an outlined capsule like the buttons — house icon for
-   Home, light chevrons, the current place in bold accent red. */
+/* Breadcrumbs: an outlined capsule matching the count pill beside it —
+   house icon for Home, light chevrons, the current place in accent red. */
 .lumen-breadcrumbs ol {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
 	margin: 0;
-	padding: 0.4rem 1.1rem;
+	/* Same box as .lumen-pill (the post count beside it): same height,
+	   padding and font size. */
+	padding: 1px 11px;
 	list-style: none;
-	font-size: var(--text-base);
-	line-height: 1.5;
+	font-size: var(--text-sm);
+	line-height: 1.6;
 	color: var(--muted);
 	background: var(--card);
 	border: 1px solid var(--line);
@@ -816,7 +832,7 @@ a.lumen-stat:hover {
 
 .lumen-breadcrumbs li + li::before {
 	content: "›";
-	margin-inline: 0.6rem;
+	margin-inline: 0.45rem;
 	font-size: 1.15em;
 	line-height: 1;
 	color: var(--line);
@@ -825,7 +841,7 @@ a.lumen-stat:hover {
 .lumen-breadcrumbs a {
 	display: inline-flex;
 	align-items: center;
-	gap: 0.4rem;
+	gap: 0.3rem;
 	color: var(--muted);
 }
 
@@ -834,17 +850,32 @@ a.lumen-stat:hover {
 }
 
 .lumen-breadcrumbs .lumen-icon {
-	width: 1.05rem;
-	height: 1.05rem;
+	width: 0.95rem;
+	height: 0.95rem;
 }
 
 .lumen-breadcrumbs [aria-current="page"] {
-	font-weight: 600;
 	color: var(--accent);
 }
 
+/* The category / tag description leads the page: two steps up the type
+   scale (body 17px → 28px), above the breadcrumb row. */
 .lumen-page-description {
-	color: var(--fg-soft);
+	font-size: var(--text-xl);
+	line-height: 1.45;
+	color: var(--fg);
+	text-wrap: pretty;
+}
+
+.lumen-page-description > * {
+	margin: 0;
+}
+
+.lumen-page-description {
+	text-box: trim-both text;
+	/* ~4px of empty text box above and below the glyphs at this size
+	   (measured); pull it in so the visible gaps are 28px / --space. */
+	margin-block: -0.14em;
 }
 
 .lumen-page-description p:last-child {
@@ -953,6 +984,9 @@ a.lumen-stat:hover {
 
 .lumen-entry-header > .lumen-pills {
 	justify-self: start;
+	/* The date row's text box leaves ~4px of empty space under the digits;
+	   pull the pills up so the visible gap is --space (measured). */
+	margin-top: -4px;
 }
 
 .lumen-entry-title,

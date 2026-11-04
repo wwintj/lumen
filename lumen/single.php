@@ -1,6 +1,6 @@
 <?php
 /**
- * Lumen — single post template.
+ * Lumen — single post.
  *
  * @package lumen
  */
@@ -8,78 +8,60 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-?>
-<?php get_header(); ?>
-<?php while ( have_posts() ) : the_post(); ?>
-<article id="post-<?php the_ID(); ?>" class="lumen-post">
-	<header class="lumen-post-header">
-		<h1 class="lumen-post-title"><?php the_title(); ?></h1>
 
-		<!--
-			Meta: grey date pill + green category pill(s), the same pill
-			language as the Blog Home / archive / search list meta. There is
-			deliberately no separator glyph between them — the original
-			middle dot was removed in v1.1.15 (it was drawn by CSS on
-			.lumen-single-meta .lumen-post-cats::before).
-		-->
-		<div class="lumen-single-meta">
-			<?php lumen_post_date(); ?>
-			<?php lumen_post_categories(); ?>
+get_header();
+
+while ( have_posts() ) :
+	the_post();
+	?>
+	<article id="post-<?php the_ID(); ?>" <?php post_class( 'lumen-column lumen-entry' ); ?>>
+		<header class="lumen-entry-header">
+			<h1 class="lumen-entry-title"><?php the_title(); ?></h1>
+			<div class="lumen-meta">
+				<?php lumen_the_date_pill(); ?>
+				<?php lumen_the_category_pills(); ?>
+				<?php lumen_the_reading_time_pill(); ?>
+			</div>
+		</header>
+
+		<?php if ( has_post_thumbnail() ) : ?>
+			<figure class="lumen-featured">
+				<?php the_post_thumbnail( 'large', array( 'loading' => 'eager', 'fetchpriority' => 'high' ) ); ?>
+			</figure>
+		<?php endif; ?>
+
+		<div class="lumen-prose">
+			<?php
+			the_content();
+			lumen_the_page_links();
+			?>
 		</div>
 
-		<?php
-		if ( has_post_thumbnail() ) : ?>
-			<div class="lumen-post-featured">
-				<?php
-				the_post_thumbnail( 'lumen-card', array( 'loading' => 'eager' ) );
-				?>
-			</div>
+		<?php if ( has_tag() ) : ?>
+			<footer class="lumen-entry-footer">
+				<?php lumen_the_tag_list(); ?>
+			</footer>
 		<?php endif; ?>
-	</header>
+	</article>
 
-	<div class="lumen-post-body">
+	<div class="lumen-column">
 		<?php
-		the_content();
+		the_post_navigation(
+			array(
+				'prev_text'          => '<span class="lumen-post-nav-label">' . esc_html__( '← Previous', 'lumen' ) . '</span><span class="lumen-post-nav-title">%title</span>',
+				'next_text'          => '<span class="lumen-post-nav-label">' . esc_html__( 'Next →', 'lumen' ) . '</span><span class="lumen-post-nav-title">%title</span>',
+				'screen_reader_text' => __( 'More posts', 'lumen' ),
+				'aria_label'         => __( 'More posts', 'lumen' ),
+				'class'              => 'lumen-post-nav',
+			)
+		);
 
-		// Multi-page posts (<!--nextpage-->) were silently truncated to page 1.
-		wp_link_pages( array(
-			'before' => '<nav class="lumen-page-links" aria-label="' . esc_attr__( 'Post pages', 'lumen' ) . '">',
-			'after'  => '</nav>',
-		) );
+		if ( comments_open() || get_comments_number() ) {
+			comments_template();
+		}
 		?>
 	</div>
-</article>
-
-<!-- Previous / next post navigation. Core the_post_navigation() emits its own
-     <nav> elements (with rel=prev/next and their own aria-labels); the
-     <div class="lumen-post-nav"> is a layout container only — it is not a
-     duplicate navigation element. -->
-<div class="lumen-post-nav">
 	<?php
-	/*
-	 * Core the_post_navigation() still resolves the neighbouring posts, the
-	 * direction and the URLs; only the visible text changes.
-	 *
-	 * The arrow is a CSS pseudo-element on the <a>, so the whole pill is
-	 * clickable and the glyph is decorative. %title stays in the markup but is
-	 * visually hidden: screen readers get "Previous post: <title>", while the
-	 * page shows only the arrow. Core escapes %title in context.
-	 */
-	the_post_navigation( array(
-		'prev_text' => '<span class="visually-hidden">' . esc_html__( 'Previous post', 'lumen' ) . ': %title</span>',
-		'next_text' => '<span class="visually-hidden">' . esc_html__( 'Next post', 'lumen' ) . ': %title</span>',
-	) );
-	?>
-</div>
+endwhile;
 
-<!-- Comments (Core). Standard loading pattern: comments_open() is a
-     non-side-effecting bool conditional, so no comments_close() is needed;
-     comments_template() includes the self-contained comments.php. -->
-<?php
-if ( comments_open() || get_comments_number() ) {
-    comments_template();
-}
-?>
-<?php endwhile; ?>
-
-<?php get_footer(); ?>
+get_footer();

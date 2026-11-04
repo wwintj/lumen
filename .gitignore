@@ -1,24 +1,7 @@
-.runtime/
 .DS_Store
 *.log
-
-# Node dependencies
 node_modules/
 
-# WordPress test instance (local only)
-.lumen-clean/
-
-# Release / candidate artifacts (GitHub Release asset, not source)
-lumen.zip
-lumen-0.2.0-rc1.zip
-lumen-*-dev*.zip
-
-# Generated QA reports
-.lumen-qa/report.json
-.lumen-qa/report-release.json
-.lumen-qa/report-home.json
-.lumen-qa/report-beta1.json
-
-# Generated QA stdout artifacts
-.lumen-qa/.qa-stdout.txt
-.lumen-qa/qa-stdout.txt
+# Release artifacts (attached to GitHub Releases, not committed)
+*.zip
+SHA256SUMS-*.txt

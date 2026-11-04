@@ -1,0 +1,118 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Lumen 1.2.0\n"
+"Language: zh_TW\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Domain: lumen\n"
+
+msgid "Page not found"
+msgstr "找不到這個頁面"
+
+msgid "The link may be broken, or the page may have moved. Try a search:"
+msgstr "連結可能已失效，或頁面已經移動。試著搜尋看看："
+
+msgid "← Back to home"
+msgstr "← 回到首頁"
+
+msgid "%s comment"
+msgid_plural "%s comments"
+msgstr[0] "%s 則留言"
+
+msgid "Comments are closed."
+msgstr "留言已關閉。"
+
+msgid "Footer menu"
+msgstr "頁尾選單"
+
+msgid "Skip to content"
+msgstr "跳至內容"
+
+msgid "Search"
+msgstr "搜尋"
+
+msgid "Primary menu"
+msgstr "主選單"
+
+msgid "Leave a comment"
+msgstr "發表留言"
+
+msgid "Reply to %s"
+msgstr "回覆 %s"
+
+msgid "Cancel"
+msgstr "取消"
+
+msgid "Write your comment…"
+msgstr "寫下你的留言…"
+
+msgid "Search posts…"
+msgstr "搜尋文章…"
+
+msgid "Tags"
+msgstr "標籤"
+
+msgid "%s min read"
+msgid_plural "%s min read"
+msgstr[0] "約 %s 分鐘"
+
+msgctxt "monthly archives date format"
+msgid "F Y"
+msgstr "Y 年 n 月"
+
+msgctxt "yearly archives date format"
+msgid "Y"
+msgstr "Y 年"
+
+msgid "%s post"
+msgid_plural "%s posts"
+msgstr[0] "%s 篇文章"
+
+msgid "Previous page"
+msgstr "上一頁"
+
+msgid "Next page"
+msgstr "下一頁"
+
+msgid "Page"
+msgstr "第"
+
+msgid "Post pages"
+msgstr "文章分頁"
+
+msgid "Archives (all posts by year)"
+msgstr "文章歸檔（依年份列出全部文章）"
+
+msgctxt "archive list date format"
+msgid "m-d"
+msgstr "m-d"
+
+msgid "%1$s result for “%2$s”"
+msgid_plural "%1$s results for “%2$s”"
+msgstr[0] "「%2$s」共 %1$s 筆結果"
+
+msgid "← Previous"
+msgstr "← 上一篇"
+
+msgid "Next →"
+msgstr "下一篇 →"
+
+msgid "More posts"
+msgstr "更多文章"
+
+msgid "Pinned"
+msgstr "置頂"
+
+msgid "Nothing matched your search. Try different words."
+msgstr "找不到相符的文章，換個關鍵字試試。"
+
+msgid "No posts yet."
+msgstr "還沒有文章。"
+
+msgid "A quiet, text-first personal blog theme for Chinese and English writing. Zero JavaScript, no web fonts, automatic dark mode, reading time, tag pills, and a year-by-year archive page."
+msgstr "安靜、以文字為主的個人部落格佈景主題，適合中英文寫作。零 JavaScript、不載入網路字型，支援自動深色模式、閱讀時間、標籤膠囊與依年份的文章歸檔頁。"
+
+msgid "Reply"
+msgstr "回覆"

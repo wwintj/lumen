@@ -1,6 +1,6 @@
 <?php
 /**
- * Lumen — search results template.
+ * Lumen — search results.
  *
  * @package lumen
  */
@@ -8,31 +8,35 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-?>
-<?php get_header(); ?>
 
-<section class="lumen-archive-wrap lumen-search-page">
-	<header class="lumen-archive-header">
-		<h1 class="lumen-archive-title">
-			<?php echo esc_html__( 'Search', 'lumen' ); ?>
-		</h1>
-		<?php
-		$found_posts = (int) $GLOBALS['wp_query']->found_posts;
-		$query       = (string) get_search_query();
-		?>
-		<?php if ( '' !== $query ) : ?>
-			<p class="lumen-archive-context">
-				<?php
-				// Always shown (even 0 hits). lumen_search_results_label()
-				// returns "N result(s) for 'query'", escaped exactly once.
-				echo lumen_search_results_label( $found_posts, $query );
-				?>
-			</p>
-		<?php endif; ?>
-		<?php lumen_search_form(); ?>
+get_header();
+
+$lumen_query = get_search_query( false );
+$lumen_found = (int) $GLOBALS['wp_query']->found_posts;
+?>
+<div class="lumen-column">
+	<header class="lumen-archive-header lumen-archive-header--plain">
+		<div class="lumen-archive-heading">
+			<h1 class="lumen-archive-title"><?php esc_html_e( 'Search', 'lumen' ); ?></h1>
+			<?php if ( '' !== $lumen_query ) : ?>
+				<span class="lumen-pill lumen-pill--purple">
+					<?php
+					echo esc_html(
+						sprintf(
+							/* translators: 1: number of results, 2: search query. */
+							_n( '%1$s result for “%2$s”', '%1$s results for “%2$s”', $lumen_found, 'lumen' ),
+							number_format_i18n( $lumen_found ),
+							$lumen_query
+						)
+					);
+					?>
+				</span>
+			<?php endif; ?>
+		</div>
+		<?php lumen_search_form( 'page' ); ?>
 	</header>
 
-	<?php get_template_part( 'template-parts/post-list', null, array( 'context' => 'search' ) ); ?>
-</section>
-
-<?php get_footer(); ?>
+	<?php get_template_part( 'template-parts/post-list' ); ?>
+</div>
+<?php
+get_footer();

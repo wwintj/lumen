@@ -1,6 +1,6 @@
 <?php
 /**
- * Lumen — static page template.
+ * Lumen — static page.
  *
  * @package lumen
  */
@@ -8,35 +8,35 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-?>
-<?php get_header(); ?>
 
-<?php while ( have_posts() ) : the_post(); ?>
-<article id="post-<?php the_ID(); ?>" class="lumen-page">
-	<div class="lumen-page-wrap">
-		<h1 class="lumen-page-title"><?php the_title(); ?></h1>
+get_header();
 
-		<div class="lumen-page-body">
+while ( have_posts() ) :
+	the_post();
+	?>
+	<article id="post-<?php the_ID(); ?>" <?php post_class( 'lumen-column lumen-entry' ); ?>>
+		<header class="lumen-entry-header">
+			<h1 class="lumen-entry-title"><?php the_title(); ?></h1>
+		</header>
+
+		<?php if ( has_post_thumbnail() ) : ?>
+			<figure class="lumen-featured">
+				<?php the_post_thumbnail( 'large', array( 'loading' => 'eager', 'fetchpriority' => 'high' ) ); ?>
+			</figure>
+		<?php endif; ?>
+
+		<div class="lumen-prose">
 			<?php
 			the_content();
-
-			wp_link_pages( array(
-				'before' => '<nav class="lumen-page-links" aria-label="' . esc_attr__( 'Page sections', 'lumen' ) . '">',
-				'after'  => '</nav>',
-			) );
+			lumen_the_page_links();
 			?>
 		</div>
-	</div>
-</article>
+	</article>
 
-<?php
-// Pages get comments only when the editor turned Discussion on for that page
-// (Core defaults pages to closed). inc/enqueue.php already loads Core's
-// comment-reply script for this case, so the thread now actually renders.
-if ( comments_open() || get_comments_number() ) {
-	comments_template();
-}
-?>
-<?php endwhile; ?>
+	<?php if ( comments_open() || get_comments_number() ) : ?>
+		<div class="lumen-column"><?php comments_template(); ?></div>
+	<?php endif; ?>
+	<?php
+endwhile;
 
-<?php get_footer(); ?>
+get_footer();

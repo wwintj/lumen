@@ -1,6 +1,6 @@
 <?php
 /**
- * Lumen — footer (closes main, renders footer nav + meta).
+ * Lumen — site footer.
  *
  * @package lumen
  */
@@ -9,29 +9,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 ?>
-	</main>
+</main>
 
-	<footer class="lumen-site-footer">
-		<div class="lumen-container lumen-footer-inner">
-			<div class="lumen-footer-left">
-				<nav class="lumen-site-footer-nav" aria-label="<?php echo esc_attr__( 'Footer menu', 'lumen' ); ?>">
+<footer class="lumen-footer">
+	<div class="lumen-footer-inner">
+		<div class="lumen-footer-main">
+			<?php if ( has_nav_menu( 'footer' ) ) : ?>
+				<nav class="lumen-footer-nav" aria-label="<?php esc_attr_e( 'Footer menu', 'lumen' ); ?>">
 					<?php lumen_render_nav( 'footer' ); ?>
 				</nav>
-				<p class="lumen-footer-copyright">
-					<?php printf(
-						esc_html__( '© %1$s %2$s', 'lumen' ),
-						esc_html( current_time( 'Y' ) ),
-						esc_html( get_bloginfo( 'name' ) )
-					); ?>
-				</p>
-			</div>
-			<a class="lumen-footer-feed"
-				href="<?php echo esc_url( get_feed_link() ); ?>"
-				rel="alternate"
-				aria-label="<?php echo esc_attr__( 'RSS feed', 'lumen' ); ?>">RSS</a>
+			<?php endif; ?>
+			<p class="lumen-copyright">&copy; <?php echo esc_html( wp_date( 'Y' ) ); ?> <?php echo esc_html( get_bloginfo( 'name' ) ); ?></p>
 		</div>
-	</footer>
+		<a class="lumen-footer-link" href="<?php echo esc_url( get_feed_link() ); ?>">RSS</a>
+	</div>
+</footer>
 
-	<?php wp_footer(); ?>
+<?php wp_footer(); ?>
 </body>
 </html>

@@ -1,2999 +1,1289 @@
-/* ============================================================
-   Lumen — component / layout styles
-   (base reset + typography + design tokens live in style.css)
-   Mobile-first. No JS; navigation is an always-accessible list.
-   ============================================================ */
+/* ==========================================================================
+   Lumen 1.2 — all theme styles.
 
-/* ============================================================
-   Skip link
-   ============================================================ */
+   1. Tokens (light + dark)     6. Lists & archives
+   2. Base & typography         7. Single post / page
+   3. Layout                    8. Comments
+   4. Header, search, footer    9. Forms & buttons
+   5. Pills & meta             10. Blocks, utilities, print
+   ========================================================================== */
+
+/* 1. Tokens ---------------------------------------------------------------- */
+
+:root {
+	color-scheme: light dark;
+
+	--bg: #fdfdfd;
+	--bg-soft: #f4f4f4;
+	--fg: #1b1b1b;
+	--fg-soft: #4b4b4b;
+	--muted: #6e6e6e;
+	--border: #e6e6e6;
+
+	--pill-bg: #f0f1f2;
+	--pill-fg: #52565c;
+	--green-bg: #e0f3e5;
+	--green-bg-hover: #d3ebda;
+	--green-fg: #176d39;
+	--purple-bg: #d8cbea;
+	--purple-fg: #49375f;
+	--red-bg: #fbe8e8;
+	--red-fg: #a33737;
+	--panel: #eef6ef;
+	--bubble: #f3f4f5;
+	--field: #f7f8f8;
+	--popover: #ffffff;
+	--backdrop: rgb(248 249 248 / 0.68);
+	--shadow: 0 1px 2px rgb(16 24 20 / 0.04), 0 4px 14px rgb(16 24 20 / 0.05);
+
+	--font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang TC", "PingFang SC", "Microsoft JhengHei", "Microsoft YaHei", sans-serif;
+	--font-read: "FangSong", "STFangsong", "仿宋", "仿宋_GB2312", "Songti TC", "Songti SC", serif;
+	--font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+	--column: 720px;
+	--wide: 1180px;
+	--gutter: clamp(1.25rem, 4vw, 2rem);
+	--radius: 4px;
+	--round: 999px;
+	--speed: 160ms;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--bg: #161718;
+		--bg-soft: #202224;
+		--fg: #e7e6e2;
+		--fg-soft: #bdbcb7;
+		--muted: #93928d;
+		--border: #2d2f32;
+
+		--pill-bg: #26282b;
+		--pill-fg: #b9bdc3;
+		--green-bg: #1c3324;
+		--green-bg-hover: #234030;
+		--green-fg: #8fd6a6;
+		--purple-bg: #332a44;
+		--purple-fg: #d3c2ee;
+		--red-bg: #3a2225;
+		--red-fg: #f2a7a7;
+		--panel: #19231c;
+		--bubble: #212326;
+		--field: #1d1f21;
+		--popover: #222427;
+		--backdrop: rgb(10 11 12 / 0.6);
+		--shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 6px 20px rgb(0 0 0 / 0.35);
+	}
+
+	img:not([src$=".svg"]) {
+		filter: brightness(0.92);
+	}
+
+	/* Editor palette colours used inside posts (higher specificity than the
+	   :root rules WordPress prints for them). */
+	html:root {
+		--wp--preset--color--text: var(--fg);
+		--wp--preset--color--text-soft: var(--fg-soft);
+		--wp--preset--color--muted: var(--muted);
+		--wp--preset--color--background-soft: var(--bg-soft);
+		--wp--preset--color--green: var(--green-fg);
+		--wp--preset--color--green-soft: var(--green-bg);
+		--wp--preset--color--purple: var(--purple-fg);
+		--wp--preset--color--purple-soft: var(--purple-bg);
+	}
+}
+
+/* 2. Base & typography ------------------------------------------------------ */
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html {
+	-webkit-text-size-adjust: 100%;
+	scroll-padding-top: 5rem;
+}
+
+body {
+	margin: 0;
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	font-family: var(--font-ui);
+	font-size: 17px;
+	line-height: 1.7;
+	color: var(--fg);
+	background: var(--bg);
+	-webkit-font-smoothing: antialiased;
+	/* CJK ⇄ Latin spacing and punctuation trimming, where supported. */
+	text-autospace: normal;
+	text-spacing-trim: normal;
+	line-break: strict;
+	overflow-wrap: break-word;
+}
+
+img,
+video {
+	max-width: 100%;
+	height: auto;
+}
+
+a {
+	color: inherit;
+	text-decoration: none;
+	transition: color var(--speed), background-color var(--speed);
+}
+
+a:hover {
+	color: var(--fg-soft);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	margin: 0 0 0.6em;
+	font-family: var(--font-read);
+	font-weight: 400;
+	line-height: 1.45;
+	text-wrap: balance;
+}
+
+p {
+	margin: 0 0 1em;
+}
+
+:focus-visible {
+	outline: 2px solid var(--fg);
+	outline-offset: 2px;
+}
+
+::selection {
+	background: var(--green-bg);
+	color: var(--fg);
+}
+
+/* 3. Layout ----------------------------------------------------------------- */
+
+.lumen-main {
+	flex: 1;
+	padding-block: 2.5rem 4rem;
+}
+
+.lumen-main:focus {
+	outline: none;
+}
+
+.lumen-column {
+	width: min(100% - 2 * var(--gutter), var(--column));
+	margin-inline: auto;
+}
+
+/* 4. Header, search, footer ------------------------------------------------- */
 
 .lumen-skip-link {
 	position: absolute;
 	top: -100px;
 	left: 1rem;
-	z-index: 200;
-	background: var(--lumen-fg);
-	color: #fff;
+	z-index: 100;
 	padding: 0.75rem 1.25rem;
-	border-radius: 0 0 var(--lumen-radius) var(--lumen-radius);
-	transition: top 120ms ease;
+	color: var(--bg);
+	background: var(--fg);
+	border-radius: 0 0 var(--radius) var(--radius);
 }
+
 .lumen-skip-link:focus {
 	top: 0;
 }
 
-/* ============================================================
-   Layout
-   ============================================================ */
-
-.lumen-container {
-	width: min(100% - 1.5rem, var(--lumen-container-max));
-	margin-inline: auto;
-}
-
-.lumen-site-main {
-	padding-block: 2.5rem 4rem;
-}
-
-/* ============================================================
-   Header
-   ============================================================ */
-
-.lumen-site-header {
+.lumen-header {
 	position: sticky;
 	top: 0;
 	z-index: 50;
-	background: var(--lumen-bg);
-	border-bottom: 1px solid var(--lumen-border);
+	background: var(--bg);
+	border-bottom: 1px solid var(--border);
 }
 
-/* When the WordPress Admin Bar is visible, offset the sticky header
-   (progressive, pure CSS — no JS). The .admin-bar class is added to <body>
-   by WordPress when the logged-in admin bar is shown.
-
-   The WordPress admin bar behaves differently per breakpoint:
-     * desktop (>= 783px):  position: fixed, 32px tall -> header sits 32px down
-     * tablet  (601-782px): position: fixed, 46px tall -> header sits 46px down
-     * mobile  (<= 600px):  position: absolute (scrolls with the page), 46px tall
-        -> header must end up at the viewport top once the bar scrolls out
-   */
-body.admin-bar .lumen-site-header {
+.admin-bar .lumen-header {
 	top: 32px;
 }
 
-/* Tablet: the admin bar is fixed but 46px tall, so the header must sit 46px
-   down to avoid overlapping it. */
-@media (min-width: 601px) and (max-width: 782px) {
-	body.admin-bar .lumen-site-header {
+@media (max-width: 782px) {
+	.admin-bar .lumen-header {
 		top: 46px;
 	}
 }
 
-/* Mobile: the admin bar scrolls with the page (position: absolute) and is no
-   longer fixed. The header must end up at the viewport top once the bar
-   scrolls out. top: 0 lets it transition from below the bar (at scroll 0)
-   to the top edge as it scrolls. */
 @media (max-width: 600px) {
-	body.admin-bar .lumen-site-header {
+	.admin-bar .lumen-header {
 		top: 0;
 	}
 }
 
 .lumen-header-inner {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-	gap: 0.75rem;
+	width: min(100% - 2 * var(--gutter), var(--wide));
+	margin-inline: auto;
+	display: grid;
+	grid-template-columns: 1fr auto;
+	align-items: center;
+	gap: 0.25rem 0.5rem;
 	padding-block: 0.75rem;
 }
 
+.lumen-brand {
+	min-width: 0;
+}
+
 .lumen-site-title {
-	/* Match the reading typography of the content so the header reads as
-	   part of the same document. 700 was tuned for the sans stack; light
-	   CJK faces like FangSong have no real bold, so the browser would
-	   synthesise one and smear the strokes. 400 keeps it crisp. */
-	font-family: var(--lumen-font-reading);
+	font-family: var(--font-read);
 	font-size: 1.5rem;
-	font-weight: 400;
 	line-height: 1.4;
 	letter-spacing: -0.02em;
-	transition: color var(--lumen-duration);
-}
-.lumen-site-title:hover {
-	color: var(--lumen-accent-hover);
 }
 
-.lumen-site-logo {
-	display: inline-block;
-}
-.lumen-site-logo img {
-	max-height: 32px;
-}
-
-/* --- Navigation (always accessible, no JS) --- */
-
-/* Search toggle + nav share one wrapper so they can be pushed right as a unit
-   on desktop and split across two rows on mobile. On mobile the wrapper steps
-   out of the way (display: contents) so its two children become grid items and
-   can be placed on separate rows. This wrapper is the only "group" element; it
-   carries no styling that would change nav wrapping. */
-.lumen-header-nav-group {
-	display: contents;
+.custom-logo {
+	display: block;
+	max-height: 40px;
+	width: auto;
 }
 
-.lumen-site-nav ul {
-	list-style: none;
+.lumen-nav {
+	grid-column: 1 / -1;
+	margin-inline: -0.5rem;
+}
+
+.lumen-menu {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 0.75rem;
+	gap: 0.25rem 0.75rem;
 	margin: 0;
 	padding: 0;
+	list-style: none;
 }
 
-.lumen-site-nav a {
-	font-family: var(--lumen-font-reading);
-	font-size: 1rem;
-	font-weight: 400;
-	line-height: 1.5;
+.lumen-menu a {
+	display: block;
 	padding: 0.25rem 0.5rem;
-	border-radius: var(--lumen-radius);
-	color: var(--lumen-fg-soft);
-	transition: color var(--lumen-duration), background-color var(--lumen-duration);
-}
-.lumen-site-nav a:hover {
-	color: var(--lumen-fg);
-	background: var(--lumen-bg-soft);
-}
-/* Persistent active state for the current page / category.
-   WordPress marks it via current-menu-item / -parent / -ancestor on the
-   <li> and/or <a>; here we color only (no bg) so it reads as the "here"
-   item, while hover adds the soft background. */
-.lumen-site-nav li.current-menu-item a,
-.lumen-site-nav li.current-menu-parent a,
-.lumen-site-nav li.current-menu-ancestor a,
-.lumen-site-nav a.current-menu-item,
-.lumen-site-nav a.current-menu-parent,
-.lumen-site-nav a.current-menu-ancestor {
-	color: var(--lumen-fg);
+	font-family: var(--font-read);
+	font-size: 1rem;
+	line-height: 1.5;
+	color: var(--fg-soft);
+	border-radius: var(--radius);
 }
 
-/* Desktop: title left, nav right */
+.lumen-menu a:hover {
+	color: var(--fg);
+	background: var(--bg-soft);
+}
+
+.lumen-menu .current-menu-item > a,
+.lumen-menu .current-menu-parent > a,
+.lumen-menu .current-menu-ancestor > a {
+	color: var(--fg);
+}
+
+.lumen-search-toggle {
+	display: inline-grid;
+	place-items: center;
+	width: 2.75rem;
+	height: 2.75rem;
+	padding: 0;
+	color: var(--fg-soft);
+	background: none;
+	border: 0;
+	border-radius: var(--radius);
+	cursor: pointer;
+}
+
+.lumen-search-toggle:hover {
+	color: var(--fg);
+}
+
+.lumen-icon {
+	display: block;
+	width: 1.25rem;
+	height: 1.25rem;
+}
+
 @media (min-width: 768px) {
 	.lumen-header-inner {
-		flex-direction: row;
-		align-items: center;
-		justify-content: space-between;
-		gap: 1rem;
+		grid-template-columns: 1fr auto auto;
 		min-height: 4.75rem;
 		padding-block: 0;
+		column-gap: 1rem;
 	}
 
-	.lumen-site-nav ul {
-		flex-direction: row;
-		align-items: center;
-		gap: 1.5rem;
+	.lumen-search-toggle {
+		order: 2;
+		width: 2.25rem;
+		height: 2.25rem;
 	}
 
-	.lumen-site-nav a {
-		font-size: 1rem;
-		padding: 0.35rem 0.5rem;
-	}
-}
-
-/* ============================================================
-   Footer
-   ============================================================ */
-
-.lumen-site-footer {
-	border-top: 1px solid var(--lumen-border);
-	padding-block: 1.5rem;
-}
-
-.lumen-footer-inner {
-	display: flex;
-	flex-direction: column;
-	gap: 0.75rem;
-}
-
-.lumen-footer-left {
-	display: flex;
-	flex-direction: column;
-	gap: 0.5rem;
-}
-
-.lumen-site-footer-nav ul {
-	list-style: none;
-	display: flex;
-	flex-wrap: wrap;
-	gap: 1.25rem;
-	margin: 0;
-	padding: 0;
-}
-
-.lumen-site-footer-nav a {
-	font-family: var(--lumen-font-reading);
-	font-size: 0.95rem;
-	font-weight: 400;
-	line-height: 1.5;
-	padding: 0.2rem 0.5rem;
-	border-radius: var(--lumen-radius);
-	transition: color var(--lumen-duration), background-color var(--lumen-duration);
-}
-.lumen-site-footer-nav a:hover {
-	color: var(--lumen-fg);
-	background: var(--lumen-bg-soft);
-}
-
-.lumen-footer-copyright {
-	margin: 0;
-	color: var(--lumen-muted);
-	font-family: var(--lumen-font-reading);
-	font-size: 0.9rem;
-	font-weight: 400;
-	line-height: 1.6;
-}
-
-.lumen-footer-feed {
-	font-family: var(--lumen-font-reading);
-	font-size: 0.9rem;
-	font-weight: 400;
-	line-height: 1.6;
-	color: var(--lumen-muted);
-	padding: 0.15rem 0.5rem;
-	border-radius: var(--lumen-radius);
-	transition: color var(--lumen-duration), background-color var(--lumen-duration);
-}
-.lumen-footer-feed:hover {
-	color: var(--lumen-fg);
-	background: var(--lumen-bg-soft);
-}
-
-@media (min-width: 768px) {
-	.lumen-footer-inner {
-		flex-direction: row;
-		align-items: flex-start;
-		justify-content: space-between;
-		gap: 2rem;
+	.lumen-nav {
+		grid-column: auto;
+		order: 1;
+		margin: 0;
 	}
 
-	.lumen-footer-feed {
-		align-self: center;
+	.lumen-menu {
+		column-gap: 1.25rem;
 	}
 }
 
-/* ============================================================
-   Archive / Blog list
-   ============================================================ */
-
-.lumen-archive-wrap {
-	max-width: var(--lumen-content-max);
-	margin-inline: auto;
-}
-
-.lumen-archive-header {
-	margin-bottom: var(--lumen-space-3);
-}
-
-/* Archive H1: reading serif, 400, lh 1.5, normal letter-spacing. */
-.lumen-archive-wrap .lumen-archive-title {
-	font-family: var(--lumen-font-reading);
-	font-size: clamp(1.75rem, 3vw, 2.5rem);
-	font-weight: 400;
-	line-height: 1.5;
-	letter-spacing: normal;
-	margin-bottom: var(--lumen-space-3);
-}
-
-.lumen-archive-header .lumen-search-form {
-	margin-top: 1rem;
-}
-
-/* Search H1: sans-serif, 400, lh 1.4 (1.75rem – 2rem). */
-.lumen-search-page .lumen-archive-title {
-	font-family: var(--lumen-sans);
-	font-size: clamp(1.75rem, 1.7rem + 0.6vw, 2rem);
-	font-weight: 400;
-	line-height: 1.4;
-	letter-spacing: normal;
-	margin-bottom: var(--lumen-space-3);
-}
-
-.lumen-archive-context {
-	font-family: var(--lumen-sans);
-	font-size: 0.85rem;
-	font-weight: 400;
-	line-height: 1.6;
-	color: var(--lumen-muted);
-	margin: 0 0 var(--lumen-space-1);
-}
-
-.lumen-archive-description {
-	font-family: var(--lumen-font-reading);
-	font-size: 1rem;
-	font-weight: 400;
-	color: var(--lumen-fg-soft);
-	line-height: 1.8;
-	margin: 0 0 var(--lumen-space-3);
-}
-
-/* ============================================================
-   Category archive intro (Phase 8F-R1 / 8F-R2) — CATEGORY ONLY.
-
-   index.php renders category / tag / date / author / taxonomy
-   archives, so everything below is scoped to the category archive
-   through the body class WordPress already emits (`body.category`,
-   from body_class()). Tag, date, author and taxonomy archives keep
-   the original header untouched. The intro-panel selectors are also
-   prefixed with .lumen-category-intro, which the template adds only
-   when is_category() is true, as a second line of defence.
-
-   The post list that follows — and in particular the grey date pill
-   and the green category pill — is deliberately untouched.
-
-   Layout model (8F-R2, requirement A2):
-     The panel's horizontal padding is cancelled by an equal negative
-     inline margin, so the TEXT inside the panel starts on exactly the
-     same vertical line as the post titles, meta and excerpts below
-     it. The pale green field therefore bleeds symmetrically to either
-     side instead of pushing its content 32px right of the column.
-
-     The bleed needs free space beside the reading column. On desktop
-     the centred column already provides it. On narrow screens the
-     column would run edge to edge, so the category archive gets a
-     small gutter that the panel bleeds back out across. Gutter and
-     panel padding are kept equal, so the panel text lands exactly on
-     the column edge at every width.
-
-   No :has() and no JavaScript are used, so this works in every
-   browser the theme supports.
-   ============================================================ */
-
-/* A. Pale green introduction panel.
-   #EEF6EF is deliberately lower-saturation and lighter than the green
-   category pill (#E0F3E5) used in the post meta below, so the two
-   never read as the same component. Flat colour: no shadow, no
-   gradient, no background image. */
-.lumen-category-intro {
-	--lumen-cat-intro-pad-x: 32px;
-	/* 8J-R1: the vertical padding is half the pre-1.1.11 value so the
-	   panel reads compact. The horizontal value keeps feeding the
-	   left-edge alignment bleed and must NOT shrink with it.
-
-	   8K-R1 keeps this value and its equality of top and bottom. The
-	   optical imbalance the user reported is NOT solved by biasing the
-	   padding, which would only trade one asymmetry for another: it is
-	   solved by pinning the H1's line box inside the heading row (see
-	   the `.lumen-category-intro-heading .lumen-archive-title` rule),
-	   which removes the font-size-dependent half-leading that caused it.
-	   The two insets therefore stay equal here. */
-	--lumen-cat-intro-pad-y: 14px;
-	/* Free space the panel may bleed into: whatever the centred
-	   reading column leaves on wide screens, plus (on narrow screens)
-	   the gutter declared on the archive wrap below. */
-	--lumen-cat-intro-room: calc(var(--lumen-cat-intro-gutter, 0px) + max(0px, (100vw - var(--lumen-content-max)) / 2));
-
-	background: #eef6ef;
-	border-radius: 16px;
-	padding: var(--lumen-cat-intro-pad-y) var(--lumen-cat-intro-pad-x);
-	/* Bleed out symmetrically so the panel's TEXT aligns with the
-	   post content below, capped by the room actually available so
-	   the panel can never cause horizontal overflow at any width. */
-	margin-inline: calc(-1 * min(var(--lumen-cat-intro-pad-x), var(--lumen-cat-intro-room)));
-	/* The panel owns the space beneath it; the divider margin is
-	   measured from here. */
-	margin-bottom: 0;
-}
-
-/* B. Category title: keeps the archived H1 typography and simply
-   inherits the site foreground token (--lumen-fg = #1B1B1B).
-
-   Only the colour is set here. The title's margin is owned by the heading
-   row rule above, because since 8K-R1 the title shares a flex line with
-   the statistics pill instead of stacking above it. The obsolete 8I-R1
-   `margin-bottom: 2px` "4px title-to-pill gap" was removed with it: on a
-   shared line, any title margin would push the pill's centre away from
-   the title's centre and break the alignment requirement.
-
-   The shared `.lumen-archive-wrap .lumen-archive-title` rule is
-   deliberately NOT touched, because tag, date, author and search
-   archives still stack the pill beneath the title and rely on the 24px
-   rhythm. The H1 keeps its family, size, weight, line-height,
-   letter-spacing and colour. */
-.lumen-category-intro .lumen-archive-title {
-	color: var(--lumen-fg);
-}
-
-/* C. Muted dark lavender statistics pill ("Category · N posts").
-   inline-flex keeps the pill shrink-to-fit instead of spanning the
-   full row, and the explicit margin-bottom replaces the original
-   paragraph margin so the pill height stays predictable.
-
-   Geometry is frozen: same display, padding, radius, font-size,
-   line-height and margin as before — only the two colours changed
-   (8G-R1). The deeper lavender is deliberately distinct from BOTH the
-   pale green panel (#EEF6EF) it sits on and the green post category
-   pill (#E0F3E5) further down, so the two never read as the same
-   component: #D8CBEA sits 24.82 ΔE from the panel.
-
-   Low saturation on purpose (13% HSV) - greyer and deeper than the
-   1.1.7 tint, never neon or a saturated button purple. #49375F on
-   #D8CBEA measures 6.84:1, comfortably WCAG AA.
-
-   Since 8K-R1 the margin-bottom declared here is overridden to 0 inside
-   `.lumen-category-intro-heading` (see rule B), where the heading row
-   owns the space beneath instead. It is kept here because the value is
-   still the correct fallback if the pill is ever rendered outside the
-   heading row, and removing it would silently change the pill's box
-   model on any future non-flex context. */
-.lumen-category-intro .lumen-archive-context {
-	display: inline-flex;
-	align-items: center;
-	padding: 4px 12px;
-	border-radius: 999px;
-	font-size: 13px;
-	line-height: 1.4;
-	color: #49375f;
-	background: #d8cbea;
-	margin: 0 0 var(--lumen-space-2);
-	border: 0;
-}
-
-/* D. Description: unchanged reading typography and colour. The
-   trailing margin is reset here because the panel now supplies the
-   bottom spacing, and long unbroken strings must never escape. */
-.lumen-category-intro .lumen-archive-description {
-	margin: 0;
-	overflow-wrap: anywhere;
-}
-
-/* B. Category heading row (Phase 8K-R1): the archive title and the
-   statistics pill share one line, vertically centred.
-
-   flex + align-items: center is what actually produces the centring, so
-   the measured delta between the H1 centre and the pill centre is the
-   real acceptance criterion — not the presence of the declaration.
-   `column-gap: 16px` is the confirmed horizontal rhythm.
-
-   `flex-wrap: wrap` is the whole responsive strategy: when the title and
-   the pill cannot share a line the pill drops below the title on its own
-   line. Nothing is truncated, no font is shrunk, the pill keeps its exact
-   dimensions, and no width is hardcoded. The description is deliberately
-   NOT a flex item — it stays a normal block paragraph beneath the row and
-   can never be pulled alongside the pill.
-
-   `align-items: center` centres each flex line independently, so the
-   title/pill centres still coincide once the pill has wrapped.
-
-   Scope: emitted by the category archive body class alone. Tag, date,
-   author, taxonomy and search archives never receive this element. */
-.lumen-category-intro-heading {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	column-gap: 16px;
-}
-
-/* The heading row owns the vertical rhythm below it, so the title no
-   longer needs its own margin. The 4px title-to-pill margin from 8I-R1
-   is obsolete now that the two sit on one line: keeping it would push the
-   pill's centre off the title's centre and defeat the centring. The
-   shared `.lumen-archive-wrap .lumen-archive-title` rule is untouched, so
-   every other archive keeps its 24px rhythm.
-
-   `line-height: 40px` is FIXED rather than a ratio, and that is what
-   makes the optical balance work at every width. The H1 font-size is
-   clamp(1.75rem, 3vw, 2.5rem), so the inherited ratio line-height (1.5)
-   grows with the viewport and drags the glyph ink progressively further
-   below the top of its line box — measured on rendered pixels the ink
-   offset above the glyphs went from 8px at 360px to 16px at 1440px,
-   which no single padding value can cancel. A fixed 40px line box makes
-   the half-leading constant, so the title's ink offset stays at 6-7px
-   from 320px through 1920px and one fixed top padding balances the panel.
-
-   40px was chosen by sweeping 34px-60px against real screenshots: it is
-   the value that equalises the measured top and bottom visible gaps
-   (0px difference across 320-1200px and 1400-1920px, never worse than
-   1px) while keeping the panel compact. The H1 keeps its family, size,
-   weight, letter-spacing and colour — only its line box is pinned — and
-   the pill stays vertically centred on it (measured delta 0.00px at
-   every viewport). */
-.lumen-category-intro-heading .lumen-archive-title {
-	margin-bottom: 0;
-	line-height: 40px;
-	/* A flex item is sized by its content, so an unbreakable single word
-	   longer than the reading column would push the heading row — and the
-	   whole document — into horizontal scrolling. `min-width: 0` lets the
-	   flex item shrink below its content width and `overflow-wrap: anywhere`
-	   lets the long word actually break, which is the same pair of
-	   behaviours the theme already applies to the description and to
-	   `.lumen-post-card`. Without these the title could not wrap at all. */
-	min-width: 0;
-	overflow-wrap: anywhere;
-}
-
-/* The pill keeps its frozen geometry and colours; only its margin is
-   reset, because inside the flex row it is the row — not the pill — that
-   owns the space beneath. This removes the old paragraph margin that
-   would otherwise double up with the row's own spacing. */
-.lumen-category-intro-heading .lumen-archive-context {
-	margin: 0;
-}
-
-/* Space between the heading row and the description. It replaces the
-   pill's old `margin-bottom: var(--lumen-space-2)` (16px) so the reading
-   rhythm below the heading row is the same as v1.1.11's pill-to-
-   description distance. Only applied when a description actually exists,
-   via :has(), so a description-less panel adds no phantom gap. */
-.lumen-category-intro-heading:has(+ .lumen-archive-description) {
-	margin-bottom: var(--lumen-space-2);
-}
-
-/* E. Divider between the intro panel and the post listing.
-   Sits outside the panel, spanning the reading column (not the
-   panel's wider bleed). This divider also gives the first post the
-   same "rule + meta + title + excerpt" opening that every later post
-   has, so the first item is not a special case (requirement A4); the
-   post list itself is untouched.
-
-   The two sides are deliberately SEPARATE margins (8G-R1):
-     margin-block-start -> panel bottom to the divider. This is the
-       existing A3 symmetry value (24px / 20px / 18px) and must not
-       move, or the top/bottom balance of the panel would break.
-     margin-block-end   -> divider to the first post. This now mirrors
-       the homepage rhythm (--lumen-home-divider-gap: 2rem / 1.75rem)
-       so the first post opens with the same breathing room as every
-       post on the homepage.
-
-   --lumen-cat-intro-gap-below defaults to the homepage desktop value
-   (2rem = 32px) and is tightened to 1.75rem (28px) at the same 768px
-   breakpoint the homepage uses. Only this category-scoped variable is
-   touched — the homepage's own --lumen-home-divider-gap is never
-   read or modified. */
-.lumen-category-intro-divider {
-	--lumen-cat-intro-gap-below: 2rem;
-	height: 1px;
-	width: 100%;
-	background: #dde1e2;
-	margin-block-start: 24px;
-	margin-block-end: var(--lumen-cat-intro-gap-below);
-}
-
-/* F. Symmetric vertical rhythm (A3).
-   The two bands of whitespace around the panel should read as equal:
-     above = site header's bottom border -> panel top
-     below = panel bottom -> listing divider
-   .lumen-site-main contributes 2.5rem (40px) of top padding while the
-   divider below the panel carries 24px, so the panel originally sat
-   in a 16px-taller band above than below. Pin the top padding to the
-   same 24px rhythm used underneath. */
-body.category .lumen-site-main {
-	padding-block-start: 24px;
-}
-
-/* Narrow screens: the reading column would run edge to edge, leaving
-   the panel nowhere to bleed. Give the category archive a gutter and
-   keep it equal to the panel padding, so the bleed fully cancels the
-   padding and the panel text still lands on the column edge.
-
-   Note that this equality is what makes the panel itself flush with the
-   column edge: with gutter == pad-x the bleed is min(pad-x, room) ==
-   pad-x, cancelling the horizontal padding exactly. Raising the gutter
-   above pad-x (see the max-width: 768px block below) is therefore the
-   supported way to inset the panel, because the bleed is capped by
-   pad-x and cannot grow past it. */
-@media (max-width: 860px) {
-	body.category .lumen-archive-wrap {
-		--lumen-cat-intro-gutter: 20px;
-		padding-inline: var(--lumen-cat-intro-gutter);
-	}
-	body.category .lumen-category-intro {
-		--lumen-cat-intro-pad-x: 20px;
-		--lumen-cat-intro-pad-y: 10px;
-		border-radius: 14px;
-	}
-	/* Top side keeps the A3 symmetry value. */
-	body.category .lumen-category-intro-divider {
-		margin-block-start: 20px;
-	}
-	/* Keep A3 symmetric on narrow screens too. */
-	body.category .lumen-site-main {
-		padding-block-start: 20px;
-	}
-}
-
-/* Match the homepage divider rhythm below the divider. The homepage
-   tightens --lumen-home-divider-gap to 1.75rem at max-width 768px, so
-   the category gap follows the same breakpoint to stay in step. */
-@media (max-width: 768px) {
-	body.category .lumen-category-intro-divider {
-		--lumen-cat-intro-gap-below: 1.75rem;
-	}
-}
-
-@media (max-width: 360px) {
-	body.category .lumen-archive-wrap {
-		--lumen-cat-intro-gutter: 18px;
-	}
-	body.category .lumen-category-intro {
-		--lumen-cat-intro-pad-x: 18px;
-		--lumen-cat-intro-pad-y: 9px;
-	}
-	/* Top side only — the bottom side keeps the homepage 1.75rem. */
-	body.category .lumen-category-intro-divider {
-		margin-block-start: 18px;
-	}
-	body.category .lumen-site-main {
-		padding-block-start: 18px;
-	}
-}
-
-/* 8L-R1: mobile horizontal breathing room.
-
-   On phones the reading column is as wide as the viewport, so the archive
-   wrap's gutter is the only horizontal space available and the panel's
-   bleed consumes all of it (`min(pad-x, room)` clamps to pad-x). The
-   panel therefore ran edge to edge with zero visible margin at every
-   width up to 768px — measured at 0px on both sides from 320px through
-   768px.
-
-   Raising the gutter ABOVE the panel's horizontal padding keeps the
-   panel's text where it was while exposing the surplus as real margin:
-   the bleed stays capped at pad-x, so the difference (gutter - pad-x)
-   becomes visible whitespace outside the panel. The wrap's inline
-   padding is what the panel text and the post list both align to, so the
-   two stay in step automatically.
-
-   20px + 16px = 36px for the normal mobile range, and 18px + 16px = 34px
-   at 360px and below, which keeps the extra space identical across the
-   small-mobile breakpoint. Above 768px nothing here applies, so the
-   tablet (769-860px) and desktop layouts are untouched. */
-@media (max-width: 768px) {
-	body.category .lumen-archive-wrap {
-		--lumen-cat-intro-gutter: 36px;
-	}
-}
-
-@media (max-width: 360px) {
-	body.category .lumen-archive-wrap {
-		--lumen-cat-intro-gutter: 34px;
-	}
-}
-
-/* ============================================================
-   Post list (archive / search)
-   ============================================================ */
-
-.lumen-post-list {
-	list-style: none;
-	margin: 0;
-	padding: 0;
-	display: grid;
-	grid-template-columns: 1fr;
-	gap: 0;
-}
-
-.lumen-post-list > li {
-	min-width: 0;
-}
-
-/* Subtle divider below each item; 1.75rem rhythm. Last item has no divider. */
-.lumen-post-card {
-	padding-bottom: 1.75rem;
-	border-bottom: 1px solid var(--lumen-border);
-	min-width: 0;
-	overflow-wrap: anywhere;
-}
-
-.lumen-post-list > li:last-child .lumen-post-card {
-	padding-bottom: 0;
-	border-bottom: 0;
-}
-
-/* 8M-R1: category archive post divider rhythm.
-
-   The homepage pairs --lumen-home-divider-gap as a padding-bottom on each
-   post with the same value as a padding-top on the following post, which
-   puts equal whitespace on both sides of its divider. The shared archive
-   list only ever had the padding-bottom half, so on a category page the
-   next post's meta sat directly under the line, and the above-side value
-   was also fixed at 1.75rem — the homepage's mobile value — leaving
-   desktop 4px short of the homepage's 2rem.
-
-   Category only. Tag, date and author archives share .lumen-post-list and
-   must keep their existing spacing, so every rule here is scoped through
-   body.category and reads a category-scoped variable rather than the
-   homepage's --lumen-home-divider-gap. The last item keeps its existing
-   "no divider, no bottom padding" rule above. */
-body.category .lumen-archive-wrap {
-	--lumen-category-post-divider-gap: 2rem;
-}
-
-/* The list is a grid whose items are separated by the newlines in
-   post-list.php. Those whitespace text nodes form the container's own
-   inline formatting context, and their strut adds ~6px of leading to each
-   grid row — measured at exactly 5.94px on every divider, which is the
-   list's inherited line-height (28.9px) minus its font-size (17px),
-   halved. That is what pushed the next post's meta to 38px below the line
-   instead of the homepage's 32px, so it has to be neutralised before the
-   spacing below can be made to match.
-
-   font-size:0 removes the strut. The text inside has its own explicit
-   sizes already, but the card is restated at the theme's body size so
-   nothing can inherit 0 — verified against meta/title/excerpt computed
-   sizes, which are unchanged. */
-body.category .lumen-post-list {
-	font-size: 0;
-}
-
-body.category .lumen-post-card {
-	font-size: 1rem;
-}
-
-/* Whitespace above the divider, matching the homepage's desktop value. */
-body.category .lumen-post-list > li:not(:last-child) .lumen-post-card {
-	padding-bottom: var(--lumen-category-post-divider-gap);
-}
-
-/* Whitespace below the divider. The first post is excluded so the intro
-   divider's existing margin-block-end already provides its 2rem, and no
-   second gap is stacked on top of it. */
-body.category .lumen-post-list > li + li {
-	padding-top: var(--lumen-category-post-divider-gap);
-}
-
-@media (max-width: 768px) {
-	body.category .lumen-archive-wrap {
-		--lumen-category-post-divider-gap: 1.75rem;
-	}
-}
-
-/* Archive list title: reading serif, 400, lh 1.5, normal ls
-   (desktop ~1.35rem–1.4rem / mobile ~1.2rem–1.3rem). */
-.lumen-post-card .lumen-post-title {
-	font-family: var(--lumen-font-reading);
-	font-size: clamp(1.2rem, 1.2rem + 0.5vw, 1.4rem);
-	font-weight: 400;
-	line-height: 1.5;
-	letter-spacing: normal;
-	margin: 0 0 0.5rem;
-}
-
-.lumen-post-card .lumen-post-title a {
-	font-weight: 400;
-	text-decoration: none;
-}
-
-.lumen-post-card .lumen-post-title a:hover {
-	color: var(--lumen-fg);
-}
-
-/* Search list title: reading serif, 400, lh 1.5, smaller
-   (desktop ~1.375rem / mobile ~1.25rem). */
-.lumen-post-card.lumen-list-search .lumen-post-title {
-	font-size: clamp(1.125rem, 1.05rem + 0.4vw, 1.375rem);
-	font-weight: 400;
-	line-height: 1.5;
-	letter-spacing: normal;
-}
-
-/* List meta: reading serif, 400, 0.85rem, lh 1.6 (date + categories). */
-.lumen-post-meta {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: flex-start;
-	margin: 0 0 0.75rem;
-	font-family: var(--lumen-font-reading);
-	font-size: 0.85rem;
-	font-weight: 400;
-	line-height: 1.6;
-	color: var(--lumen-muted);
-}
-
-.lumen-post-meta .lumen-post-date {
-	font-variant-numeric: tabular-nums;
-}
-
-.lumen-post-meta .lumen-post-cats {
-	display: inline-flex;
-	align-items: center;
-	gap: 0.4rem;
-	margin-left: 0.5rem;
-}
-
-/* Middle dot between date and categories; only appears when categories render. */
-.lumen-post-meta .lumen-post-cats::before {
-	content: '\00B7';
-}
-
-.lumen-post-meta .lumen-post-cat {
-	font-size: 0.85rem;
-	color: var(--lumen-muted);
-}
-
-.lumen-post-meta a {
-	color: inherit;
-}
-
-.lumen-post-meta a:hover {
-	color: var(--lumen-fg);
-}
-
-/* ============================================================
-   Date / category pills — Blog Home, archive lists, search results,
-   and the Single post header
-
-   The list contexts and the Single post header share one pill language:
-   grey date pill + green category pill(s), no middle-dot separator.
-   The selectors are listed per context (never as a bare
-   `.lumen-post-date`) so the pill language stays scoped to these four
-   meta rows and cannot leak into other date/category output.
-   ============================================================ */
-
-.lumen-home-meta,
-.lumen-post-meta,
-.lumen-single-meta {
-	align-items: center;
-	gap: 8px;
-}
-
-/* No middle-dot separator and no separator margin in any pill context.
-   (Single post header previously drew its own '\00B7' here.) */
-.lumen-home-meta .lumen-post-cats,
-.lumen-post-meta .lumen-post-cats,
-.lumen-single-meta .lumen-post-cats {
-	margin-left: 0;
-	gap: 8px;
-	align-items: center;
-}
-
-.lumen-home-meta .lumen-post-cats::before,
-.lumen-post-meta .lumen-post-cats::before,
-.lumen-single-meta .lumen-post-cats::before {
-	content: none;
-}
-
-/* Date pill (grey). */
-.lumen-home-meta .lumen-post-date,
-.lumen-post-meta .lumen-post-date,
-.lumen-single-meta .lumen-post-date {
-	display: inline-block;
-	padding: 4px 10px;
-	font-size: 13px;
-	line-height: 1.4;
-	color: #52565c;
-	background: #f0f1f2;
-	border-radius: 999px;
-}
-
-/* Category pills (green), each one its own pill inside the wrapper.
-   The wrapper stays inline-flex + wrap so multiple categories never end up
-   inside one big pill. The `a` variants are listed explicitly because the
-   legacy `.lumen-post-meta a { color: inherit }` / `.lumen-single-meta a`
-   rules would otherwise pull the pill text down to the muted body colour. */
-.lumen-home-meta .lumen-post-cats,
-.lumen-post-meta .lumen-post-cats,
-.lumen-single-meta .lumen-post-cats {
-	display: inline-flex;
-	flex-wrap: wrap;
-	align-items: center;
-}
-
-.lumen-home-meta .lumen-post-cat,
-.lumen-home-meta a.lumen-post-cat,
-.lumen-post-meta .lumen-post-cat,
-.lumen-post-meta a.lumen-post-cat,
-.lumen-single-meta .lumen-post-cat,
-.lumen-single-meta a.lumen-post-cat {
-	display: inline-block;
-	padding: 4px 10px;
-	font-size: 13px;
-	line-height: 1.4;
-	color: #176d39;
-	background: #e0f3e5;
-	border-radius: 999px;
-	text-decoration: none;
-}
-
-.lumen-home-meta a.lumen-post-cat:hover,
-.lumen-post-meta a.lumen-post-cat:hover,
-.lumen-single-meta a.lumen-post-cat:hover,
-.lumen-home-meta .lumen-post-cat:hover,
-.lumen-post-meta .lumen-post-cat:hover,
-.lumen-single-meta .lumen-post-cat:hover {
-	color: #176d39;
-	background: #d3ebda;
-	opacity: 1;
-}
-
-/* Excerpt: reading serif, 400, lh 1.75 (~1rem). */
-.lumen-post-excerpt {
-	font-family: var(--lumen-font-reading);
-	font-size: 1rem;
-	font-weight: 400;
-	line-height: 1.75;
-	color: var(--lumen-fg-soft);
-	margin: 0.5rem 0 0;
-}
-
-/* ============================================================
-   Single post
-   ============================================================ */
-
-.lumen-post-header {
-	max-width: var(--lumen-content-max);
-	margin-inline: auto;
-	padding-bottom: 2rem;
-}
-
-.lumen-post-featured {
-	margin-top: 1.75rem;
-}
-
-.lumen-post-featured img {
-	width: 100%;
-	height: auto;
-	display: block;
-	aspect-ratio: 16 / 9;
-	object-fit: cover;
-	border-radius: var(--lumen-radius);
-}
-
-.lumen-post-header .lumen-post-title {
-	font-family: var(--lumen-font-reading);
-	font-size: clamp(1.75rem, 3vw, 2.5rem);
-	font-weight: 400;
-	line-height: 1.5;
-	margin-bottom: 0.75rem;
-}
-
-/* Single post header meta: same pill language as the list contexts
-   (grey date pill + green category pill). The legacy inline reading style
-   and the middle-dot separator are gone; the slug-specific rules live in
-   the shared pill block above. Only the container metrics stay here. */
-.lumen-single-meta {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	font-family: var(--lumen-font-reading);
-	font-weight: 400;
-	font-size: 0.875rem;
-	line-height: 1.6;
-	color: var(--lumen-muted);
-}
-
-.lumen-single-meta .lumen-post-date {
-	font-variant-numeric: tabular-nums;
-}
-
-.lumen-post-body,
-.lumen-page-body {
-	max-width: var(--lumen-content-max);
-	margin-inline: auto;
-	font-family: var(--lumen-font-reading);
-	font-weight: 400;
-	line-height: 1.9;
-}
-
-/* v1.1.20 (Feature B) - the dashed rule that separates the Single Post header
-   from the article body.
-
-   WHERE THE SPACE COMES FROM. `.lumen-post-header` already ends with 2rem
-   (32px) of padding-bottom, and `.lumen-post-body` contributes no top padding
-   of its own, so before this rule the header's last painted row and the first
-   body paragraph were separated by exactly that 32px of empty header padding.
-   The divider is drawn INSIDE that existing whitespace instead of being given
-   fresh margins of its own: the naive approach (a top margin plus a bottom
-   margin on the line) would have added ~50px of page height and pushed the
-   whole article down for a purely decorative hairline.
-   Positioning the pseudo-element absolutely against the body, at the very top
-   of the body's box, places the rule exactly on the header/body boundary - so
-   the header-to-first-paragraph distance is unchanged and the line simply
-   becomes visible in space that was already blank.
-
-   WHY A PSEUDO-ELEMENT. The markup is `<article class="lumen-post"><header
-   class="lumen-post-header">...</header><div class="lumen-post-body">...
-   </div></article>`. A decorative rule needs no element and no template edit,
-   so `single.php` is untouched. It is purely decorative: it carries no text
-   (empty `content`), it is not focusable, it cannot be clicked, and it is
-   `pointer-events: none` so it cannot intercept anything underneath.
-
-   SCOPE. `.lumen-post-body` only. `.lumen-page-body` deliberately does NOT get
-   the rule, so static Pages keep their current look exactly.
-
-   FEATURED IMAGE. The featured image lives inside `.lumen-post-header`, above
-   this boundary, so the visual order is title, date pill, category pill,
-   featured image, dashed rule, body. The line can never land above the
-   featured image because it is anchored to the body, not to the header. */
-.lumen-post > .lumen-post-body {
-	position: relative;
-}
-
-.lumen-post > .lumen-post-body::before {
-	content: "";
-	position: absolute;
-	/* Pinned to the TOP edge of the body, which is the header/body boundary.
-	   `inset-inline: 0` makes the rule exactly as wide as the body container and
-	   aligns both ends with the body text, so it cannot be wider than the copy
-	   and cannot introduce a horizontal scrollbar. */
-	top: 0;
-	inset-inline: 0;
-	/* A real 1px hairline in the theme's existing border token. No shadow, no
-	   background fill, no gradient - just the same neutral grey the theme already
-	   uses for its other dividers. */
-	height: 0;
-	border-top: 1px dashed var(--lumen-border);
-	/* Decorative only. */
-	pointer-events: none;
-}
-
-.lumen-post-body img,
-.lumen-page-body img {
-	max-width: 100%;
-	height: auto;
-	margin-block: 1rem 1.5rem;
-	border-radius: var(--lumen-radius);
-}
-.lumen-post-body img:first-child,
-.lumen-page-body img:first-child {
-	margin-top: 0;
-}
-.lumen-post-body img:last-child,
-.lumen-page-body img:last-child {
-	margin-bottom: 0;
-}
-
-.lumen-post-body p,
-.lumen-page-body p {
-	margin-bottom: 1.5rem;
-}
-
-/* ================================================================
-   Body content typography — long-form reading. Grouped so regular Pages
-   (.lumen-page-body) inherit the exact Single Post system without altering
-   any .lumen-post-body rule (byte-identical Single output; zero regression).
-   Does NOT touch the global reset, homepage, archive, search, comments,
-   header/footer, or the frozen dev.7 single header / Previous-Next nav.
-   Headings keep the reading font; weight is 400 to stay coherent with the
-   dev.7 title and the FangSong reading-serif convention (see FINAL REPORT
-   for the weight caveat).
-   ================================================================ */
-
-/* H2 — primary article section: clearly above body, below a page title. */
-.lumen-post-body h2,
-.lumen-page-body h2 {
-	font-family: var(--lumen-font-reading);
-	font-size: clamp(1.5rem, 2.2vw, 1.75rem);
-	font-weight: 400;
-	line-height: 1.45;
-	margin-top: 2.25em;
-	margin-bottom: 0.8em;
-}
-/* H3 — sub-section: below H2, above body. */
-.lumen-post-body h3,
-.lumen-page-body h3 {
-	font-family: var(--lumen-font-reading);
-	font-size: 1.35rem;
-	font-weight: 400;
-	line-height: 1.5;
-	margin-top: 2em;
-	margin-bottom: 0.7em;
-}
-/* H4 — slightly above body. */
-.lumen-post-body h4,
-.lumen-page-body h4 {
-	font-family: var(--lumen-font-reading);
-	font-size: 1.125rem;
-	font-weight: 400;
-	line-height: 1.5;
-	margin-top: 1.75em;
-	margin-bottom: 0.6em;
-}
-/* H5 / H6 — near body; distinguished by spacing, not size. */
-.lumen-post-body h5,
-.lumen-page-body h5,
-.lumen-post-body h6,
-.lumen-page-body h6 {
-	font-family: var(--lumen-font-reading);
-	font-size: 1.05rem;
-	font-weight: 400;
-	line-height: 1.5;
-	margin-top: 1.6em;
-	margin-bottom: 0.6em;
-}
-/* Avoid a large gap above the first heading (header already supplies padding). */
-.lumen-post-body > h2:first-child,
-.lumen-page-body > h2:first-child,
-.lumen-post-body > h3:first-child,
-.lumen-page-body > h3:first-child,
-.lumen-post-body > h4:first-child,
-.lumen-page-body > h4:first-child,
-.lumen-post-body > h5:first-child,
-.lumen-page-body > h5:first-child,
-.lumen-post-body > h6:first-child,
-.lumen-page-body > h6:first-child {
-	margin-top: 0;
-}
-
-/* Lists — scoped to the single post body; native markers kept. */
-.lumen-post-body ul,
-.lumen-page-body ul,
-.lumen-post-body ol,
-.lumen-page-body ol {
-	padding-left: 1.5em;
-	margin-top: 1.4rem;
-	margin-bottom: 1.4rem;
-}
-.lumen-post-body li,
-.lumen-page-body li {
-	margin-bottom: 0.45em;
-}
-.lumen-post-body li ul,
-.lumen-page-body li ul,
-.lumen-post-body li ol,
-.lumen-page-body li ol {
-	padding-left: 1.2em;
-	margin-top: 0.25em;
-	margin-bottom: 0.5em;
-}
-
-/* Blockquote — minimal left rule, soft text, no card/shadow/background. */
-.lumen-post-body blockquote,
-.lumen-page-body blockquote {
-	margin: 1.75rem 0;
-	padding-left: 1.4rem;
-	border-left: 2px solid var(--lumen-fg-soft);
-	color: var(--lumen-fg-soft);
-	font-size: 1em;
-	line-height: 1.88;
-}
-.lumen-post-body blockquote p:last-child,
-.lumen-page-body blockquote p:last-child {
-	margin-bottom: 0;
-}
-
-/* Inline links in article text — persistent subtle underline so links are
-   discoverable without relying on colour alone. Excludes Gutenberg buttons so
-   they keep the sans UI style. Hover deepens the colour; the underline stays
-   (no font-weight change, no layout shift). */
-.lumen-post-body a:not(.wp-block-button__link),
-.lumen-page-body a:not(.wp-block-button__link) {
-	text-decoration: underline;
-	text-decoration-thickness: 1px;
-	text-underline-offset: 0.18em;
-	text-decoration-color: var(--lumen-muted);
-}
-.lumen-post-body a:not(.wp-block-button__link):hover,
-.lumen-page-body a:not(.wp-block-button__link):hover {
-	color: var(--lumen-fg-soft);
-}
-
-/* Inline code — keep the mono token; keep the existing 0.9em size. */
-.lumen-post-body code,
-.lumen-page-body code {
-	font-size: 0.9em;
-}
-
-/* Code blocks — real code reading: no forced wrap. The block scrolls
-   horizontally on its own, so the page never overflows horizontally. */
-.lumen-post-body pre,
-.lumen-page-body pre {
-	white-space: pre;
-	overflow-wrap: normal;
-	word-break: normal;
-	overflow-x: auto;
-	overflow-y: hidden;
-	max-width: 100%;
-	font-size: 0.875rem;
-	line-height: 1.6;
-}
-.lumen-post-body pre code,
-.lumen-page-body pre code {
-	font-size: 100%;
-	padding: 0;
-}
-
-/* Tables — compact and readable; horizontal scroll on mobile via the
-   media query below. Preserves user/Gutenberg alignment (no zebra/sticky). */
-.lumen-post-body table,
-.lumen-page-body table {
-	font-size: 0.95em;
-	line-height: 1.5;
-}
-.lumen-post-body th,
-.lumen-page-body th {
-	font-weight: 600;
-}
-
-/* Image captions / figure captions — reading font, quiet. */
-.lumen-post-body figcaption,
-.lumen-page-body figcaption,
-.lumen-post-body .wp-caption-text,
-.lumen-page-body .wp-caption-text {
-	font-family: var(--lumen-font-reading);
-	font-size: 0.875rem;
-	line-height: 1.6;
-	color: var(--lumen-muted);
-	margin-top: 0.5rem;
-	text-align: inherit;
-}
-
-/* Horizontal rule / separator — more breathing room. Respects block styles. */
-.lumen-post-body hr,
-.lumen-page-body hr {
-	margin: 2.75rem 0;
-}
-
-/* Wide tables on narrow screens scroll horizontally. */
-@media (max-width: 767px) {
-	.lumen-post-body table,
-	.lumen-page-body table {
-		display: block;
-		width: 100%;
-		overflow-x: auto;
-	}
-}
-
-.lumen-post-nav {
-	max-width: var(--lumen-content-max);
-	margin-inline: auto;
-	margin-top: 2.75rem;
-	padding-top: 1.75rem;
-	border-top: 1px solid var(--lumen-border);
-	display: flex;
-	flex-wrap: wrap;
-	gap: 1rem;
-	align-items: center;
-}
-/* Core the_post_navigation() emits:
-     <nav class="navigation post-navigation">
-       <div class="nav-links">
-         <div class="nav-previous">…</div>
-         <div class="nav-next">…</div>
-       </div>
-     </nav>
-   Style those exact Core classes; no nth-child fallback.
-   The link text is two-layer: a small sans .lumen-post-nav-label and a
-   FangSong .lumen-post-nav-title; both live inside the same <a>. */
-.lumen-post-nav .post-navigation {
-	flex: 1 1 100%;
-}
-.lumen-post-nav .post-navigation .nav-links {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 1rem;
-	align-items: center;
-}
-.lumen-post-nav .post-navigation .nav-previous,
-.lumen-post-nav .post-navigation .nav-next {
-	margin: 0;
-	min-width: 0;
-}
-.lumen-post-nav .post-navigation .nav-previous {
-	margin-right: auto;
-}
-.lumen-post-nav .post-navigation .nav-next {
-	margin-left: auto;
-}
-/* Core emits an empty .nav-previous / .nav-next when there is no neighbour;
-   collapse it so a single-neighbour post shows one pill aligned to its side
-   rather than a gap or an empty box. */
-.lumen-post-nav .post-navigation .nav-previous:empty,
-.lumen-post-nav .post-navigation .nav-next:empty {
-	display: none;
-}
-
-/* Legacy label/title classes are no longer emitted by single.php, but the
-   rules are kept harmless in case a child theme or filter reintroduces them. */
-.lumen-post-nav a {
-	display: inline-flex;
-	align-items: center;
-	gap: 0 0.5rem;
-	color: var(--lumen-fg-soft);
-	text-decoration: none;
-}
-.lumen-post-nav-label {
-	font-family: var(--lumen-sans);
-	font-size: 0.8125rem;
-	font-weight: 400;
-	color: var(--lumen-muted);
-}
-.lumen-post-nav-title {
-	font-family: var(--lumen-font-reading);
-	font-size: 1.05rem;
-	font-weight: 400;
-	line-height: 1.4;
-}
-
-/* ============================================================
-   Page
-   ============================================================ */
-
-.lumen-page-title {
-	font-family: var(--lumen-font-reading);
-	font-size: clamp(1.75rem, 3vw, 2.5rem);
-	font-weight: 400;
-	line-height: 1.5;
-	margin-bottom: 0.75rem;
-}
-
-.lumen-page-wrap {
-	max-width: var(--lumen-content-max);
-	margin-inline: auto;
-}
-
-.lumen-page-body {
-	margin-top: 1rem;
-	font-family: var(--lumen-font-reading);
-	font-weight: 400;
-	line-height: 1.9;
-}
-
-/* ============================================================
-   Search / 404
-   ============================================================ */
-
-.lumen-not-found-wrap {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	min-height: calc(100vh - 2rem);
-}
-
-.lumen-not-found {
-	text-align: center;
-	padding-block: var(--lumen-space-5);
-}
-
-.lumen-not-found-code {
-	font-size: 5rem;
-	font-weight: 700;
-	margin: 0;
-}
-
-.lumen-not-found-message {
-	font-size: 1.25rem;
-}
-
-.lumen-not-found-sub {
-	color: var(--lumen-muted);
-}
-
-/* ============================================================
-   Comments — v1.1.15 minimal redesign
-   ============================================================
-   Reads Core's native comment DOM (xhtml format): bare <li> items are wrapped
-   in a semantic <ol.lumen-comment-list>; nested replies use Core's
-   <ul class="children">. Only real Core classes are targeted.
-
-   Visual language: calm, soft, unified with the rest of Lumen.
-     - comment text sits in a light-grey "chat bubble" (WhatsApp-like, but
-       still a blog: no tails, no saturated colours, no heavy shadow)
-     - dashed light-grey rules separate one comment from the next
-     - author name is a grey pill, date + Reply sit on the same compact row
-     - Reply is a soft green pill (same family as the category pill)
-
-   No heading is rendered at all (see comments.php): "Comments",
-   "Comments (N)" and "Leave a comment" are gone. */
-
-/* Section: clear separation from the Previous/Next nav. No card, no shadow. */
-.lumen-comments {
-	margin-top: 3rem;
-	padding-top: 2rem;
-	max-width: var(--lumen-content-max);
-	margin-inline: auto;
-	border-top: 1px solid var(--lumen-border);
-}
-
-/* The section heading is intentionally absent. The rule is kept (harmless) so
-   an empty Core/plugin-injected title never inherits a stray 1.5rem block. */
-.lumen-comments-title:empty {
-	display: none;
-}
-
-/* Top-level list container (semantic <ol> for the bare <li> items). */
-.lumen-comment-list {
-	list-style: none;
-	margin: 0;
-	padding: 0;
-}
-
-/* Dashed rule *between* comments — drawn on the item, never across the bubble
-   (the bubble is a child of .comment-body, so the rule stays in the gap).
-   v1.1.16: vertical rhythm halved (24px -> 12px) at the user's request; the
-   dashed rule, the colours and the horizontal metrics are unchanged. */
-.lumen-comment-list > li {
-	margin: 0;
-	padding: 0.75rem 0;
-	border-top: 1px dashed var(--lumen-border);
-}
-.lumen-comment-list > li:first-child {
-	padding-top: 0;
-	border-top: none;
-}
-
-/* Item body: reset the default <div> margins. */
-.lumen-comments .comment-body {
-	margin: 0;
-}
-
-/* ------------------------------------------------------------
-   Compact header row: author pill · date · Reply
-   ------------------------------------------------------------ */
-
-/* Core emits .comment-author, .comment-meta and .reply as separate blocks.
-   We make the item a containing block and float-free-position them onto one
-   flex row via the item's own flex context: .comment-body becomes the row
-   owner and the three children become row items.
-
-   Avatar: Core prints it inside .comment-author. A 48px gravatar next to a
-   compact pill row made the header two-storey and broke the minimal,
-   calm look that this round asks for, so the avatar is *visually* hidden
-   (not removed from the DOM). Screen readers and Core's own markup are
-   unaffected; the author pill carries the identity instead. */
-.lumen-comments .comment-body {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	column-gap: 0.5rem;
-	row-gap: 0.175rem;
-}
-
-.lumen-comments .comment-author {
-	display: inline-flex;
-	align-items: center;
-	gap: 0.5rem;
-	margin: 0;
-	min-width: 0;
-}
-
-.lumen-comments .comment-author .avatar {
-	/* Visually hidden, still in the accessibility tree. */
-	position: absolute;
-	width: 1px;
-	height: 1px;
-	padding: 0;
-	margin: -1px;
-	overflow: hidden;
-	clip: rect(0, 0, 0, 0);
-	clip-path: inset(50%);
-	white-space: nowrap;
-	border: 0;
-	/* v1.1.20: take the avatar out of the flex flow entirely. It is already
-	   `position: absolute` and clipped to 1px, but as a flex ITEM it still
-	   consumed a `gap` slot, which added a phantom 8px between the invisible
-	   avatar and the author name. With no flex basis it contributes no width
-	   and no gap, so the author-to-date separation is governed solely by the
-	   author track's own padding - predictable, and inside the required
-	   8-12px band. Accessibility is unaffected: the element remains in the DOM
-	   and in the accessibility tree. */
-	flex: 0 0 0;
-	align-self: center;
-}
-
-/* Author name → grey pill (the theme's pill family, calmer than the green
-   category pill; the green is reserved for actions like Reply / submit).
-
-   v1.1.16 — ONE pill layer only. The name is rendered by comments.php as
-   plain text (Core's get_comment_author_link is filtered), so there is no
-   inner <a> any more. The styling is nonetheless attached to `.fn` alone, and
-   an explicit `.fn a` reset is kept below: if a comment ever reached this list
-   through a path that bypassed the filter, the link must not become a second,
-   nested pill.
-
-   <cite> is italic in every browser's UA stylesheet — that is what made the
-   name look slanted — so font-style is normalised here. There is deliberately
-   no :hover rule: the name is static text, not a control.
-
-   v1.1.17 (C) doubled this to 26px. v1.1.18 (A) reverses that: production
-   feedback was that 26px reads far too large beside the date, so the size is
-   now 1.0625rem, i.e. exactly 17px in a 16px-root document. Everything that
-   made the pill safe is untouched - the 1px/10px padding, the 999px radius,
-   the single layer, the normal weight, the static text and the absence of any
-   :hover rule - so this changes the type size and nothing else. line-height
-   returns to 1.4, which at 17px keeps the capsule a true capsule and still
-   leaves it taller than the 12.6px date beside it, so the name stays the
-   visually dominant element on the meta row without dwarfing it. */
-.lumen-comments .comment-author .fn {
-	display: inline-block;
-	padding: 1px 10px;
-	font-family: var(--lumen-sans);
-	font-size: 1.0625rem;
-	font-style: normal;
-	font-weight: 500;
-	line-height: 1.4;
-	color: var(--lumen-comment-pill-fg);
-	background: var(--lumen-comment-pill);
-	border-radius: 999px;
-	text-decoration: none;
-	overflow-wrap: anywhere;
-	max-width: 100%;
-}
-
-/* Defensive: a link inside .fn must never add a second pill layer and must
-   never change on hover/focus. */
-.lumen-comments .comment-author .fn a,
-.lumen-comments .comment-author .fn a:hover,
-.lumen-comments .comment-author .fn a:focus {
-	padding: 0;
-	margin: 0;
-	font: inherit;
-	font-style: normal;
-	color: inherit;
-	background: none;
-	border: 0;
-	border-radius: 0;
-	box-shadow: none;
-	text-decoration: none;
-}
-
-/* Core's "says" is decorative connective text — keep it for screen readers,
-   drop it from the visual compact row. */
-.lumen-comments .comment-author .says {
-	position: absolute;
-	width: 1px;
-	height: 1px;
-	padding: 0;
-	margin: -1px;
-	overflow: hidden;
-	clip: rect(0, 0, 0, 0);
-	clip-path: inset(50%);
-	white-space: nowrap;
-	border: 0;
-}
-
-/* Date (and optional edit link): quiet, same row, tabular numerals. */
-.lumen-comments .comment-meta {
-	display: inline-flex;
-	align-items: baseline;
-	gap: 0.5rem;
-	margin: 0;
-	font-family: var(--lumen-sans);
-}
-.lumen-comments .comment-meta a,
-.lumen-comments .comment-meta .comment-date {
-	font-size: 0.7875rem;
-	color: var(--lumen-muted);
-	font-variant-numeric: tabular-nums;
-	text-decoration: none;
-}
-.lumen-comments .comment-meta a:hover {
-	color: var(--lumen-fg);
-}
-/* v1.1.17 (D): Core prints "(Edit)" as bare text. The parentheses are removed
-   and the link becomes a quiet lavender capsule on the same header row as the
-   author and the date.
-
-   The colour pair is the site's EXISTING purple language, taken verbatim from
-   the category statistics pill: background #D8CBEA on text #49375F. Reusing
-   the established pair rather than inventing a new purple keeps the site to
-   one purple; measured contrast is the same 6.84:1 already documented for that
-   pill, so this stays WCAG AA.
-
-   The parentheses are hidden, not deleted: Core's string lives in a
-   translatable gettext call, so removing "(...)" by filtering the text would
-   fight every locale. Hiding the two bracket glyphs with a zero-width,
-   clipped box keeps the link's accessible name reading "Edit" while leaving
-   Core's string and translation untouched.
-
-   .comment-meta is already a flex row item (order: 2) alongside the author
-   pill, so the capsule lands on the same line automatically. */
-/* Core renders the edit link as <a class="comment-edit-link"> inside
-   .comment-meta.commentmetadata — there is no .edit-link wrapper element in
-   Core's xhtml comment format, so the anchor itself is styled. */
-.lumen-comments .comment-meta .comment-edit-link {
-	display: inline-flex;
-	align-items: center;
-	margin: 0;
-	padding: 1px 10px;
-	font-family: var(--lumen-sans);
-	font-size: 0.75rem;
-	font-weight: 500;
-	line-height: 1.5;
-	color: #49375f;
-	background: #d8cbea;
-	border-radius: 999px;
-	text-decoration: none;
-}
-.lumen-comments .comment-meta .comment-edit-link:hover,
-.lumen-comments .comment-meta .comment-edit-link:focus-visible {
-	color: #49375f;
-	background: #cbb9e3;
-}
-
-/* Awaiting moderation: quiet, not error-red. Own row under the header. */
-.lumen-comments .comment-awaiting-moderation {
-	font-family: var(--lumen-sans);
-	font-size: 0.8rem;
-	color: var(--lumen-muted);
-	margin: 0;
-}
-
-/* ------------------------------------------------------------
-   Comment text — light grey chat bubble
-   ------------------------------------------------------------ */
-
-/* The bubble spans the full row (flex-basis 100%) so it always starts on a
-   new line under the header row, whatever the header wraps to. Soft grey,
-   generous radius, no hard border, no heavy shadow. Comment text is
-   direct-child <p> of .comment-body (Core's format); the bubble is drawn by
-   the first paragraph so paragraphs inside the comment stack inside the
-   bubble instead of each becoming its own bubble. */
-/* The bubble is a grid item spanning both columns. Its right padding is the
-   normal 0.95rem PLUS the width of the action lane that overlays it, so the
-   first line of text stops before the pill. Because the padding applies to the
-   whole block, every following line also stops there and the copy reads as a
-   clean column beside the button; on a short comment that costs nothing,
-   because there is no second line at all. */
-.lumen-comments .comment-body > p {
-	width: 100%;
-	min-width: 0;
-	margin: 0;
-	padding: 0.375rem 0.95rem;
-	background: var(--lumen-comment-bubble);
-	border-radius: 14px;
-}
-/* Only a comment that actually has a Reply button reserves the lane, so a
-   comment the visitor cannot reply to keeps its full text width. */
-.lumen-comments .comment-body:has(> .reply) > p {
-	padding-right: calc(0.95rem + var(--lumen-reply-lane));
-}
-
-/* Subsequent paragraphs (and pre blocks) join the bubble visually. */
-.lumen-comments .comment-body > p + p,
-.lumen-comments .comment-body > pre {
-	width: 100%;
-	min-width: 0;
-	margin: 0;
-}
-
-/* v1.1.18 (C): the Reply action shares the FIRST line of the comment text
-   instead of occupying a dedicated second row.
-
-   v1.1.17 absolutely positioned Reply at the bubble's bottom-right and paid for
-   it with 30.4px of reserved bottom padding. On a one-line comment that meant
-   an empty second row holding nothing but the button, which is exactly what
-   production feedback rejected.
-
-   Core's DOM cannot be re-parented, so the association is made by LAYOUT: the
-   .comment-body becomes a 2-column grid whose second column is a fixed-width
-   action lane, and Reply is placed into row 2 / column 2 - the same grid row
-   the text bubble occupies. The bubble spans column 1, so the button sits on
-   the first line's right without ever overlapping a glyph, and because the
-   button lives inside the bubble's own grid row the grey field still encloses
-   it, which keeps the v1.1.17 "Reply belongs to this comment" reading.
-
-   Row 1 holds the header (author / date / edit) spanning both columns, so the
-   meta row is untouched. Subsequent paragraphs and <pre> blocks span both
-   columns and continue below the lane.
-
-   Column 2 is a fixed 4.25rem (68px) - comfortably wider than the ~58px pill -
-   and the bubble keeps its own 0.95rem side padding, so the gap between the
-   last glyph of line 1 and the pill is never less than ~16px.
-
-   `.comment-body` had `display: flex` before this rule; the grid replaces that
-   flex formatting context for comment bodies only. Nothing outside
-   .lumen-comments is affected.
-
-   The link is still Core's own .comment-reply-link from get_comment_reply_link(),
-   so clicking it still runs Core's comment-reply script: #respond relocates,
-   #comment_parent is set and Cancel reply works. Nothing here fakes or
-   intercepts that behaviour. */
-.lumen-comments .comment-body {
-	position: relative;
-	display: grid;
-	/* FOUR tracks (v1.1.20).
-	     1: max-content - the author pill's own width.
-	     2: max-content - the date column at exactly the width it needs.
-	     3: minmax(0, 1fr) - THE SLACK TRACK. It has no item in row 1, so it
-	        absorbs every pixel of leftover width and the header stays packed
-	        against the left edge.
-	     4: var(--lumen-reply-lane) - the action lane. Kept as a token so the
-	        track and the bubble's reserved right padding cannot drift apart.
-
-	   v1.1.19 (BUG A) removed the overlap but left `minmax(0, 1fr)` on the
-	   AUTHOR track. A 1fr track grows to fill the row, so a 45px name sat
-	   inside a 455px column and the date was pushed ~418px away from the name
-	   it belongs to. Measuring the two CONTAINERS reported a healthy 8px gap,
-	   which is why the defect survived that round's assertions: the empty space
-	   was inside `.comment-author`, not between the two boxes.
-	   Moving the flexible track to third position leaves the author/date pair
-	   content-sized and adjacent at every width, and the slack still has a
-	   legitimate owner instead of being faked away with margins. */
-	/* Track sizing, chosen after measuring real failure modes.
-	   (a) A bare `1fr` author track (v1.1.19) stretched a 45px name across
-	      455px and pushed the date ~418px away - the defect reported in
-	       production.
-	   (b) A bare `max-content` ceiling never yields: the 181px timestamp kept
-	       its track at 181px inside a 239px fourth-level nested reply, so the
-	       columns summed past the container and the document scrolled sideways.
-	   `minmax(0, max-content)` is the correct ceiling. It is content-sized, so
-	   while there is room the track takes the date's own width and the author
-	   and the date stay adjacent - but the explicit `0` floor lets the track
-	   yield under negative free space, at which point the date wraps inside its
-	   own box instead of pushing the page sideways. (A `min-content` ceiling is
-	   wrong: it collapses the date track to its narrowest single word and
-	   destroys the reading order.) All leftover width belongs to the third
-	   track, which has no row-1 item, so the slack simply sits at the right edge
-	   of the header. */
-	grid-template-columns:
-		minmax(0, max-content)
-		minmax(0, max-content)
-		minmax(0, 1fr)
-		var(--lumen-reply-lane);
-	/* An earlier rule (from the v1.1.16 flex layout of this same element) sets
-	   `column-gap: 0.5rem`. That gap survives the switch to grid and would be
-	   charged between EVERY pair of tracks, adding a second, invisible 8px on
-	   top of the author track's own padding - which is how the measured
-	   name-to-date gap reached 16px. The separator is expressed once, as the
-	   author track's padding, so the gap is zeroed here to keep the two
-	   figures from compounding. */
-	column-gap: 0;
-	align-items: start;
-}
-
-/* Header row.
-   v1.1.19 (BUG A): v1.1.18 gave .comment-author and .comment-meta the SAME
-   explicit grid area (grid-row: 1; grid-column: 1 / -1). Two grid items
-   assigned to one and the same area are NOT laid out side by side - they are
-   both placed into that single area and therefore paint over each other.
-   v1.1.20 keeps the two distinct tracks from v1.1.19 (so they still cannot
-   share a cell) and makes both of them content-sized, which is what removes
-   the former blank stretch. */
-.lumen-comments .comment-body > .comment-author,
-.lumen-comments .comment-body > .comment-meta {
-	grid-row: 1;
-}
-
-.lumen-comments .comment-body > .comment-author {
-	grid-column: 1;
-	/* The visible separator between the author pill and the date. It is grid
-	   padding on the first track rather than a margin on either child, so it
-	   cannot be collapsed away or double-applied, and it holds at every depth.
-	   0.5rem = 8px, the lower bound of the required 8-12px band; the measured
-	   visible gap lands inside the band at every viewport. */
-	padding-right: 0.5rem;
-	/* A long user name must wrap inside its own track rather than widen the
-	   row past the comment box. */
-	min-width: 0;
-}
-
-/* Track 2 is content-sized, so the date sits immediately after the author pill
-   instead of being pushed to the far edge of the comment.
-   When the comment box is too narrow for both, `minmax(0, max-content)` lets
-   the track collapse - but a COLLAPSED TRACK DOES NOT BY ITSELF STOP THE ITEM
-   FROM OVERFLOWING IT, so the box is additionally told it may be narrower than
-   its own content and how to break. Both are required: without `min-width: 0`
-   the track never shrinks, and without a wrappable child the item simply
-   spills out of the track it was given. */
-.lumen-comments .comment-body > .comment-meta {
-	grid-column: 2;
-	min-width: 0;
-	max-width: 100%;
-}
-
-/* The BUBBLE spans both columns, so the grey field still encloses the Reply
-   pill exactly as it did in v1.1.17. Only the TEXT inside it is inset on the
-   right, by an amount equal to the action lane, which is what puts Reply on
-   the first line without letting it overlap a glyph. */
-.lumen-comments .comment-body > p {
-	grid-row: 2;
-	grid-column: 1 / -1;
-	/* The bubble is a grid item, so it stretches to the full row width. With the
-	   default `content-box` sizing the Reply reservation below is ADDED to that
-	   width instead of being taken out of it: the bubble measured 301.5px inside
-	   a 299.8px track. That 1.7px was enough to give the whole document a
-	   horizontal scrollbar at 320px and 360px. `border-box` makes the
-	   reservation subtract from the box, so the bubble stays exactly as wide as
-	   the row. */
-	box-sizing: border-box;
-}
-
-/* Reply rides in row 2, column 4 - i.e. on the first line's right, inside the
-   bubble's own row. Column 4 is the action lane; track 3 is the header's slack
-   track, which has no item in row 2 and therefore contributes no width here. */
-.lumen-comments .comment-body > .reply {
-	grid-row: 2;
-	grid-column: 4;
-	align-self: start;
-	justify-self: end;
-	position: static;
-	margin: 0;
-	/* Optically centre the pill against the first 15px/1.65 line box. */
-	margin-top: 0.1875rem;
-}
-
-/* Anything that is not the bubble continues below the lane, full width. */
-.lumen-comments .comment-body > p + p,
-.lumen-comments .comment-body > pre,
-.lumen-comments .comment-body > blockquote,
-.lumen-comments .comment-body > .comment-awaiting-moderation {
-	grid-column: 1 / -1;
-}
-
-/* A comment with no text still needs its Reply button reachable; without a
-   bubble there is no row 2 to share, so it simply flows full width. */
-.lumen-comments .comment-body:not(:has(> p)) > .reply {
-	grid-column: 1 / -1;
-	justify-self: start;
-	margin-top: 0.25rem;
-}
-
-/* On the narrowest screens the 68px action lane would leave too little room
-   for the text, so the lane shrinks and the pill stays put; below that the
-   button moves to its own line rather than squeezing the copy. */
-@media (max-width: 480px) {
-	.lumen-comments .comment-body {
-		/* Narrow screens give up the action lane so the bubble keeps the full
-		   width, exactly as in v1.1.18. The header keeps content-sized tracks
-		   so the author and the date still cannot overlap.
-		   `minmax(0, max-content)`, not a bare `max-content`: a plain
-		   max-content track has no shrinking floor, so at 320px the 181px date
-		   plus the author pill overran a fourth-level nested reply and the
-		   document scrolled sideways. The explicit `0` floor lets the date track
-		   yield and wrap instead. */
-		grid-template-columns:
-			minmax(0, max-content)
-			minmax(0, max-content)
-			minmax(0, 1fr);
-	}
-	.lumen-comments .comment-body > .reply {
-		/* The action lane is gone, so Reply takes the trailing slack track and
-		   stays at the bubble's right edge instead of overflowing. */
-		grid-column: 3;
-		margin-top: 0.125rem;
-	}
-}
-
-/* Header wrapping, driven by the COMMENT'S OWN WIDTH rather than by device
-   width (v1.1.20).
-   v1.1.19 stacked the header for every viewport below 480px, which split the
-   author and the date onto two lines even when there was ample room. The
-   question is not "how wide is the device" but "how wide is this particular
-   comment box" - and a fourth-level nested reply is narrow on a wide desktop
-   too. Both header children are independent flex containers that wrap their own
-   contents when they run out of room, so the decision follows the available
-   width automatically and no breakpoint has to guess.
-   Reading order survives because the author track precedes the date track: a
-   date that no longer fits drops to the next line, never above the author. */
-.lumen-comments .comment-body > .comment-meta {
-	/* `display: flex`, not the `inline-flex` this element otherwise carries.
-	   An INLINE-flex box shrink-to-fits: as a grid item its used width is its
-	   max-content size, so it stayed 181px wide inside a 239px fourth-level
-	   reply and the row overran the viewport (scrollWidth 386px at a 320px
-	   window). A block-level flex container instead fills the track it is
-	   given and wraps its own children inside that width, which is what keeps
-	   a genuinely narrow comment inside its box. */
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	row-gap: 0.125rem;
-	/* The base rule gives this box `gap: 0.5rem`. Because the Edit pill carries
-	   10px of its own horizontal padding, that flex gap did not read as the
-	   required 8-12px between the date and the Edit pill - the two compounded
-	   into a 24.7px visual gap. The separation is expressed once, as an explicit
-	   margin on the Edit pill below, so the number that is measured is the number
-	   that was intended. */
-	column-gap: 0;
-	min-width: 0;
-	max-width: 100%;
-}
-
-/* The ONLY separation between the date and the Edit pill. 0.5rem = 8px puts the
-   measured date->Edit gap at 8px, inside the required 8-12px band, and it stays
-   there at every viewport because nothing else contributes to that gap. */
-.lumen-comments .comment-meta .comment-edit-link {
-	margin-left: 0.5rem;
-}
-
-/* Core's own comment markup separates the date and the Edit link with
-   `&nbsp;&nbsp;` - two literal non-breaking spaces. Inside a FLEX container a
-   run of text becomes an ANONYMOUS FLEX ITEM, so those spaces claimed a slot of
-   their own and added roughly 8.7px on top of the margin above (measured
-   date->Edit gap 16.7px against a required 8-12px).
-   Collapsing the container's font-size to zero makes that anonymous text run
-   generate no glyphs and therefore no box, which removes the phantom item
-   WITHOUT touching Core's markup, either anchor, or any character a reader can
-   see. The two visible children then restore their own explicit sizes, so
-   nothing about the date or the Edit pill changes. */
-.lumen-comments .comment-meta {
-	font-size: 0;
-}
-
-/* The date link must be able to break at its own spaces, otherwise the
-   shrink-to-fit promise above is never honoured and the comment box still
-   overflows. Dates Core emits ("October 14, 2026 at 11:00 am") are naturally
-   space-separated, so ordinary wrapping is enough - no word-break hacking. */
-.lumen-comments .comment-meta a,
-.lumen-comments .comment-meta .comment-date {
-	overflow-wrap: break-word;
-	min-width: 0;
-}
-
-.lumen-comments .comment-body p {
-	font-family: var(--lumen-font-reading);
-	/* v1.1.18 (B): comment copy is set to 15px with a 1.65 line-height, down
-	   from 16px / 1.85. In a 16px-root document 0.9375rem computes to exactly
-	   15px, so this is the real computed value and not a visual scale. The
-	   family, weight and colour are unchanged, as are the bubble background,
-	   its 14px radius, its horizontal padding and the compact vertical rhythm
-	   established in v1.1.16/1.1.17.
-
-	   Scoped to `.lumen-comments .comment-body p`, which reaches the top level
-	   and every nesting depth (children are just nested .comment-body
-	   elements). It does NOT reach the single-post body, Gutenberg content,
-	   the form textarea, the author pill, the date, the Edit pill, the Reply
-	   pill or the submit/cancel controls - each of those sets its own size and
-	   none of them is a `.comment-body p`. */
-	font-size: 0.9375rem;
-	font-weight: 400;
-	line-height: 1.65;
-	color: var(--lumen-fg);
-	/* v1.1.18 (C): a long unbroken string must never widen the page. This is
-	   the "very long continuous English string" case from the layout contract;
-	   without it a 36-character word repeated six times pushed the document
-	   scrollWidth to 1305px at a 390px viewport. */
-	overflow-wrap: anywhere;
-}
-
-/* Keep a single trailing margin reset for the last text block. */
-.lumen-comments .comment-body > :last-child {
-	margin-bottom: 0;
-}
-
-/* Inline links inside comment text: persistent subtle underline. */
-.lumen-comments .comment-body p a {
-	color: var(--lumen-muted);
-	text-decoration: underline;
-	text-decoration-thickness: 1px;
-	text-underline-offset: 0.18em;
-}
-.lumen-comments .comment-body p a:hover {
-	color: var(--lumen-fg);
-}
-
-/* Inline code: mono, never overflows. (pre/code already styled globally.) */
-.lumen-comments .comment-body pre {
-	overflow-x: auto;
-}
-
-/* Reply link → soft green pill.
-   v1.1.17 sequenced this row with flex `order`; v1.1.18 replaced that flex
-   formatting context with an explicit 2-column grid on .comment-body (see the
-   Feature C block above), so placement is now expressed as grid-row /
-   grid-column instead of `order`. The `order` declarations were removed rather
-   than left behind, because a stale `order` on a grid item is inert and would
-   have silently misled anyone reading this file later.
-
-   v1.1.19: this comment block was shipped WITHOUT its closing comment
-   terminator in v1.1.18. A CSS comment does not stop at the end of the line -
-   it runs on until the next terminator sequence wherever that appears - so the
-   browser swallowed this whole region: the .reply container rule, the green
-   pill rule below, its :hover rule, and the .lumen-comments-closed rule. They
-   were discarded and the Reply control rendered as unstyled black text.
-   The terminator is restored at the end of this comment, and CSS_PARSER_QA.json
-   now asserts that the sheet holds no unterminated comment.
-
-   NOTE FOR FUTURE EDITS: never write the comment terminator sequence inside a
-   comment's prose, not even in backticks or as an example. It closes the
-   comment early and silently swallows whatever follows - which is exactly the
-   bug this block documents. */
-.lumen-comments .reply {
-	display: inline-flex;
-	align-items: center;
-	margin: 0 0 0 auto;
-	font-family: var(--lumen-sans);
-}
-.lumen-comments .reply .comment-reply-link {
-	display: inline-block;
-	padding: 1px 12px;
-	font-family: var(--lumen-sans);
-	font-size: 0.7875rem;
-	font-weight: 500;
-	line-height: 1.5;
-	color: var(--lumen-comment-green-fg);
-	background: var(--lumen-comment-green);
-	border-radius: 999px;
-	text-decoration: none;
-}
-.lumen-comments .reply .comment-reply-link:hover {
-	color: var(--lumen-comment-green-fg);
-	background: var(--lumen-comment-green-hover);
-}
-
-/* Empty / closed state. */
-.lumen-comment-empty,
-.lumen-comments-closed {
-	font-family: var(--lumen-sans);
-	font-size: 0.95rem;
-	color: var(--lumen-muted);
-	margin: 0;
-}
-
-/* ------------------------------------------------------------
-   Nested threading: dashed guide per level, modest indent, same styling.
-
-   v1.1.17 (F): the reply-thread vertical rhythm is halved again, and the
-   TOP LEVEL IS DELIBERATELY LEFT ALONE. Inside a thread, every vertical value
-   that separates one reply from the next is now half of its v1.1.16 figure:
-     - child item padding-top/bottom   6px   -> 3px
-     - children margin-top             6px   -> 3px
-     - meta row -> bubble gap          3px   -> 1.5px (via row-gap below)
-   the mobile values follow the same halving. The indent, the dashed guide and
-   the nesting semantics are unchanged, and nothing is compressed to the point
-   where the dashed guide would touch a bubble.
-   ------------------------------------------------------------ */
-.lumen-comments li > ul.children,
-.lumen-comments li > ol.children {
-	list-style: none;
-	margin: 0.1875rem 0 0 1.1rem;
-	padding: 0;
-	padding-left: 1.1rem;
-	border-left: 1px dashed var(--lumen-border);
-}
-.lumen-comments ul.children > li,
-.lumen-comments ol.children > li {
-	margin: 0;
-	padding: 0.1875rem 0;
-}
-.lumen-comments ul.children > li:first-child,
-.lumen-comments ol.children > li:first-child {
-	padding-top: 0;
-}
-/* Inside a thread only: tighten the gap between the reply's meta row and its
-   bubble. Scoped to .children so the top-level row-gap is untouched. */
-.lumen-comments ul.children .comment-body,
-.lumen-comments ol.children .comment-body {
-	row-gap: 0.0875rem;
-}
-@media (max-width: 480px) {
-	.lumen-comments li > ul.children,
-	.lumen-comments li > ol.children {
-		margin: 0.125rem 0 0 0.5rem;
-		padding-left: 0.7rem;
-	}
-	.lumen-comments ul.children > li,
-	.lumen-comments ol.children > li {
-		padding: 0.15rem 0;
-	}
-}
-
-/* ------------------------------------------------------------
-   Comment form — minimal, unified, no harsh WordPress default look
-   ------------------------------------------------------------ */
-
-/* v1.1.17 (B): dashed rule between the last comment and the form.
-   Same dashed language as the rule drawn between comments, but quieter: the
-   comment-to-comment rule is 1px dashed on --lumen-border and this one reuses
-   that exact token and width, only standing further from the form so the two
-   never read as one merged line. */
-.lumen-comments .lumen-comment-divider {
-	margin: 1rem 0 0;
-	border: 0;
-	border-top: 1px dashed var(--lumen-border);
-}
-
-.lumen-comment-form-wrap {
-	margin-top: 2rem;
-}
-
-/* v1.1.17 (A): the WordPress "Logged in as … Edit your profile. Log out?
-   Required fields are marked *" paragraph is not shown. The theme already
-   passes comment_notes_before => '' in comments.php, but Core still emits
-   .logged-in-as for authenticated visitors, and it is that paragraph (not
-   .comment-notes) which carries this sentence. It is removed visually here
-   rather than filtered out of WordPress, so Core's markup, nonce-bearing
-   logout URL and the profile link stay intact in the DOM for assistive
-   technology and for anything else that may rely on them; nothing is left
-   behind in the layout because the element is taken out of flow entirely.
-   has_logged_in_as => false via the filter below is what guarantees the
-   string is gone even if this rule were ever overridden. */
-.lumen-comments .logged-in-as,
-.lumen-comments .must-log-in,
-.lumen-comments .comment-notes,
-.lumen-comments .comment-form .logged-in-as {
-	position: absolute !important;
-	width: 1px !important;
-	height: 1px !important;
-	padding: 0 !important;
-	margin: -1px !important;
-	overflow: hidden !important;
-	clip: rect(0, 0, 0, 0) !important;
-	clip-path: inset(50%) !important;
-	white-space: nowrap !important;
-	border: 0 !important;
-}
-
-/* The visible "Leave a Reply" heading is removed (title_reply => ''), but
-   Core still prints <h3 id="reply-title">. Collapse it when it carries no
-   content so it adds no gap; once the visitor clicks Reply on a comment, Core
-   injects the cancel-reply link and the h3 renders as a small quiet row.
-   (:has() is used only as a progressive enhancement — the :empty rule above
-   it already covers the real, whitespace-free empty case.) */
-.lumen-comments .comment-reply-title {
-	font-family: var(--lumen-sans);
-	font-size: 0.9rem;
-	font-weight: 500;
-	line-height: 1.5;
-	color: var(--lumen-muted);
-	margin: 0;
-	/* v1.1.18 (D): the heading now always contains a visually hidden span (see
-	   lumen_comment_form_defaults), so it is never :empty. It must therefore
-	   contribute no height of its own - the span below is taken out of flow and
-	   the heading collapses to zero, leaving no blank placeholder between the
-	   comment list and the form. */
-	height: 0;
-	overflow: hidden;
-}
-.lumen-comments .comment-reply-title:empty {
-	display: none;
-}
-.lumen-comments .comment-reply-title:not(:has(a)):not(:has(small)) {
-	display: none;
-}
-/* The visually hidden label inside #reply-title. It exists purely so Core's
-   comment-reply.js finds a real firstChild to read (an empty heading throws a
-   TypeError there and aborts the form relocation). It must not be visible and
-   must not occupy space. This is the standard clipped pattern already used
-   elsewhere in this file for Core's own hidden labels. */
-.lumen-comments .comment-reply-title .screen-reader-text {
-	position: absolute;
-	width: 1px;
-	height: 1px;
-	padding: 0;
-	margin: -1px;
-	overflow: hidden;
-	clip: rect(0, 0, 0, 0);
-	clip-path: inset(50%);
-	white-space: nowrap;
-	border: 0;
-}
-
-.lumen-comments .comment-reply-title small {
-	font-size: 0.75rem;
-	font-weight: 400;
-}
-.lumen-comments .cancel-comment-reply-link {
-	font-family: var(--lumen-sans);
-	font-size: 0.8rem;
-	color: var(--lumen-muted);
-	text-decoration: none;
-}
-.lumen-comments .cancel-comment-reply-link:hover {
-	color: var(--lumen-fg);
-}
-
-/* Notes: Core's required-field / email-privacy sentences, kept small and
-   quiet (they are re-enabled in comments.php for guest commenters). */
-.lumen-comments .comment-notes,
-.lumen-comments .comment-notes .required-field-message {
-	font-family: var(--lumen-sans);
-	font-size: 0.7875rem;
-	color: var(--lumen-muted);
-	margin: 0 0 0.85rem;
-}
-
-.lumen-comments #commentform p {
-	margin: 0 0 0.85rem;
-}
-
-/* Labels are kept in the DOM for accessibility but visually hidden: the
-   placeholder + autocomplete carry the visible affordance (E.2/E.3). */
-.lumen-comments #commentform > p > label,
-.lumen-comments #commentform .comment-form-comment > label,
-.lumen-comments #commentform .comment-form-author > label,
-.lumen-comments #commentform .comment-form-email > label,
-.lumen-comments #commentform .comment-form-url > label {
-	position: absolute;
-	width: 1px;
-	height: 1px;
-	padding: 0;
-	margin: -1px;
-	overflow: hidden;
-	clip: rect(0, 0, 0, 0);
-	clip-path: inset(50%);
-	white-space: nowrap;
-	border: 0;
-}
-
-/* Fields: one unified soft style — light grey fill, hairline border, pill-ish
-   radius. This replaces the harsh black-and-white WordPress default. */
-.lumen-comments #commentform input[type="text"],
-.lumen-comments #commentform input[type="email"],
-.lumen-comments #commentform input[type="url"],
-.lumen-comments #commentform textarea {
-	width: 100%;
-	max-width: 100%;
-	padding: 0.6rem 0.9rem;
-	font-family: var(--lumen-font-reading);
-	font-size: 0.95rem;
-	line-height: 1.7;
-	color: var(--lumen-fg);
-	background: #f7f8f8;
-	border: 1px solid var(--lumen-border);
-	border-radius: 12px;
-	box-shadow: none;
-	transition: border-color var(--lumen-duration), background var(--lumen-duration);
-}
-.lumen-comments #commentform textarea {
-	border-radius: 14px;
-	min-height: 7.5rem;
-	resize: vertical;
-}
-.lumen-comments #commentform input[type="text"]:focus,
-.lumen-comments #commentform input[type="email"]:focus,
-.lumen-comments #commentform input[type="url"]:focus,
-.lumen-comments #commentform textarea:focus {
-	background: #fff;
-	border-color: #b9c2c6;
-	outline: none;
-}
-.lumen-comments #commentform input::placeholder,
-.lumen-comments #commentform textarea::placeholder {
-	color: #9aa1a7;
-	opacity: 1;
-}
-
-/* Cookies consent: quiet inline row. */
-.lumen-comments #commentform input[type="checkbox"] {
-	flex: 0 0 auto;
-	vertical-align: baseline;
-}
-.lumen-comments #commentform .cookies-consent-text,
-.lumen-comments .comment-form-cookies-consent label {
-	font-weight: 400;
-}
-.lumen-comments .comment-form-cookies-consent {
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-	margin: 0 0 0.85rem;
-	font-family: var(--lumen-sans);
-	font-size: 0.7875rem;
-	color: var(--lumen-muted);
-}
-.lumen-comments .comment-form-cookies-consent label {
-	margin-bottom: 0;
-}
-
-/* Submit: soft green pill — the same family as the category / Reply pills,
-   replacing the former hard black button.
-
-   v1.1.18 (D): .form-submit is also the action ROW. Core's submit button and
-   the relocated native cancel link are siblings inside this <p>, so a flex row
-   places them side by side and lets them wrap naturally on narrow screens
-   (wrapping rather than hiding, so neither action is ever lost). */
-.lumen-comments .form-submit {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	gap: 0.5rem;
-	margin: 0;
-}
-.lumen-comments .form-submit input,
-.lumen-comments .form-submit button {
-	font-family: var(--lumen-sans);
-	font-size: 0.875rem;
-	font-weight: 500;
-	line-height: 1.5;
-	padding: 0.5em 1.35em;
-	color: var(--lumen-comment-green-fg);
-	background: var(--lumen-comment-green);
-	border: 1px solid #cfe8d7;
-	border-radius: 999px;
-	cursor: pointer;
-	transition: background var(--lumen-duration), border-color var(--lumen-duration);
-}
-.lumen-comments .form-submit input:hover,
-.lumen-comments .form-submit button:hover {
-	color: var(--lumen-comment-green-fg);
-	background: var(--lumen-comment-green-hover);
-	border-color: #bfe0cb;
-}
-.lumen-comments .form-submit input:focus-visible,
-.lumen-comments .form-submit button:focus-visible {
-	outline: 2px solid var(--lumen-comment-green-fg);
-	outline-offset: 2px;
-}
-
-/* v1.1.18 (D): the native cancel link, restyled as a soft-red pill sitting to
-   the RIGHT of Post Comment.
-
-   Core writes `style="display:none;"` inline on this anchor and its own
-   comment-reply.js toggles that inline style to reveal the control while a
-   reply is in progress. The inline style therefore must NOT be overridden
-   here - no `display:` declaration is set on the element itself, so Core keeps
-   full control of when it appears. The link is left in normal flow beside the
-   submit button and simply takes the pill shape.
-
-   Sizes are inherited from the same declarations as the submit button (0.875rem
-   type, 0.5em/1.35em padding, 1px border, 999px radius) so the two actions
-   measure identical heights without hard-coding a px value that could drift.
-   The border is a tint of the background rather than a hard edge. */
-.lumen-comments .form-submit #cancel-comment-reply-link {
-	font-family: var(--lumen-sans);
-	font-size: 0.875rem;
-	font-weight: 500;
-	line-height: 1.5;
-	padding: 0.5em 1.35em;
-	color: var(--lumen-comment-cancel-fg);
-	background: var(--lumen-comment-cancel);
-	border: 1px solid #f3d0d0;
-	border-radius: 999px;
-	text-decoration: none;
-	cursor: pointer;
-	transition: background var(--lumen-duration), border-color var(--lumen-duration);
-}
-.lumen-comments .form-submit #cancel-comment-reply-link:hover {
-	color: var(--lumen-comment-cancel-fg);
-	background: var(--lumen-comment-cancel-hover);
-	border-color: #eebcbc;
-}
-.lumen-comments .form-submit #cancel-comment-reply-link:focus-visible {
-	outline: 2px solid var(--lumen-comment-cancel-fg);
-	outline-offset: 2px;
-}
-
-/* ============================================================
-   Search form
-   ============================================================ */
-
-.lumen-search-form {
-	display: flex;
-	gap: 0.5rem;
-	max-width: 32rem;
-	flex-wrap: wrap;
-}
-
-.lumen-search-input {
-	flex: 1;
-	width: min(100%, 20rem);
-	min-width: 0;
-	padding: 0.6rem 0.9rem;
-}
-
-.lumen-search-button {
-	padding: 0.6rem 1rem;
-}
-
-/* ============================================================
-   Header search — icon-only button that opens the global popover
-   Scoped to .lumen-header-search* so the in-page search form
-   (search.php / 404.php) keeps its own, larger presentation.
-   There is no JavaScript here; the popover is the native API.
-   ============================================================ */
-
-.lumen-header-search-wrap {
-	min-width: 0;
-}
-
-/* The magnifier toggle: a plain, borderless icon button — no grey box, no
-   border, no shadow. The click target is padded up to 36px (desktop) /
-   44px (mobile) while the glyph itself stays ~20px / 18px. */
-.lumen-header-search-toggle {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	width: 2.25rem;  /* 36px  */
-	height: 2.25rem; /* 36px  */
-	padding: 0;
-	color: var(--lumen-fg-soft);
-	background: none;
-	border: 0;
-	border-radius: var(--lumen-radius);
-	cursor: pointer;
-	transition: color var(--lumen-duration);
-}
-
-.lumen-header-search-toggle:hover {
-	color: var(--lumen-fg);
-}
-
-/* The button is a real focus stop; keep the theme's focus ring visible.
-   The ring is the only visual affordance, so it must not be suppressed. */
-.lumen-header-search-toggle:focus-visible {
-	outline: 2px solid var(--lumen-accent);
-	outline-offset: 2px;
-}
-
-/* Open state: the icon reads as active without gaining a box. Keyed off the
-   invoker relationship the browser already knows about, so no class or
-   attribute has to be toggled by script. */
-.lumen-header-search-toggle:has(+ .lumen-search-popover:popover-open),
-.lumen-header-search-toggle[aria-expanded="true"] {
-	color: var(--lumen-fg);
-}
-
-/* ------------------------------------------------------------
-   Global search popover (native HTML Popover API)
-
-   Rendered in the browser's top layer, so it is centred in the *viewport*
-   and is not positioned relative to the header at all. That is the whole
-   point of this implementation: nothing here depends on the header's
-   position, width, sticky behaviour or right edge.
-   ------------------------------------------------------------ */
-
-/* Soft green focus hue for global search ONLY. Defined as a component-local
-   custom property so --lumen-accent and every other control in the theme are
-   left untouched. Derived from the category pill green (#176d39 / #e0f3e5)
-   so the search field joins the same visual family without becoming a solid
-   green button. */
+/* Search popover (native [popover], no JS). */
 .lumen-search-popover {
-	/* Focus hue is component-local. The global --lumen-accent is NOT touched,
-	   so no other control in the theme changes colour. */
-	--lumen-search-focus: #176d39;
-
-	/* The resting capsule draws NO border, so separation from the page comes
-	   from two very low-alpha shadow layers instead. Kept this faint on
-	   purpose: a deeper stack would read as a floating card. */
-	--lumen-search-shadow: 0 1px 2px rgba(16, 24, 20, 0.04), 0 4px 14px rgba(16, 24, 20, 0.05);
-	--lumen-search-shadow-focus: 0 1px 2px rgba(16, 24, 20, 0.05), 0 6px 20px rgba(16, 24, 20, 0.09);
-
 	position: fixed;
 	inset: 0;
-	width: min(26.25rem, calc(100vw - 2rem)); /* ~420px, minus 16px each side */
-	max-width: none;
-	max-height: none;
-	margin: auto;      /* centres the fixed box in the viewport */
+	width: min(26.25rem, 100vw - 2rem);
+	height: fit-content;
+	margin: auto;
 	padding: 0;
-	overflow: visible;
-
-	/* Feature A: a pure white, borderless capsule. `border: 0` removes the
-	   v1.1.4 hairline rather than swapping it for another visible line. */
-	background: #fff;
+	color: var(--fg);
+	background: var(--popover);
 	border: 0;
-
-	/* Full capsule, matching the date/category pills and the arrow pager. */
-	border-radius: 999px;
-
-	box-shadow: var(--lumen-search-shadow);
+	border-radius: var(--round);
+	box-shadow: var(--shadow);
 }
 
-/* The form sits between the popover and the input. It draws nothing itself,
-   but carries the capsule radius so no intermediate box can square the
-   silhouette off. */
-.lumen-search-popover .lumen-search-form {
-	display: block;
+.lumen-search-popover::backdrop {
+	background: var(--backdrop);
+	-webkit-backdrop-filter: blur(6px);
+	backdrop-filter: blur(6px);
+}
+
+.lumen-search-popover:focus-within {
+	box-shadow: var(--shadow), inset 0 0 0 1.5px var(--green-fg);
+}
+
+.lumen-search-form--popover {
 	margin: 0;
-	border-radius: 999px;
 }
 
-.lumen-search-popover .lumen-search-input {
-	display: block;
-	width: 100%;
-	height: 3rem; /* 48px */
+.lumen-search-form--popover .lumen-search-input {
+	height: 3rem;
 	padding: 0 1.25rem;
-	font-size: 1rem;
-	color: var(--lumen-fg);
 	background: transparent;
 	border: 0;
-
-	/* Stated longhand so no engine has to expand the shorthand before
-	   painting the capsule. */
-	border-top-left-radius: 999px;
-	border-top-right-radius: 999px;
-	border-bottom-right-radius: 999px;
-	border-bottom-left-radius: 999px;
-
-	/* The field never paints its own ring. An outline here is drawn OUTSIDE
-	   the white pill and would reinstate exactly the hard coloured edge this
-	   release removes. Focus is expressed on the capsule instead, below.
-	   Scoped to this field only — no global outline is removed. */
+	border-radius: var(--round);
 	outline: none;
-	box-shadow: none;
-}
-
-/* Placeholder in the muted tone; the real <label> remains the field's
-   accessible name, so this is presentational only. */
-.lumen-search-popover .lumen-search-input::placeholder {
-	color: var(--lumen-muted);
-	opacity: 1;
-}
-
-/* Soft mist backdrop — UNCHANGED from v1.1.4 (Feature C is frozen).
-   Both prefixes are required: Chromium ignores -webkit-backdrop-filter and
-   older Safari ignores the unprefixed form. */
-.lumen-search-popover::backdrop {
-	background: rgba(248, 249, 248, 0.68);
-	-webkit-backdrop-filter: blur(6px) saturate(0.9);
-	backdrop-filter: blur(6px) saturate(0.9);
-}
-
-/* Focus indicator.
-   The resting capsule is pure white, borderless, with only a soft shadow.
-   While the field holds focus, two things change:
-     1. the drop shadow deepens very slightly (a soft lift);
-     2. a single restrained green edge appears INSIDE the capsule.
-
-   The edge is INSET, so it can never form the outer halo/glow that v1.1.4
-   had, and the resting pill stays completely borderless. It is a thin inset
-   edge, not the 2px outer outline this release removes.
-
-   The inset edge is kept because a shadow-only cue measured ~1.05:1 against
-   the page, far below the 3:1 non-text contrast that WCAG 1.4.11 asks of a
-   focus indicator. This edge measures well above that while still reading as
-   a quiet tint rather than a drawn border.
-
-   :has() and :focus-within are listed in ONE rule on purpose: as two
-   separate rules the later box-shadow would silently overwrite the inset and
-   drop the focus indicator entirely. */
-.lumen-search-popover:has(.lumen-search-input:focus-visible),
-.lumen-search-popover:focus-within {
-	box-shadow:
-		var(--lumen-search-shadow-focus),
-		inset 0 0 0 1.5px var(--lumen-search-focus);
-}
-
-/* Forced-colors / High Contrast.
-   Author shadows and background colours are discarded here, so the focus cue
-   must move back to an outline. This uses the FIELD's own :focus-visible
-   rather than :has(), so the indicator does not depend on :has() support in
-   the one mode where losing it would be a real accessibility failure. */
-@media (forced-colors: active) {
-	.lumen-search-popover::backdrop {
-		background: transparent;
-		-webkit-backdrop-filter: none;
-		backdrop-filter: none;
-	}
-
-	.lumen-search-popover {
-		border: 1px solid CanvasText;
-		box-shadow: none;
-	}
-
-	.lumen-search-popover .lumen-search-input:focus-visible {
-		outline: 2px solid Highlight;
-		outline-offset: -2px;
-	}
-
-	.lumen-search-popover:has(.lumen-search-input:focus-visible),
-	.lumen-search-popover:focus-within {
-		box-shadow: none;
-	}
 }
 
 @supports not selector(:popover-open) {
 	.lumen-search-popover {
-		position: static;
-		width: auto;
-		max-width: none;
-		margin: 0 auto 0.5rem;
+		display: none;
 	}
 }
 
-.lumen-search-icon {
-	display: block;
-	width: 1.25rem;  /* 20px */
-	height: 1.25rem;
+/* Footer */
+.lumen-footer {
+	border-top: 1px solid var(--border);
+	padding-block: 1.5rem;
+	font-family: var(--font-read);
+	font-size: 0.9rem;
+	color: var(--muted);
 }
 
-/* ------------------------------------------------------------
-   Mobile M2 — two explicit rows:
-
-     row 1:  [ brand ............  magnifier ]
-     row 2:  [ navigation, wrapping freely ]
-
-   Implemented as a 2-column grid on .lumen-header-inner. The nav group
-   keeps display: contents, so its children (.lumen-header-search-wrap and
-   .lumen-site-nav) become grid items and can be placed on their own rows.
-   No negative margins and no absolute positioning, so a brand that wraps
-   to several lines can never push the magnifier off its row.
-   ------------------------------------------------------------ */
-@media (max-width: 767px) {
-	.lumen-header-inner {
-		display: grid;
-		grid-template-columns: 1fr auto;
-		align-items: center;
-		row-gap: 0.75rem;
-		column-gap: 0.5rem;
-	}
-
-	/* Row 1, column 1: brand. min-width:0 lets long titles wrap instead of
-	   forcing the grid wider than the viewport. */
-	.lumen-site-brand-wrap {
-		grid-column: 1;
-		grid-row: 1;
-		min-width: 0;
-	}
-
-	/* Row 1, column 2: the magnifier, hard right. */
-	.lumen-header-search-wrap {
-		grid-column: 2;
-		grid-row: 1;
-		justify-self: end;
-	}
-
-	/* Row 2, spanning both columns. */
-	.lumen-site-nav {
-		grid-column: 1 / -1;
-		grid-row: 2;
-		min-width: 0;
-	}
-
-	/* Comfortable touch target on small screens. */
-	.lumen-header-search-toggle {
-		width: 2.75rem;  /* 44px */
-		height: 2.75rem; /* 44px */
-	}
-
-	.lumen-search-icon {
-		width: 1.125rem; /* 18px */
-		height: 1.125rem;
-	}
-}
-
-@media (min-width: 768px) {
-	/* Desktop: brand hard left, search + navigation hard right.
-
-	   Plain flexbox with one auto margin. An auto margin absorbs exactly the
-	   free space, so the group is flush with the container's right edge —
-	   the same left/right rhythm the footer uses, so the last menu item and
-	   the footer RSS link line up. No balancing spacers, no equal-width
-	   columns, and no empty placeholder elements are needed for this.
-
-	   `min-width: 0` on the group lets a long menu shrink and wrap instead of
-	   overflowing; if it cannot fit beside the brand, flex-wrap drops the
-	   whole group onto its own line rather than letting it overlap the brand. */
-	.lumen-header-inner {
-		display: flex;
-		flex-direction: row;
-		flex-wrap: wrap;
-		align-items: center;
-		justify-content: flex-start;
-		gap: 1rem;
-		min-height: 4.75rem;
-		padding-block: 0;
-	}
-
-	/* Brand first, never stretched, never shrunk below its text. */
-	.lumen-site-brand-wrap {
-		flex: 0 1 auto;
-		min-width: 0;
-	}
-
-	/* Auto margin pushes the search + nav group to the right edge. */
-	.lumen-header-nav-group {
-		display: flex;
-		align-items: center;
-		flex: 0 1 auto;
-		margin-left: auto;
-		min-width: 0;
-	}
-
-	.lumen-header-search-wrap {
-		flex: 0 0 auto;
-		margin-right: 1rem; /* ~16px to the first navigation link */
-	}
-
-	.lumen-site-nav {
-		flex: 0 1 auto;
-		min-width: 0;
-	}
-}
-
-/* ============================================================
-   Pagination
-   ============================================================ */
-
-.lumen-pagination {
-	margin-top: 2.5rem;
-	text-align: center;
-}
-
-.lumen-pagination .prev,
-.lumen-pagination .next {
-	font-weight: 500;
-}
-
-/* ============================================================
-   Gutenberg / block styles
-   ============================================================ */
-
-/* Full-bleed alignment (progressive; modern browsers). */
-/* WP generates .alignfull / .alignwide (not .align-wp-block-align-full);
-   match the real class names so the rule actually applies. */
-.align-wp-block-align-full,
-.alignfull {
-	margin-left: calc(50% - 50vw);
-	margin-right: calc(50% - 50vw);
-}
-
-.wp-block-quote {
-	margin: 1.5rem 0;
-	padding-left: 1.5rem;
-	border-left: 2px solid var(--lumen-fg-soft);
-	color: var(--lumen-fg-soft);
-}
-
-.wp-block-image img {
-	max-width: 100%;
-	border-radius: var(--lumen-radius);
-}
-
-.wp-block-image.is-alignment-center {
+.lumen-footer-inner {
+	width: min(100% - 2 * var(--gutter), var(--wide));
 	margin-inline: auto;
-}
-
-/* Image captions (WP core .wp-caption / figcaption). */
-figcaption,
-.wp-caption-text {
-	font-size: 0.9em;
-	color: var(--lumen-muted);
-	margin-top: 0.5rem;
-	text-align: left;
-}
-
-/* Responsive galleries. */
-.gallery,
-.wp-block-gallery {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-	gap: 1rem;
-	list-style: none;
-	padding: 0;
-	margin: 0 0 1.5rem;
-}
-.gallery-item,
-.wp-block-gallery figure {
-	margin: 0;
-}
-.gallery-item img,
-.wp-block-gallery img {
-	width: 100%;
-	aspect-ratio: 1 / 1;
-	object-fit: cover;
-	border-radius: var(--lumen-radius);
-}
-
-/* ============================================================
-   Utilities
-   ============================================================ */
-
-.lumen-btn {
-	display: inline-block;
-}
-
-.lumen-not-found-home {
-	margin-top: 1.5rem;
-	display: inline-block;
-	padding: 0.6rem 1.25rem;
-	font-weight: 500;
-	text-decoration: none;
-	border: 1px solid var(--lumen-fg);
-	border-radius: var(--lumen-radius);
-}
-.lumen-not-found-home:hover {
-	background: var(--lumen-fg);
-	color: var(--lumen-bg);
-}
-
-.lumen-archive-empty {
-	text-align: center;
-	color: var(--lumen-muted);
-	padding-block: var(--lumen-space-4);
-}
-
-/* Respect prefers-reduced-motion: the skip link needs no animation. */
-@media (prefers-reduced-motion: reduce) {
-	.lumen-skip-link {
-		transition: none;
-	}
-}
-
-/* ============================================================
-   Homepage — latest posts only (.lumen-home-*)
-   ============================================================ */
-
-/* Reading column: 720px max, centered (no featured/hero — posts only). */
-.lumen-home-wrap {
-	max-width: var(--lumen-content-max);
-	margin-inline: auto;
-	/* Divider spacing: equal whitespace on each side of the line. */
-	--lumen-home-divider-gap: 2rem;
-}
-
-/* Comfortable side spacing for the homepage reading area on mobile.
-   Very small screens fall back to 20px. No effect on desktop. */
-@media (max-width: 768px) {
-	.lumen-home-wrap {
-		padding-inline: 24px;
-		--lumen-home-divider-gap: 1.75rem;
-	}
-}
-@media (max-width: 360px) {
-	.lumen-home-wrap {
-		padding-inline: 20px;
-	}
-}
-
-/* Quiet list: whitespace + a subtle divider between posts.
-   No cards, no backgrounds, no shadows. */
-.lumen-home-list {
-	margin: 0;
-	padding: 0;
-}
-
-.lumen-home-post {
-	margin: 0;
-	min-width: 0;
-	padding-bottom: var(--lumen-home-divider-gap);
-	border-bottom: 1px solid var(--lumen-border);
-}
-
-/* Space below each divider, measured against the next post's content. */
-.lumen-home-post + .lumen-home-post {
-	padding-top: var(--lumen-home-divider-gap);
-}
-
-.lumen-home-post:last-child {
-	padding-bottom: 0;
-	border-bottom: none;
-}
-
-/* DATE · CATEGORY meta line. */
-.lumen-home-meta {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
-	margin: 0 0 0.5rem;
-	font-family: var(--lumen-font-reading);
-	font-weight: 400;
-	font-size: 0.8125rem;
-	line-height: 1.5;
-	color: var(--lumen-muted);
+	justify-content: space-between;
+	gap: 0.75rem 2rem;
 }
-.lumen-home-meta .lumen-post-date {
-	font-variant-numeric: tabular-nums;
-}
-/* The date/category pill rules in the shared block above now own the
-   appearance of .lumen-post-cats / .lumen-post-cat in this context. The
-   previous inline text rules (middle-dot separator, grey 0.8125rem links)
-   were removed here so they can no longer override the pills. */
 
-/* Title: FangSong-style reading serif, medium weight (not 600/700). */
-.lumen-home-title {
-	margin: 0 0 0.75rem;
-	font-family: var(--lumen-font-reading);
+.lumen-footer-main {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+}
+
+.lumen-footer-nav {
+	margin-inline: -0.5rem;
+}
+
+.lumen-footer-nav .lumen-menu a {
+	font-size: 0.95rem;
+	padding-block: 0.15rem;
+}
+
+.lumen-copyright {
+	margin: 0;
+}
+
+.lumen-footer-link {
+	padding: 0.15rem 0.5rem;
+	border-radius: var(--radius);
+}
+
+.lumen-footer-link:hover {
+	color: var(--fg);
+	background: var(--bg-soft);
+}
+
+/* 5. Pills & meta ----------------------------------------------------------- */
+
+.lumen-meta {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.4rem;
+	margin-bottom: 0.5rem;
+}
+
+.lumen-pill {
+	display: inline-block;
+	padding: 4px 10px;
+	font-family: var(--font-read);
+	font-size: 13px;
+	line-height: 1.4;
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+	color: var(--pill-fg);
+	background: var(--pill-bg);
+	border-radius: var(--round);
+}
+
+a.lumen-pill:hover {
+	color: var(--fg);
+}
+
+.lumen-pill--green {
+	color: var(--green-fg);
+	background: var(--green-bg);
+}
+
+a.lumen-pill--green:hover {
+	color: var(--green-fg);
+	background: var(--green-bg-hover);
+}
+
+.lumen-pill--purple {
+	color: var(--purple-fg);
+	background: var(--purple-bg);
+}
+
+/* 6. Lists & archives ------------------------------------------------------- */
+
+.lumen-post-list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.lumen-post-item {
+	padding-block: 2rem;
+	border-bottom: 1px solid var(--border);
+}
+
+.lumen-post-item:first-child {
+	padding-top: 0;
+}
+
+.lumen-post-item-title {
+	margin: 0 0 0.5rem;
 	font-size: 1.5rem;
-	font-weight: 500;
 	line-height: 1.55;
 }
-.lumen-home-title a {
-	font-weight: 500;
-	text-decoration: none;
-}
-.lumen-home-title a:hover {
-	opacity: 0.7;
+
+.lumen-post-item-title a:hover {
+	color: var(--fg-soft);
 }
 
-/* Excerpt: FangSong-style reading serif, taller line-height for Chinese. */
-.lumen-home-excerpt {
+.lumen-post-item-excerpt {
 	margin: 0;
-	font-family: var(--lumen-font-reading);
+	font-family: var(--font-read);
 	font-size: 1rem;
 	line-height: 1.85;
-	color: var(--lumen-fg-soft);
+	color: var(--fg-soft);
 }
 
-/* Pagination (prev = Newer Posts, next = Older Posts). */
-.lumen-home-pagination {
+.lumen-archive-header {
+	/* The panel bleeds into the side gutter so its text lines up with the
+	   reading column, but always keeps at least 8px of page margin. */
+	--bleed: min(32px, calc((100vw - min(100vw - 2 * var(--gutter), var(--column))) / 2 - 8px));
+	margin-bottom: 2rem;
+	padding: 14px var(--bleed);
+	margin-inline: calc(-1 * var(--bleed));
+	background: var(--panel);
+	border-radius: 16px;
+}
+
+.lumen-archive-header--plain {
+	padding: 0;
+	margin-inline: 0;
+	background: none;
+}
+
+.lumen-archive-heading {
 	display: flex;
+	flex-wrap: wrap;
 	align-items: center;
-	justify-content: space-between;
-	gap: 1rem;
-	margin-top: 3rem;
+	gap: 0.5rem 1rem;
 }
 
-/* ============================================================
-   Arrow pills — Blog Home pagination + Single post navigation
+.lumen-archive-title {
+	margin: 0;
+	font-size: clamp(1.75rem, 3vw, 2.25rem);
+	line-height: 1.5;
+	min-width: 0;
+}
 
-   Shared visual language: a 52x44 rounded pill whose only visible
-   content is a decorative arrow. The arrow is a pseudo-element on the
-   <a> itself, so the entire pill is the click target and the glyph is
-   never announced separately. The accessible name is supplied by a
-   visually-hidden string inside the link.
+.lumen-archive-description {
+	margin-top: 0.75rem;
+	font-family: var(--font-read);
+	color: var(--fg-soft);
+}
 
-   Scoped to .lumen-pager and .lumen-post-nav only: archive and search
-   numeric pagination, Gutenberg buttons, comment submit and footer
-   links are untouched.
-   ============================================================ */
+.lumen-archive-description p:last-child {
+	margin-bottom: 0;
+}
 
-.lumen-pager {
+.lumen-archive-header--plain .lumen-search-form {
+	margin-top: 1.25rem;
+}
+
+.lumen-empty {
+	font-family: var(--font-read);
+	color: var(--muted);
+}
+
+/* Pagination (lists and comments). */
+.lumen-pagination {
+	margin-top: 2.5rem;
+}
+
+.lumen-pagination .nav-links {
 	display: flex;
-	align-items: center;
-}
-
-/* Both pager slots are always rendered; collapse the empty ones so a
-   missing target never leaves a ghost pill or an orphaned arrow. */
-.lumen-pager:empty {
-	display: none;
-}
-
-.lumen-pager-next {
-	margin-left: auto;
-}
-
-.lumen-pager a,
-.lumen-post-nav .post-navigation .nav-links a {
-	display: inline-flex;
-	align-items: center;
+	flex-wrap: wrap;
 	justify-content: center;
-	width: 52px;
-	height: 44px;
-	background: #f0f1f2;
-	color: #52565c;
-	border-radius: 999px;
-	text-decoration: none;
-	transition: background-color var(--lumen-duration), color var(--lumen-duration);
+	gap: 0.5rem;
 }
 
-.lumen-pager a:hover,
-.lumen-post-nav .post-navigation .nav-links a:hover {
-	background: #e4e6e8;
-	color: #3b3f45;
+.lumen-pagination .page-numbers {
+	display: inline-grid;
+	place-items: center;
+	min-width: 2.5rem;
+	height: 2.5rem;
+	padding-inline: 0.75rem;
+	font-variant-numeric: tabular-nums;
+	color: var(--pill-fg);
+	background: var(--pill-bg);
+	border-radius: var(--round);
 }
 
-.lumen-pager a:focus-visible,
-.lumen-post-nav .post-navigation .nav-links a:focus-visible {
-	outline: 2px solid var(--lumen-accent);
-	outline-offset: 2px;
+.lumen-pagination a.page-numbers:hover {
+	color: var(--fg);
 }
 
-/* Decorative arrows. They live on the link box, not on a wrapper, so they
-   can never sit outside the clickable area. */
-.lumen-pager-prev a::before,
-.lumen-post-nav .post-navigation .nav-previous a::before {
-	content: '\2190';
-	font-size: 1.125rem;
-	line-height: 1;
+.lumen-pagination .page-numbers.current {
+	color: var(--bg);
+	background: var(--fg);
 }
 
-.lumen-pager-next a::after,
-.lumen-post-nav .post-navigation .nav-next a::after {
-	content: '\2192';
-	font-size: 1.125rem;
-	line-height: 1;
+.lumen-pagination .page-numbers.dots {
+	background: none;
 }
 
-/* Mobile: slightly smaller titles.
-   Divider spacing is now controlled by --lumen-home-divider-gap
-   (set to 1.75rem in the 768px media query above). */
-@media (max-width: 768px) {
-	.lumen-home-title {
-		font-size: 1.375rem;
-	}
+/* Archive page template: posts by year. */
+.lumen-year {
+	margin-top: 2.5rem;
 }
 
-/* ============================================================
-   Multi-page post / page links (wp_link_pages, <!--nextpage-->)
-   Same grey pill language as the single-post date pill.
-   ============================================================ */
+.lumen-year-title {
+	display: flex;
+	align-items: baseline;
+	gap: 0.75rem;
+	margin: 0 0 0.75rem;
+	padding-bottom: 0.5rem;
+	font-size: 1.5rem;
+	border-bottom: 1px solid var(--border);
+}
+
+.lumen-year-count {
+	font-family: var(--font-ui);
+	font-size: 0.8rem;
+	color: var(--muted);
+}
+
+.lumen-year-list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.lumen-year-list li {
+	display: grid;
+	grid-template-columns: 3.5rem 1fr;
+	gap: 1rem;
+	padding-block: 0.4rem;
+	font-family: var(--font-read);
+}
+
+.lumen-year-list time {
+	font-family: var(--font-ui);
+	font-size: 0.85rem;
+	line-height: 1.7rem;
+	color: var(--muted);
+	font-variant-numeric: tabular-nums;
+}
+
+.lumen-year-list a:hover {
+	color: var(--fg-soft);
+}
+
+/* 7. Single post / page ----------------------------------------------------- */
+
+.lumen-entry-header {
+	margin-bottom: 2rem;
+}
+
+.lumen-entry-title {
+	margin: 0 0 0.75rem;
+	font-size: clamp(1.75rem, 4vw, 2.25rem);
+	line-height: 1.5;
+}
+
+.lumen-featured {
+	margin: 0 0 2rem;
+}
+
+.lumen-featured img {
+	display: block;
+	width: 100%;
+	border-radius: var(--radius);
+}
+
+/* Long-form text. */
+.lumen-prose {
+	font-family: var(--font-read);
+	font-size: 1.0625rem;
+	line-height: 1.9;
+	padding-top: 2rem;
+	border-top: 1px dashed var(--border);
+}
+
+.lumen-prose > * {
+	margin-block: 0 1.4em;
+}
+
+.lumen-prose p {
+	text-wrap: pretty;
+}
+
+.lumen-prose h2 {
+	margin: 2.2em 0 0.8em;
+	font-size: 1.5rem;
+}
+
+.lumen-prose h3 {
+	margin: 2em 0 0.7em;
+	font-size: 1.3rem;
+}
+
+.lumen-prose h4,
+.lumen-prose h5,
+.lumen-prose h6 {
+	margin: 1.8em 0 0.6em;
+	font-size: 1.1rem;
+}
+
+.lumen-prose a {
+	text-decoration: underline;
+	text-decoration-color: var(--muted);
+	text-decoration-thickness: 1px;
+	text-underline-offset: 0.2em;
+}
+
+.lumen-prose a:hover {
+	text-decoration-color: currentColor;
+}
+
+.lumen-prose strong {
+	font-weight: 600;
+}
+
+.lumen-prose ul,
+.lumen-prose ol {
+	padding-left: 1.5em;
+}
+
+.lumen-prose li {
+	margin-bottom: 0.35em;
+}
+
+.lumen-prose blockquote {
+	margin-inline: 0;
+	padding-left: 1.25em;
+	color: var(--fg-soft);
+	border-left: 2px solid var(--border);
+}
+
+.lumen-prose blockquote > :last-child {
+	margin-bottom: 0;
+}
+
+.lumen-prose hr {
+	border: 0;
+	border-top: 1px solid var(--border);
+	margin-block: 2.5em;
+}
+
+.lumen-prose img {
+	border-radius: var(--radius);
+}
+
+.lumen-prose figcaption,
+.lumen-prose .wp-caption-text {
+	margin-top: 0.5em;
+	font-size: 0.85rem;
+	color: var(--muted);
+	text-align: center;
+}
+
+.lumen-prose table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.95rem;
+}
+
+.lumen-prose th,
+.lumen-prose td {
+	padding: 0.5em 0.75em;
+	text-align: left;
+	border: 1px solid var(--border);
+}
+
+.lumen-prose th {
+	background: var(--bg-soft);
+	font-weight: 600;
+}
+
+code,
+kbd,
+samp,
+pre {
+	font-family: var(--font-mono);
+}
+
+.lumen-prose code {
+	padding: 0.1em 0.35em;
+	font-size: 0.88em;
+	background: var(--bg-soft);
+	border-radius: var(--radius);
+}
+
+.lumen-prose pre {
+	padding: 1em 1.25em;
+	font-size: 0.85rem;
+	line-height: 1.65;
+	background: var(--bg-soft);
+	border-radius: 8px;
+	overflow-x: auto;
+	tab-size: 4;
+}
+
+.lumen-prose pre code {
+	padding: 0;
+	font-size: inherit;
+	background: none;
+}
+
+/* Multi-page posts (<!--nextpage-->). */
 .lumen-page-links {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 0.5rem;
 	margin-top: 2rem;
+	font-family: var(--font-ui);
 }
 
 .lumen-page-links .post-page-numbers {
-	display: inline-block;
+	display: inline-grid;
+	place-items: center;
 	min-width: 2rem;
-	padding: 4px 10px;
+	padding: 2px 10px;
 	font-size: 13px;
-	line-height: 1.4;
-	text-align: center;
-	color: #52565c;
-	background: #f0f1f2;
-	border-radius: 999px;
 	text-decoration: none;
-	font-variant-numeric: tabular-nums;
-}
-
-.lumen-page-links a.post-page-numbers:hover {
-	color: var(--lumen-fg);
+	color: var(--pill-fg);
+	background: var(--pill-bg);
+	border-radius: var(--round);
 }
 
 .lumen-page-links .post-page-numbers.current {
-	color: var(--lumen-bg);
-	background: var(--lumen-fg);
+	color: var(--bg);
+	background: var(--fg);
+}
+
+/* Tags */
+.lumen-entry-footer {
+	margin-top: 2.5rem;
+}
+
+.lumen-tags {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+/* Previous / next post, with titles. */
+.lumen-post-nav {
+	margin-top: 3rem;
+	padding-top: 2rem;
+	border-top: 1px solid var(--border);
+}
+
+.lumen-post-nav .nav-links {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 0.75rem;
+}
+
+@media (min-width: 600px) {
+	.lumen-post-nav .nav-links {
+		grid-template-columns: 1fr 1fr;
+	}
+
+	.lumen-post-nav .nav-next {
+		grid-column: 2;
+		text-align: right;
+	}
+}
+
+.lumen-post-nav a {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	height: 100%;
+	padding: 0.9rem 1.1rem;
+	background: var(--bg-soft);
+	border-radius: 12px;
+}
+
+.lumen-post-nav a:hover {
+	color: inherit;
+	background: var(--pill-bg);
+}
+
+.lumen-post-nav-label {
+	font-size: 0.8rem;
+	color: var(--muted);
+}
+
+.lumen-post-nav-title {
+	font-family: var(--font-read);
+	line-height: 1.5;
+}
+
+/* 404 */
+.lumen-not-found p {
+	font-family: var(--font-read);
+	color: var(--fg-soft);
+}
+
+.lumen-not-found .lumen-search-form {
+	margin-block: 1.5rem;
+}
+
+/* 8. Comments --------------------------------------------------------------- */
+
+.lumen-comments {
+	margin-top: 3rem;
+	padding-top: 2rem;
+	border-top: 1px solid var(--border);
+}
+
+.lumen-comments-title,
+.comment-reply-title {
+	margin: 0 0 1.25rem;
+	font-size: 1.25rem;
+}
+
+.lumen-comment-list,
+.lumen-comment-list .children {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.lumen-comment-list .comment,
+.lumen-comment-list .pingback,
+.lumen-comment-list .trackback {
+	padding-block: 0.75rem;
+}
+
+.lumen-comment-list > li + li {
+	border-top: 1px dashed var(--border);
+}
+
+.lumen-comment-list .children {
+	margin-left: 1rem;
+	padding-left: 1rem;
+	border-left: 1px dashed var(--border);
+}
+
+.comment-meta {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.25rem 0.5rem;
+	margin-bottom: 0.4rem;
+	font-size: 0.8rem;
+	color: var(--muted);
+}
+
+.comment-author {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	min-width: 0;
+}
+
+.comment-author .avatar {
+	width: 28px;
+	height: 28px;
+	border-radius: 50%;
+}
+
+.comment-author .fn {
+	font-size: 0.95rem;
+	font-weight: 500;
+	color: var(--fg);
+	overflow-wrap: anywhere;
+}
+
+.comment-author .says {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+}
+
+.comment-metadata {
+	display: flex;
+	gap: 0.5rem;
+}
+
+.comment-metadata a:hover {
+	color: var(--fg);
+}
+
+.comment-metadata .edit-link a {
+	padding: 1px 8px;
+	color: var(--purple-fg);
+	background: var(--purple-bg);
+	border-radius: var(--round);
+}
+
+.comment-awaiting-moderation {
+	flex-basis: 100%;
+	margin: 0;
+	font-style: normal;
+	color: var(--red-fg);
+}
+
+.comment-content {
+	padding: 0.5rem 0.95rem;
+	font-family: var(--font-read);
+	font-size: 0.95rem;
+	line-height: 1.7;
+	background: var(--bubble);
+	border-radius: 14px;
+}
+
+.comment-content > :last-child {
+	margin-bottom: 0;
+}
+
+.comment-content a {
+	text-decoration: underline;
+	text-underline-offset: 0.2em;
+}
+
+.comment-body .reply {
+	margin-top: 0.35rem;
+	text-align: right;
+}
+
+.comment-reply-link {
+	display: inline-block;
+	padding: 1px 12px;
+	font-size: 0.75rem;
+	font-weight: 500;
+	color: var(--green-fg);
+	background: var(--green-bg);
+	border-radius: var(--round);
+}
+
+.comment-reply-link:hover {
+	color: var(--green-fg);
+	background: var(--green-bg-hover);
+}
+
+.lumen-comments-closed {
+	margin-top: 1.5rem;
+	font-family: var(--font-read);
+	color: var(--muted);
+}
+
+.comment-respond {
+	margin-top: 2rem;
+	padding-top: 1.5rem;
+	border-top: 1px dashed var(--border);
+}
+
+.lumen-comment-list .comment-respond {
+	margin: 0.75rem 0 0;
+	padding-top: 0;
+	border: 0;
+}
+
+.lumen-comments > .comment-respond:first-child {
+	margin-top: 0;
+	padding-top: 0;
+	border: 0;
+}
+
+.comment-reply-title {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5rem 0.75rem;
+}
+
+.comment-reply-title small a {
+	display: inline-block;
+	padding: 1px 12px;
+	font-family: var(--font-ui);
+	font-size: 0.75rem;
+	color: var(--red-fg);
+	background: var(--red-bg);
+	border-radius: var(--round);
+}
+
+/* 9. Forms & buttons -------------------------------------------------------- */
+
+input[type="text"],
+input[type="email"],
+input[type="url"],
+input[type="search"],
+textarea {
+	width: 100%;
+	padding: 0.55rem 0.85rem;
+	font: inherit;
+	font-size: 0.95rem;
+	color: var(--fg);
+	background: var(--field);
+	border: 1px solid var(--border);
+	border-radius: 10px;
+}
+
+input:focus-visible,
+textarea:focus-visible {
+	outline: none;
+	border-color: var(--green-fg);
+	box-shadow: 0 0 0 1px var(--green-fg);
+}
+
+::placeholder {
+	color: var(--muted);
+	opacity: 1;
+}
+
+textarea {
+	min-height: 8rem;
+	font-family: var(--font-read);
+	line-height: 1.7;
+	border-radius: 14px;
+	resize: vertical;
+}
+
+.lumen-button,
+.wp-block-button__link {
+	display: inline-block;
+	padding: 0.45rem 1.2rem;
+	font: inherit;
+	font-size: 0.875rem;
+	font-weight: 500;
+	color: var(--green-fg);
+	background: var(--green-bg);
+	border: 0;
+	border-radius: var(--round);
+	cursor: pointer;
+}
+
+.lumen-button:hover,
+.wp-block-button__link:hover {
+	color: var(--green-fg);
+	background: var(--green-bg-hover);
+}
+
+.lumen-search-form--page {
+	display: flex;
+	gap: 0.5rem;
+	margin: 0;
+}
+
+.lumen-search-form--page .lumen-search-input {
+	border-radius: var(--round);
+	padding-inline: 1.1rem;
+}
+
+.comment-form {
+	display: grid;
+	gap: 0.75rem;
+}
+
+.comment-form p {
+	margin: 0;
+}
+
+.comment-form label {
+	display: block;
+	margin-bottom: 0.2rem;
+	font-size: 0.8rem;
+	color: var(--muted);
+}
+
+.comment-form .comment-form-comment label {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+}
+
+.comment-form .required {
+	color: var(--red-fg);
+}
+
+.comment-form-cookies-consent {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.5rem;
+}
+
+.comment-form-cookies-consent label {
+	margin: 0;
+}
+
+.comment-form-cookies-consent input {
+	margin-top: 0.3rem;
+}
+
+@media (min-width: 600px) {
+	.comment-form {
+		grid-template-columns: repeat(3, 1fr);
+	}
+
+	.comment-form > * {
+		grid-column: 1 / -1;
+	}
+
+	.comment-form .comment-form-author,
+	.comment-form .comment-form-email,
+	.comment-form .comment-form-url {
+		grid-column: auto;
+	}
+}
+
+/* 10. Blocks, utilities, print ---------------------------------------------- */
+
+.alignwide {
+	width: min(100vw - 2 * var(--gutter), var(--wide));
+	margin-inline: calc(50% - min(50vw - var(--gutter), var(--wide) / 2));
+}
+
+.alignfull {
+	width: 100vw;
+	max-width: 100vw;
+	margin-inline: calc(50% - 50vw);
+}
+
+.alignfull img,
+.alignwide img {
+	width: 100%;
+}
+
+.alignleft {
+	float: left;
+	margin: 0.3em 1.5em 1em 0;
+}
+
+.alignright {
+	float: right;
+	margin: 0.3em 0 1em 1.5em;
+}
+
+.aligncenter {
+	margin-inline: auto;
+}
+
+.wp-block-image,
+.wp-caption {
+	max-width: 100%;
+}
+
+.wp-block-embed iframe {
+	max-width: 100%;
+}
+
+.sticky,
+.bypostauthor,
+.gallery-caption {
+	/* Required class names; no extra styling. */
+}
+
+.screen-reader-text {
+	position: absolute !important;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+	border: 0;
+}
+
+.screen-reader-text:focus {
+	position: static !important;
+	width: auto;
+	height: auto;
+	margin: 0;
+	clip-path: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		transition: none !important;
+		animation: none !important;
+		scroll-behavior: auto !important;
+	}
+}
+
+@media print {
+	.lumen-header,
+	.lumen-footer,
+	.lumen-skip-link,
+	.lumen-search-popover,
+	.lumen-post-nav,
+	.lumen-comments {
+		display: none;
+	}
+
+	body {
+		color: #000;
+		background: #fff;
+	}
 }

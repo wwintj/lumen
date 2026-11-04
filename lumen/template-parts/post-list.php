@@ -1,18 +1,6 @@
 <?php
 /**
- * Lumen — shared post list (archive / search).
- *
- * Template hierarchy:
- *   - category.php
- *   - tag.php
- *   - author.php
- *   - archive.php
- *   - index.php
- *   - search.php
- *
- * The context ('archive' | 'search') is received via $args, which is set by
- * load_template() in WP core when the third $args array is passed to
- * get_template_part(). Unknown or missing context normalizes to 'archive'.
+ * Lumen — the main query as a post list, with pagination or an empty state.
  *
  * @package lumen
  */
@@ -21,53 +9,27 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Read the explicit context from $args (third arg of the parent call).
-$context = 'archive';
-if ( isset( $args ) && is_array( $args ) && isset( $args['context'] ) ) {
-	$context = (string) $args['context'];
-}
-if ( '' !== $context && ! in_array( $context, array( 'archive', 'search' ), true ) ) {
-	$context = 'archive';
-}
-
-if ( have_posts() ) :
-	?>
+if ( have_posts() ) : ?>
 	<ul class="lumen-post-list">
 		<?php
 		while ( have_posts() ) :
 			the_post();
-
-			?>
-			<li>
-				<?php get_template_part( 'template-parts/post-list-item', null, array( 'context' => $context ) ); ?>
-			</li>
-			<?php
+			get_template_part( 'template-parts/post-item' );
 		endwhile;
 		?>
 	</ul>
-
-	<?php lumen_pagination(); ?>
-
 	<?php
-elseif ( ! have_posts() ) :
+	lumen_the_posts_pagination();
+else :
 	?>
-	<p class="lumen-archive-empty">
+	<p class="lumen-empty">
 		<?php
-		if ( 'search' === $context ) {
-			$query = (string) get_search_query();
-			if ( '' !== $query ) {
-				// Search empty: "No results for 'query'".
-				/* translators: %s: search query. */
-				printf( esc_html__( 'No results for %s', 'lumen' ), esc_html( $query ) );
-			} else {
-				echo esc_html__( 'No results found.', 'lumen' );
-			}
+		if ( is_search() ) {
+			esc_html_e( 'Nothing matched your search. Try different words.', 'lumen' );
 		} else {
-			// Archive empty: "No posts found."
-			echo esc_html__( 'No posts found.', 'lumen' );
+			esc_html_e( 'No posts yet.', 'lumen' );
 		}
 		?>
 	</p>
 	<?php
 endif;
-?>

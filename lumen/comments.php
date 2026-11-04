@@ -1,26 +1,6 @@
 <?php
 /**
- * Lumen — comments template.
- *
- * Renders the comments section using WordPress Core's native comment system.
- * No custom walker, no custom comment form, no theme JS. Core threading,
- * ordering, pagination, moderation and the guest/registered permission model
- * are preserved exactly.
- *
- * This template only decides *what markup is emitted*; all presentation lives
- * in main.css. Deliberate changes from the former version:
- *
- *   - No visible section heading. "Comments" / "Comments (N)" are not printed
- *     at all (the reading contract asks for a heading-free, minimal block);
- *     the section keeps its #comments landmark and an accessible name so the
- *     region is still announced and still targetable by Core's reply links.
- *   - No "Leave a comment" / "Leave a Reply" heading. Core's comment_form()
- *     title_reply is set to an empty string, so the visible heading and the
- *     duplicate <h3 id="reply-title"> text are gone while every Core field,
- *     id, name and hidden input is untouched.
- *   - No "No comments yet" filler line (requirement C.2/C.4): with zero
- *     comments the block is simply the form, and with comments closed and
- *     zero comments nothing is emitted at all.
+ * Lumen — comments: list, pagination and Core's comment form.
  *
  * @package lumen
  */
@@ -29,117 +9,48 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Password-protected posts must never expose the comment UI.
-if ( post_password_required( get_the_ID() ) ) {
+if ( post_password_required() || ( ! have_comments() && ! comments_open() ) ) {
 	return;
 }
-
-$lumen_has_comments = have_comments();
-$lumen_comments_open = comments_open();
-
-// Requirement C.4: comments closed and nothing to show → emit nothing rather
-// than a meaningless empty block.
-if ( ! $lumen_has_comments && ! $lumen_comments_open ) {
-	return;
-}
-
-/*
- * comment_form() args. Only Core-supported args are used.
- *
- * v1.1.18 (D): 'title_reply' is deliberately NOT set here any more.
- * comment_form() merges as wp_parse_args( $args, apply_filters(
- * 'comment_form_defaults', $defaults ) ), so anything passed in this array
- * OVERRIDES the filtered default. Passing '' here would win over the theme's
- * comment_form_defaults filter and empty <h3 id="reply-title"> completely -
- * and an empty heading makes wp-includes/js/comment-reply.js throw inside
- * addPlaceHolder() on `replyElement.firstChild.textContent`, which stops the
- * form from being relocated at all. The heading is now produced by
- * lumen_comment_form_defaults() as a visually hidden span, so it has a real
- * firstChild for Core while showing no text.
- *
- * 'comment_notes_before' is emptied so the guest email-privacy paragraph does
- * not appear; 'label_submit' is left at Core's own translated string.
- */
-$lumen_form_args = array(
-	'title_reply_before'   => '<h3 id="reply-title" class="comment-reply-title">',
-	'title_reply_after'    => '</h3>',
-	'comment_notes_before' => '',
-	'comment_notes_after'  => '',
-);
 ?>
-<section id="comments" class="lumen-comments" aria-label="<?php echo esc_attr__( 'Comments', 'lumen' ); ?>">
-	<?php if ( $lumen_has_comments ) : ?>
-		<!--
-			Comments (Core). Single #comments landmark, once, as required by the
-			reading-focused contract. wp_list_comments() emits top-level <li> items
-			with no list container (in xhtml format they are bare <li>), so we wrap
-			them in a semantic <ol class="lumen-comment-list">; the nested
-			<ul class="children"> remain valid Core child lists. Only valid Core
-			args are passed: 'avatar_size' sizes the gravatar.
+<section id="comments" class="lumen-comments">
+	<?php if ( have_comments() ) : ?>
+		<h2 class="lumen-comments-title">
+			<?php
+			$lumen_count = (int) get_comments_number();
+			echo esc_html(
+				sprintf(
+					/* translators: %s: number of comments. */
+					_n( '%s comment', '%s comments', $lumen_count, 'lumen' ),
+					number_format_i18n( $lumen_count )
+				)
+			);
+			?>
+		</h2>
 
-			Static author names (v1.1.16): the filter below is attached only for
-			the duration of this one wp_list_comments() call and detached again
-			immediately after, so the change is scoped strictly to the comment
-			list rendered here. It does not affect wp-admin, feeds, or any other
-			author output elsewhere on the site.
-		-->
 		<ol class="lumen-comment-list">
 			<?php
-			/*
-			 * Render the comment author as plain, escaped text instead of a
-			 * link. Requires no custom walker: Core builds the author from
-			 * get_comment_author_link(), so filtering that value to the safely
-			 * escaped display name removes the <a> for every comment in this
-			 * list (top-level and nested alike).
-			 *
-			 * get_comment_author_link() passes ( $link, $author, $comment_id ).
-			 * The comment ID is the THIRD argument: reading it from the second
-			 * (the author name) silently fell back to the global comment, and a
-			 * numeric author name such as "42" resolved to comment #42. The raw name
-			 * is read back through Core's own get_comment_author() and escaped
-			 * once with esc_html() — no double-escaping, no HTML survives.
-			 *
-			 * This deliberately does NOT touch the stored comment_author_url
-			 * data or any user profile; it only changes what this list prints.
-			 */
-			$lumen_static_author = static function ( $link, $author = '', $comment_id = 0 ) {
-				return esc_html( get_comment_author( $comment_id ) );
-			};
-			add_filter( 'get_comment_author_link', $lumen_static_author, 10, 3 );
-
-			wp_list_comments( array( 'avatar_size' => 48 ) );
-
-			remove_filter( 'get_comment_author_link', $lumen_static_author, 10 );
+			add_filter( 'get_comment_author_link', 'lumen_plain_comment_author', 10, 3 );
+			add_filter( 'gettext', 'lumen_comment_date_format', 10, 3 );
+			wp_list_comments(
+				array(
+					'style'       => 'ol',
+					'short_ping'  => true,
+					'avatar_size' => 32,
+					'reply_text'  => __( 'Reply', 'lumen' ),
+				)
+			);
+			remove_filter( 'gettext', 'lumen_comment_date_format', 10 );
+			remove_filter( 'get_comment_author_link', 'lumen_plain_comment_author', 10 );
 			?>
 		</ol>
 
-		<?php the_comments_pagination(); ?>
+		<?php the_comments_pagination( array( 'class' => 'lumen-pagination' ) ); ?>
 
-		<?php
-		// v1.1.17 (B): dashed rule separating the last comment from the form
-		// below. Emitted only when there is a list to separate from, so the
-		// form-only state (comments open, none yet) does not open with a
-		// stray ruled edge. Decorative, hence aria-hidden.
-		?>
-		<hr class="lumen-comment-divider" aria-hidden="true" />
+		<?php if ( ! comments_open() ) : ?>
+			<p class="lumen-comments-closed"><?php esc_html_e( 'Comments are closed.', 'lumen' ); ?></p>
+		<?php endif; ?>
 	<?php endif; ?>
 
-	<?php if ( $lumen_comments_open ) : ?>
-		<div class="lumen-comment-form-wrap">
-			<!--
-				comment_form() has no bare 'class' arg; the container/form are
-				already classed #respond.comment-respond / #commentform.comment-form
-				by Core. We scope styling to .lumen-comments in main.css.
-
-				Guest commenting is Core's decision: with "Users must be
-				registered and logged in to comment" off, Core renders the
-				Name / Email / Website fields to logged-out visitors and
-				accepts the submission through wp-comments-post.php. This
-				template does not bypass that permission model in any way.
-			-->
-			<?php comment_form( $lumen_form_args ); ?>
-		</div>
-	<?php else : ?>
-		<p class="lumen-comments-closed"><?php echo esc_html__( 'Comments are closed.', 'lumen' ); ?></p>
-	<?php endif; ?>
+	<?php comment_form(); ?>
 </section>

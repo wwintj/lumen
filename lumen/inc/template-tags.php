@@ -2,8 +2,8 @@
 /**
  * Lumen — template tags.
  *
- * Small, composable output helpers for the loop. All `lumen_`-prefixed.
- * These run in the loop context (the_post() already called).
+ * Small output helpers used by the templates. Functions that print start
+ * with `lumen_the_`/`lumen_render_`; the rest return values.
  *
  * @package lumen
  */
@@ -12,356 +12,257 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( ! function_exists( 'lumen_post_date' ) ) {
-	/**
-	 * Outputs the post date as a <time> element.
-	 *
-	 * Both values come from get_the_date(), which formats the local post_date
-	 * in the site timezone. The previous implementation parsed post_date_gmt,
-	 * which is '0000-00-00 00:00:00' for drafts and therefore produced a
-	 * bogus machine-readable datetime in previews.
-	 */
-	function lumen_post_date() {
-		$display_date = (string) get_the_date();
-		$datetime     = (string) get_the_date( DATE_W3C );
-		if ( '' === $display_date ) {
-			return;
-		}
-		echo '<time class="lumen-post-date" datetime="' . esc_attr( $datetime ) . '">' . esc_html( $display_date ) . '</time>';
+/**
+ * Print a registered nav menu, or nothing when the location is empty.
+ *
+ * @param string $location Menu location slug.
+ */
+function lumen_render_nav( $location ) {
+	if ( ! has_nav_menu( $location ) ) {
+		return;
 	}
+	wp_nav_menu(
+		array(
+			'theme_location' => $location,
+			'container'      => false,
+			'menu_class'     => 'lumen-menu',
+			'depth'          => 1,
+			'fallback_cb'    => false,
+		)
+	);
 }
 
-if ( ! function_exists( 'lumen_post_meta' ) ) {
-	/**
-	 * Outputs author + date (used in the single post header).
-	 */
-	function lumen_post_meta() {
-		$author_id = (int) get_the_author_meta( 'ID' );
-		if ( $author_id ) {
-			$name = (string) get_the_author_meta( 'display_name' );
-			$link = (string) get_author_posts_url( $author_id );
-			if ( $name !== '' && $link !== '' ) {
-				echo '<a class="lumen-post-author" href="' . esc_url( $link ) . '">' . esc_html( $name ) . '</a>';
-			}
-		}
-
-		lumen_post_date();
-	}
+/**
+ * Inline magnifier icon (decorative).
+ *
+ * @return string
+ */
+function lumen_search_icon() {
+	return '<svg class="lumen-icon" viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" focusable="false">'
+		. '<circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.6"/>'
+		. '<line x1="12.6" y1="12.6" x2="17.5" y2="17.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>'
+		. '</svg>';
 }
 
-if ( ! function_exists( 'lumen_post_categories' ) ) {
-	/**
-	 * Outputs category links for the current post (or $post_id).
-	 *
-	 * Uses get_the_category() (object-cached, filtered) and get_category_link().
-	 * The previous version read the non-existent WP_Term::$ID property (a PHP
-	 * warning on every pill) and cast get_term_link() to string, which is a
-	 * fatal error whenever it returns a WP_Error.
-	 *
-	 * @param int|null $post_id
-	 */
-	function lumen_post_categories( $post_id = null ) {
-		$terms = get_the_category( $post_id ? (int) $post_id : false );
-		if ( empty( $terms ) ) {
-			return;
-		}
-
-		$items = array();
-		foreach ( $terms as $term ) {
-			$name = (string) $term->name;
-			if ( '' === $name ) {
-				continue;
-			}
-			$link = get_category_link( $term );
-			if ( '' === $link ) {
-				$items[] = '<span class="lumen-post-cat">' . esc_html( $name ) . '</span>';
-			} else {
-				$items[] = '<a class="lumen-post-cat" href="' . esc_url( $link ) . '">' . esc_html( $name ) . '</a>';
-			}
-		}
-
-		if ( $items ) {
-			echo '<span class="lumen-post-cats">' . implode( '', $items ) . '</span>';
-		}
-	}
+/**
+ * Print the search form.
+ *
+ * @param string $context 'page' (with a submit button) or 'popover' (input only).
+ */
+function lumen_search_form( $context = 'page' ) {
+	$is_popover = ( 'popover' === $context );
+	$input_id   = $is_popover ? 'lumen-search-popover-input' : 'lumen-search-input';
+	?>
+	<form role="search" method="get" class="lumen-search-form lumen-search-form--<?php echo esc_attr( $context ); ?>" action="<?php echo esc_url( home_url( '/' ) ); ?>">
+		<label class="screen-reader-text" for="<?php echo esc_attr( $input_id ); ?>"><?php esc_html_e( 'Search', 'lumen' ); ?></label>
+		<input
+			type="search"
+			id="<?php echo esc_attr( $input_id ); ?>"
+			class="lumen-search-input"
+			name="s"
+			value="<?php echo esc_attr( get_search_query() ); ?>"
+			placeholder="<?php esc_attr_e( 'Search posts…', 'lumen' ); ?>"
+			autocomplete="off"
+			<?php echo $is_popover ? 'autofocus' : ''; ?>
+		>
+		<?php if ( ! $is_popover ) : ?>
+			<button type="submit" class="lumen-button"><?php esc_html_e( 'Search', 'lumen' ); ?></button>
+		<?php endif; ?>
+	</form>
+	<?php
 }
 
-if ( ! function_exists( 'lumen_home_excerpt' ) ) {
-	/**
-	 * Returns a trimmed excerpt for the Blog Home only.
-	 *
-	 * CJK (Chinese) text → up to 80 characters.
-	 * Latin text          → up to 24 words.
-	 *
-	 * Only used by template-parts/home-post-item.php, so Single/Archive/
-	 * Search excerpts are untouched.
-	 *
-	 * @return string
-	 */
-	function lumen_home_excerpt() {
-		$raw  = (string) get_the_excerpt();
-		$text = trim( wp_strip_all_tags( $raw ) );
-		if ( '' === $text ) {
-			return '';
-		}
-		if ( preg_match( '/[\p{Han}]/u', $text ) ) {
-			// Chinese: cut to ~80 characters.
-			$max   = 80;
-			$chars = preg_split( '//u', $text, -1, PREG_SPLIT_NO_EMPTY );
-			$kept  = array_slice( $chars, 0, $max );
-			$out   = implode( '', $kept );
-			if ( count( $chars ) > $max ) {
-				$out .= '…';
-			}
-			return $out;
-		}
-		// Latin: cut to ~24 words.
-		return wp_trim_words( $text, 24, '…' );
-	}
+/**
+ * Print the post date as a pill.
+ */
+function lumen_the_date_pill() {
+	printf(
+		'<time class="lumen-pill" datetime="%1$s">%2$s</time>',
+		esc_attr( get_the_date( DATE_W3C ) ),
+		esc_html( get_the_date() )
+	);
 }
 
-if ( ! function_exists( 'lumen_list_excerpt' ) ) {
-	/**
-	 * Returns a trimmed excerpt for archive/search lists.
-	 *
-	 * Archive: CJK 68 chars / Latin 22 words.
-	 * Search:  CJK 92 chars / Latin 28 words.
-	 * Ellipsis: U+2026.
-	 *
-	 * @param string $context 'archive' | 'search'.
-	 * @return string
-	 */
-	function lumen_list_excerpt( $context = 'archive' ) {
-		$raw  = (string) get_the_excerpt();
-		$text = trim( wp_strip_all_tags( $raw ) );
-		if ( '' === $text ) {
-			return '';
-		}
-		if ( preg_match( '/[\p{Han}]/u', $text ) ) {
-			$max   = ( 'search' === $context ) ? 92 : 68;
-			$chars = preg_split( '//u', $text, -1, PREG_SPLIT_NO_EMPTY );
-			$kept  = array_slice( $chars, 0, $max );
-			$out   = implode( '', $kept );
-			if ( count( $chars ) > $max ) {
-				$out .= '…';
-			}
-			return $out;
-		}
-		// Latin: word count.
-		return wp_trim_words( $text, ( 'search' === $context ) ? 28 : 22, '…' );
+/**
+ * Print the post's categories as green pills.
+ */
+function lumen_the_category_pills() {
+	$categories = get_the_category();
+	if ( empty( $categories ) ) {
+		return;
 	}
-}
-
-if ( ! function_exists( 'lumen_archive_title' ) ) {
-	/**
-	 * Returns the clean archive H1 title (no "Category:" / "Tag:" prefix).
-	 *
-	 * Derived from the queried object, so every standard archive type is
-	 * covered by core APIs:
-	 *   - WP_Term     → term name (category / tag / any public custom taxonomy)
-	 *   - WP_User     → display name (author archive)
-	 *   - WP_Post_Type → post-type label (post-type archive)
-	 *   - date archive → localized year / month / day via wp_date()
-	 * Falls back to core get_the_archive_title() (string return, no echo
-	 * side-effect) for any other archive type.
-	 *
-	 * @return string
-	 */
-	function lumen_archive_title() {
-		$object = get_queried_object();
-
-		// Term archives (category / tag / any public custom taxonomy).
-		if ( $object instanceof WP_Term ) {
-			$name = (string) $object->name;
-			if ( '' !== $name ) {
-				return esc_html( $name );
-			}
-		}
-
-		// Author archives.
-		if ( is_author() && $object instanceof WP_User ) {
-			$name = (string) $object->display_name;
-			if ( '' !== $name && '0' !== $name ) {
-				return esc_html( $name );
-			}
-		}
-
-		// Post-type archives.
-		if ( is_post_type_archive() && $object instanceof WP_Post_Type ) {
-			$label = (string) $object->label;
-			if ( '' !== $label ) {
-				return esc_html( $label );
-			}
-		}
-
-		// Date archives (year / month / day), localized via wp_date().
-		// Timestamps are built and formatted in UTC so the site timezone can
-		// never shift the label to the neighbouring day/month/year.
-		if ( is_date() ) {
-			$year     = (int) get_query_var( 'year' );
-			$monthnum = (int) get_query_var( 'monthnum' );
-			$day      = (int) get_query_var( 'day' );
-			$utc      = new DateTimeZone( 'UTC' );
-			if ( $year > 0 && 0 === $monthnum && 0 === $day ) {
-				return esc_html( wp_date( _x( 'Y', 'yearly archives date format', 'lumen' ), gmmktime( 12, 0, 0, 1, 1, $year ), $utc ) );
-			}
-			if ( $year > 0 && $monthnum > 0 && 0 === $day ) {
-				return esc_html( wp_date( _x( 'F Y', 'monthly archives date format', 'lumen' ), gmmktime( 12, 0, 0, $monthnum, 1, $year ), $utc ) );
-			}
-			if ( $year > 0 && $monthnum > 0 && $day > 0 ) {
-				return esc_html( wp_date( (string) get_option( 'date_format', 'F j, Y' ), gmmktime( 12, 0, 0, $monthnum, $day, $year ), $utc ) );
-			}
-		}
-
-		// Fallback: core archive title (returns a string; no echo side effect).
-		// get_the_archive_title() wraps its prefix in a <span>; strip markup
-		// so it is not printed as literal "<span>" text after escaping.
-		$title = trim( wp_strip_all_tags( (string) get_the_archive_title() ) );
-		if ( '' !== $title ) {
-			return esc_html( $title );
-		}
-
-		return '';
-	}
-}
-
-if ( ! function_exists( 'lumen_archive_context_label' ) ) {
-	/**
-	 * Returns the localized archive context line, e.g. "Category · 14 posts",
-	 * "Author · 3 posts", "0 posts", etc. Always shows the post count
-	 * (localized plural) even when it is 0.
-	 *
-	 * @param int $count Number of found posts (defaults to current $wp_query count).
-	 * @return string
-	 */
-	function lumen_archive_context_label( $count = null ) {
-		$found = (int) ( $GLOBALS['wp_query']->found_posts ?? 0 );
-		$count = null !== $count ? (int) $count : $found;
-		$count_text = lumen_posts_count_label( $count );
-
-		$object = get_queried_object();
-
-		// Term archives (category / tag / any public custom taxonomy).
-		if ( $object instanceof WP_Term && ! empty( $object->taxonomy ) ) {
-			$singular = '';
-			$tax      = get_taxonomy( $object->taxonomy );
-			if ( is_object( $tax ) && ! empty( $tax->labels->singular_name ) ) {
-				$singular = (string) $tax->labels->singular_name;
-			}
-			if ( '' !== $singular ) {
-				return $singular . ' · ' . $count_text;
-			}
-			// Fallback to core category / tag labels (localized).
-			if ( is_category() ) {
-				return __( 'Category', 'lumen' ) . ' · ' . $count_text;
-			}
-			if ( is_tag() ) {
-				return __( 'Tag', 'lumen' ) . ' · ' . $count_text;
-			}
-			return $count_text;
-		}
-
-		// Author archives.
-		if ( is_author() ) {
-			return __( 'Author', 'lumen' ) . ' · ' . $count_text;
-		}
-
-		// Date archives: only the localized count ("N posts").
-		if ( is_date() ) {
-			return $count_text;
-		}
-
-		// Post-type archives: only the localized count ("N posts").
-		if ( is_post_type_archive() ) {
-			return $count_text;
-		}
-
-		return '';
-	}
-}
-
-if ( ! function_exists( 'lumen_archive_term_description' ) ) {
-	/**
-	 * Returns the queried term description (escaped with wp_kses_post()),
-	 * empty when absent.
-	 *
-	 * Works for any public term archive (category / tag / custom taxonomy)
-	 * by reading the description from the queried object, which is a
-	 * standard WordPress Core API.
-	 *
-	 * @return string
-	 */
-	function lumen_archive_term_description() {
-		$object = get_queried_object();
-		if ( ! ( $object instanceof WP_Term ) ) {
-			return '';
-		}
-		$description = (string) $object->description;
-		if ( '' === $description ) {
-			return '';
-		}
-		return wp_kses_post( $description );
-	}
-}
-
-if ( ! function_exists( 'lumen_posts_count_label' ) ) {
-	/**
-	 * Returns the localized post count label, e.g. "1 post", "0 posts", "14 posts".
-	 *
-	 * Built with _n() + number_format_i18n() — never a hardcoded "posts".
-	 *
-	 * @param int $count
-	 * @return string
-	 */
-	function lumen_posts_count_label( $count ) {
-		$count = (int) $count;
-		/* translators: %s: number of posts. */
-		return sprintf( _n( '%s post', '%s posts', $count, 'lumen' ), number_format_i18n( $count ) );
-	}
-}
-
-if ( ! function_exists( 'lumen_search_results_label' ) ) {
-	/**
-	 * Returns the localized search results count, e.g.
-	 * "0 results for 'query'", "1 result for 'query'", "14 results for 'query'".
-	 *
-	 * Always shows the count (including 0). The query value is escaped
-	 * exactly once (esc_html) — no double-escape.
-	 *
-	 * @param int    $count Number of results.
-	 * @param string $query The search query string.
-	 * @return string
-	 */
-	function lumen_search_results_label( $count, $query ) {
-		$count = (int) $count;
-		return esc_html(
-			sprintf(
-				/* translators: 1: number of results, 2: search query. */
-				_n( "%1\$s result for '%2\$s'", "%1\$s results for '%2\$s'", $count, 'lumen' ),
-				number_format_i18n( $count ),
-				$query
-			)
+	foreach ( $categories as $category ) {
+		printf(
+			'<a class="lumen-pill lumen-pill--green" href="%1$s">%2$s</a>',
+			esc_url( get_category_link( $category ) ),
+			esc_html( $category->name )
 		);
 	}
 }
 
-if ( ! function_exists( 'lumen_list_meta' ) ) {
-	/**
-	 * Outputs the list meta for archive / search items: post date + categories.
-	 *
-	 * Uses the shared lumen_post_date() and lumen_post_categories() helpers
-	 * (date + categories, no author). The "·" separator is rendered by CSS
-	 * ::before on the categories span, so it appears only when categories
-	 * render (never an orphan dot).
-	 *
-	 * @return void
-	 */
-	function lumen_list_meta() {
-		// Wrap the date + categories in one meta block so the list-item meta
-		// styles apply in both archive and search contexts.
-		echo '<p class="lumen-post-meta">';
-		lumen_post_date();
-		lumen_post_categories();
-		echo '</p>';
+/**
+ * Print the post's tags as a list of pills.
+ */
+function lumen_the_tag_list() {
+	$tags = get_the_tags();
+	if ( empty( $tags ) || is_wp_error( $tags ) ) {
+		return;
 	}
+	echo '<ul class="lumen-tags" aria-label="' . esc_attr__( 'Tags', 'lumen' ) . '">';
+	foreach ( $tags as $tag ) {
+		printf(
+			'<li><a class="lumen-pill" href="%1$s">#%2$s</a></li>',
+			esc_url( get_tag_link( $tag ) ),
+			esc_html( $tag->name )
+		);
+	}
+	echo '</ul>';
+}
+
+/**
+ * Estimated reading time in minutes.
+ *
+ * CJK text is counted per character (~400/min), everything else per word
+ * (~220/min), so mixed Chinese/English posts get a sensible estimate.
+ *
+ * @param int|WP_Post|null $post Post.
+ * @return int
+ */
+function lumen_reading_minutes( $post = null ) {
+	$post = get_post( $post );
+	if ( ! $post ) {
+		return 0;
+	}
+	$text = wp_strip_all_tags( strip_shortcodes( $post->post_content ) );
+	$text = html_entity_decode( $text, ENT_QUOTES, 'UTF-8' );
+
+	$cjk   = (int) preg_match_all( '/[\p{Han}\p{Hiragana}\p{Katakana}\p{Hangul}]/u', $text );
+	$rest  = preg_replace( '/[\p{Han}\p{Hiragana}\p{Katakana}\p{Hangul}]/u', ' ', $text );
+	$words = (int) preg_match_all( '/[\p{L}\p{N}]+/u', (string) $rest );
+
+	return max( 1, (int) round( $cjk / 400 + $words / 220 ) );
+}
+
+/**
+ * Print the reading time as a pill.
+ */
+function lumen_the_reading_time_pill() {
+	$minutes = lumen_reading_minutes();
+	printf(
+		'<span class="lumen-pill">%s</span>',
+		esc_html(
+			sprintf(
+				/* translators: %s: number of minutes. */
+				_n( '%s min read', '%s min read', $minutes, 'lumen' ),
+				number_format_i18n( $minutes )
+			)
+		)
+	);
+}
+
+/**
+ * Trimmed plain-text excerpt: CJK by characters, other text by words.
+ *
+ * @param int $cjk_chars Max CJK characters.
+ * @param int $words     Max words for non-CJK text.
+ * @return string Plain text (not escaped).
+ */
+function lumen_get_excerpt( $cjk_chars = 90, $words = 30 ) {
+	if ( post_password_required() ) {
+		return '';
+	}
+	// A hand-written excerpt is used as written (only trimmed if too long).
+	// Otherwise start from the content itself: Core's auto excerpt is already
+	// cut by locale rules (very short for Chinese) and ends in " [&hellip;]".
+	$source = has_excerpt()
+		? get_the_excerpt()
+		: excerpt_remove_blocks( strip_shortcodes( get_the_content( '' ) ) );
+	$text   = trim( preg_replace( '/\s+/u', ' ', wp_strip_all_tags( (string) $source ) ) );
+	$text = html_entity_decode( $text, ENT_QUOTES, 'UTF-8' );
+	if ( '' === $text ) {
+		return '';
+	}
+	if ( preg_match( '/\p{Han}/u', $text ) ) {
+		if ( mb_strlen( $text ) > $cjk_chars ) {
+			$text = rtrim( mb_substr( $text, 0, $cjk_chars ) ) . '…';
+		}
+		return $text;
+	}
+	return wp_trim_words( $text, $words, '…' );
+}
+
+/**
+ * Archive heading text without Core's "Category:" style prefixes.
+ *
+ * @return string Plain text (not escaped).
+ */
+function lumen_get_archive_title() {
+	$object = get_queried_object();
+
+	if ( $object instanceof WP_Term ) {
+		return $object->name;
+	}
+	if ( $object instanceof WP_User ) {
+		return $object->display_name;
+	}
+	if ( $object instanceof WP_Post_Type ) {
+		return $object->labels->name;
+	}
+
+	$utc = new DateTimeZone( 'UTC' );
+	$y   = (int) get_query_var( 'year' );
+	$m   = (int) get_query_var( 'monthnum' );
+	$d   = (int) get_query_var( 'day' );
+	if ( is_day() && $y && $m && $d ) {
+		return wp_date( get_option( 'date_format' ), gmmktime( 12, 0, 0, $m, $d, $y ), $utc );
+	}
+	if ( is_month() && $y && $m ) {
+		return wp_date( _x( 'F Y', 'monthly archives date format', 'lumen' ), gmmktime( 12, 0, 0, $m, 1, $y ), $utc );
+	}
+	if ( is_year() && $y ) {
+		return wp_date( _x( 'Y', 'yearly archives date format', 'lumen' ), gmmktime( 12, 0, 0, 1, 1, $y ), $utc );
+	}
+
+	return wp_strip_all_tags( get_the_archive_title() );
+}
+
+/**
+ * Localised "N posts" label.
+ *
+ * @param int $count Number of posts.
+ * @return string
+ */
+function lumen_posts_count_label( $count ) {
+	return sprintf(
+		/* translators: %s: number of posts. */
+		_n( '%s post', '%s posts', (int) $count, 'lumen' ),
+		number_format_i18n( (int) $count )
+	);
+}
+
+/**
+ * Numbered pill pagination for post lists.
+ */
+function lumen_the_posts_pagination() {
+	the_posts_pagination(
+		array(
+			'mid_size'           => 1,
+			'prev_text'          => '<span aria-hidden="true">←</span><span class="screen-reader-text">' . esc_html__( 'Previous page', 'lumen' ) . '</span>',
+			'next_text'          => '<span class="screen-reader-text">' . esc_html__( 'Next page', 'lumen' ) . '</span><span aria-hidden="true">→</span>',
+			'before_page_number' => '<span class="screen-reader-text">' . esc_html__( 'Page', 'lumen' ) . ' </span>',
+			'class'              => 'lumen-pagination',
+		)
+	);
+}
+
+/**
+ * Print wp_link_pages() for posts split with <!--nextpage-->.
+ */
+function lumen_the_page_links() {
+	wp_link_pages(
+		array(
+			'before' => '<nav class="lumen-page-links" aria-label="' . esc_attr__( 'Post pages', 'lumen' ) . '">',
+			'after'  => '</nav>',
+		)
+	);
 }

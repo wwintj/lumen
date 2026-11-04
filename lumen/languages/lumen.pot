@@ -1,15 +1,15 @@
 # Copyright (C) 2026 Lumen Team
-# This file is distributed under the same license as the Lumen theme.
+# This file is distributed under the GNU General Public License v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Lumen 1.1.21\n"
+"Project-Id-Version: Lumen 1.2.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/theme/lumen\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-04T14:24:30+00:00\n"
+"POT-Creation-Date: 2026-11-04T14:51:41+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: lumen\n"
@@ -26,7 +26,7 @@ msgstr ""
 
 #. Description of the theme
 #: style.css
-msgid "Lumen is a minimalist, SEO-friendly content blog theme for a bilingual (EN/CN) site. Semantic structure, fast loading, mobile-first, and designed to pair with a thin companion plugin."
+msgid "A quiet, text-first personal blog theme for Chinese and English writing. Zero JavaScript, no web fonts, automatic dark mode, reading time, tag pills, and a year-by-year archive page."
 msgstr ""
 
 #. Author of the theme
@@ -39,178 +39,163 @@ msgstr ""
 msgid "https://github.com/wwintj"
 msgstr ""
 
+#: 404.php:15
+msgid "Page not found"
+msgstr ""
+
+#: 404.php:16
+msgid "The link may be broken, or the page may have moved. Try a search:"
+msgstr ""
+
 #: 404.php:18
-msgid "Sorry, we could not find that page."
+msgid "← Back to home"
 msgstr ""
 
-#: 404.php:21
-msgid "You may have mistyped the URL or the page may have been moved."
+#. translators: %s: number of comments.
+#: comments.php:24
+#, php-format
+msgid "%s comment"
+msgid_plural "%s comments"
+msgstr[0] ""
+msgstr[1] ""
+
+#: comments.php:40
+msgid "Reply"
 msgstr ""
 
-#: 404.php:25
-msgid "Back to home"
-msgstr ""
-
-#: comments.php:70
-msgid "Comments"
-msgstr ""
-
-#: comments.php:143
+#: comments.php:51
 msgid "Comments are closed."
 msgstr ""
 
-#: footer.php:17
-#: inc/setup.php:51
+#: footer.php:18
+#: inc/setup.php:49
 msgid "Footer menu"
 msgstr ""
 
-#: footer.php:22
-#, php-format
-msgid "© %1$s %2$s"
-msgstr ""
-
-#: footer.php:31
-msgid "RSS feed"
-msgstr ""
-
-#: header.php:20
+#: header.php:21
 msgid "Skip to content"
 msgstr ""
 
-#: header.php:62
-#: inc/template-functions.php:100
-#: inc/template-functions.php:110
-#: search.php:17
+#: header.php:33
+#: inc/template-tags.php:57
+#: inc/template-tags.php:69
+#: search.php:20
 msgid "Search"
 msgstr ""
 
-#: header.php:70
-#: inc/setup.php:50
+#: header.php:38
+#: inc/setup.php:48
 msgid "Primary menu"
 msgstr ""
 
-#: home.php:50
-msgid "Posts navigation"
+#: inc/comments.php:22
+msgid "Leave a comment"
 msgstr ""
 
-#: home.php:54
-msgid "Previous page"
-msgstr ""
-
-#: home.php:61
-msgid "Next page"
-msgstr ""
-
-#: home.php:71
-#: template-parts/post-list.php:67
-msgid "No posts found."
-msgstr ""
-
-#: inc/template-functions.php:42
-msgid "Previous"
-msgstr ""
-
-#: inc/template-functions.php:43
-msgid "Next"
-msgstr ""
-
-#: inc/template-functions.php:83
-msgid "Site search"
-msgstr ""
-
-#: inc/template-functions.php:96
-msgid "Search articles…"
-msgstr ""
-
-#: inc/template-functions.php:200
-msgid "Leave a Reply"
-msgstr ""
-
-#: inc/template-functions.php:201
+#. translators: %s: comment author name.
+#: inc/comments.php:24
 #, php-format
-msgid "Leave a Reply to %s"
+msgid "Reply to %s"
 msgstr ""
 
-#: inc/template-functions.php:213
+#: inc/comments.php:27
 msgid "Cancel"
 msgstr ""
 
-#: inc/template-functions.php:252
-msgid "Write your comment..."
+#: inc/comments.php:47
+msgid "Write your comment…"
 msgstr ""
 
-#: inc/template-tags.php:206
-msgctxt "yearly archives date format"
-msgid "Y"
+#: inc/template-tags.php:64
+msgid "Search posts…"
 msgstr ""
 
-#: inc/template-tags.php:209
+#: inc/template-tags.php:111
+msgid "Tags"
+msgstr ""
+
+#. translators: %s: number of minutes.
+#: inc/template-tags.php:156
+#, php-format
+msgid "%s min read"
+msgid_plural "%s min read"
+msgstr[0] ""
+msgstr[1] ""
+
+#: inc/template-tags.php:211
 msgctxt "monthly archives date format"
 msgid "F Y"
 msgstr ""
 
-#: inc/template-tags.php:256
-msgid "Category"
-msgstr ""
-
-#: inc/template-tags.php:259
-msgid "Tag"
-msgstr ""
-
-#: inc/template-tags.php:266
-msgid "Author"
+#: inc/template-tags.php:214
+msgctxt "yearly archives date format"
+msgid "Y"
 msgstr ""
 
 #. translators: %s: number of posts.
-#: inc/template-tags.php:319
+#: inc/template-tags.php:229
 #, php-format
 msgid "%s post"
 msgid_plural "%s posts"
 msgstr[0] ""
 msgstr[1] ""
 
-#. translators: 1: number of results, 2: search query.
-#: inc/template-tags.php:340
-#, php-format
-msgid "%1$s result for '%2$s'"
-msgid_plural "%1$s results for '%2$s'"
-msgstr[0] ""
-msgstr[1] ""
-
-#: page.php:24
-msgid "Page sections"
+#: inc/template-tags.php:241
+msgid "Previous page"
 msgstr ""
 
-#: single.php:46
+#: inc/template-tags.php:242
+msgid "Next page"
+msgstr ""
+
+#: inc/template-tags.php:243
+msgid "Page"
+msgstr ""
+
+#: inc/template-tags.php:255
 msgid "Post pages"
 msgstr ""
 
-#: single.php:69
-msgid "Previous post"
+#. Template Name of the theme
+msgid "Archives (all posts by year)"
 msgstr ""
 
-#: single.php:70
-msgid "Next post"
+#: page-templates/archives.php:60
+msgctxt "archive list date format"
+msgid "m-d"
 msgstr ""
 
-#. translators: %s: search query.
-#: template-parts/post-list.php:61
+#. translators: 1: number of results, 2: search query.
+#: search.php:27
 #, php-format
-msgid "No results for %s"
+msgid "%1$s result for “%2$s”"
+msgid_plural "%1$s results for “%2$s”"
+msgstr[0] ""
+msgstr[1] ""
+
+#: single.php:51
+msgid "← Previous"
 msgstr ""
 
-#: template-parts/post-list.php:63
-msgid "No results found."
+#: single.php:52
+msgid "Next →"
 msgstr ""
 
-#: theme.json
-msgctxt "Color name"
-msgid "Background"
+#: single.php:53
+#: single.php:54
+msgid "More posts"
 msgstr ""
 
-#: theme.json
-msgctxt "Color name"
-msgid "Background soft"
+#: template-parts/post-item.php:17
+msgid "Pinned"
+msgstr ""
+
+#: template-parts/post-list.php:28
+msgid "Nothing matched your search. Try different words."
+msgstr ""
+
+#: template-parts/post-list.php:30
+msgid "No posts yet."
 msgstr ""
 
 #: theme.json
@@ -230,15 +215,40 @@ msgstr ""
 
 #: theme.json
 msgctxt "Color name"
-msgid "Border"
+msgid "Background soft"
 msgstr ""
 
 #: theme.json
 msgctxt "Color name"
-msgid "Accent"
+msgid "Green"
 msgstr ""
 
 #: theme.json
-msgctxt "Font family name"
-msgid "Sans (system)"
+msgctxt "Color name"
+msgid "Green soft"
+msgstr ""
+
+#: theme.json
+msgctxt "Color name"
+msgid "Purple"
+msgstr ""
+
+#: theme.json
+msgctxt "Color name"
+msgid "Purple soft"
+msgstr ""
+
+#: theme.json
+msgctxt "Font size name"
+msgid "Small"
+msgstr ""
+
+#: theme.json
+msgctxt "Font size name"
+msgid "Normal"
+msgstr ""
+
+#: theme.json
+msgctxt "Font size name"
+msgid "Large"
 msgstr ""

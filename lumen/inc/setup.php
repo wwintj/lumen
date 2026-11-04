@@ -1,9 +1,6 @@
 <?php
 /**
- * Lumen — theme setup.
- *
- * Registers theme supports, nav menus, sidebar, image sizes.
- * All public helpers are `lumen_`-prefixed to avoid global collisions.
+ * Lumen — theme setup and assets.
  *
  * @package lumen
  */
@@ -12,65 +9,68 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( ! function_exists( 'lumen_setup' ) ) {
-	add_action( 'after_setup_theme', 'lumen_setup' );
+/**
+ * Theme supports, menus and translations.
+ */
+function lumen_setup() {
+	load_theme_textdomain( 'lumen', LUMEN_DIR . '/languages' );
 
-	function lumen_setup() {
-		load_theme_textdomain( 'lumen', LUMEN_DIR . '/languages' );
-
-		// --- Theme supports ----------------------------------------------
-		add_theme_support( 'title-tag' );
-		add_theme_support( 'post-thumbnails' );
-		add_theme_support( 'automatic-feed-links' );
-		add_theme_support( 'responsive-embeds' );
-		add_theme_support( 'custom-logo', array(
+	add_theme_support( 'title-tag' );
+	add_theme_support( 'automatic-feed-links' );
+	add_theme_support( 'post-thumbnails' );
+	add_theme_support( 'responsive-embeds' );
+	add_theme_support( 'align-wide' );
+	add_theme_support(
+		'custom-logo',
+		array(
 			'height'      => 80,
 			'width'       => 200,
-			'thumbnail'   => false,
-			'flex_height' => false,
+			'flex_height' => true,
 			'flex_width'  => true,
-		) );
-		add_theme_support( 'align-wide' );
-
-		// Only Core-recognised html5 feature keys. 'comment-list' and
-		// 'comment-form' are deliberately NOT declared: the comment styles in
-		// main.css are tuned to Core's classic comment markup (e.g. the
-		// .comment-meta.commentmetadata row and the "(Edit)" link).
-		add_theme_support( 'html5', array(
+		)
+	);
+	add_theme_support(
+		'html5',
+		array(
 			'search-form',
+			'comment-form',
+			'comment-list',
 			'gallery',
 			'caption',
 			'style',
 			'script',
 			'navigation-widgets',
-		) );
+		)
+	);
 
-		// --- Navigation menus --------------------------------------------
-		register_nav_menus( array(
-			'primary' => esc_html__( 'Primary menu', 'lumen' ),
-			'footer'  => esc_html__( 'Footer menu', 'lumen' ),
-		) );
+	register_nav_menus(
+		array(
+			'primary' => __( 'Primary menu', 'lumen' ),
+			'footer'  => __( 'Footer menu', 'lumen' ),
+		)
+	);
+}
+add_action( 'after_setup_theme', 'lumen_setup' );
 
-		// --- Image sizes ---------------------------------------------------
-		add_image_size( 'lumen-thumb', 640, 400, true );
-		add_image_size( 'lumen-card', 800, 450, true );
-		add_image_size( 'lumen-square', 640, 640, true );
+/**
+ * Stylesheet, plus Core's comment-reply script where threaded replies exist.
+ *
+ * The theme ships no JavaScript of its own.
+ */
+function lumen_enqueue_assets() {
+	wp_enqueue_style( 'lumen', LUMEN_URI . '/assets/css/main.css', array(), LUMEN_VERSION );
+
+	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
+		wp_enqueue_script( 'comment-reply' );
 	}
 }
+add_action( 'wp_enqueue_scripts', 'lumen_enqueue_assets' );
 
-if ( ! function_exists( 'lumen_homeposts' ) ) {
-	add_action( 'pre_get_posts', 'lumen_homeposts' );
-
-	function lumen_homeposts( $query ) {
-		// Homepage only: 8 posts per page.
-		// Does not touch Archive, Search, Category, Tag, Author,
-		// or the admin ( is_main_query() + is_home() ).
-		if (
-			! is_admin()
-			&& $query->is_main_query()
-			&& $query->is_home()
-		) {
-			$query->set( 'posts_per_page', 8 );
-		}
-	}
+/**
+ * Browser UI colour for light and dark schemes.
+ */
+function lumen_theme_color_meta() {
+	echo '<meta name="theme-color" content="#fdfdfd" media="(prefers-color-scheme: light)">' . "\n";
+	echo '<meta name="theme-color" content="#161718" media="(prefers-color-scheme: dark)">' . "\n";
 }
+add_action( 'wp_head', 'lumen_theme_color_meta', 2 );

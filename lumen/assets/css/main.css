@@ -551,22 +551,29 @@ body:has(#lumen-search:popover-open) .lumen-search-toggle {
 	anchor-name: --lumen-search-toggle;
 }
 
+.lumen-header-inner {
+	anchor-name: --lumen-header;
+}
+
+/* No frame of its own: the search capsule floats by itself. */
 .lumen-search-popover {
 	position: fixed;
 	inset: auto;
-	width: min(24rem, 100vw - 2rem);
+	width: min(22rem, 100vw - 2rem);
 	margin: 0;
-	padding: var(--space);
+	padding: 0;
+	overflow: visible;
 	color: var(--fg);
-	background: var(--card);
-	border: 1px solid var(--line);
-	border-radius: var(--radius);
+	background: none;
+	border: 0;
 }
 
 @supports (anchor-name: --a) {
 	.lumen-search-popover {
 		position-anchor: --lumen-search-toggle;
-		top: calc(anchor(bottom) + 10px);
+		/* --space below the header's outline (on phones the header is taller
+		   than the magnifier's row, so measure from the header itself). */
+		top: calc(anchor(--lumen-header bottom) + var(--space));
 		right: anchor(right);
 		position-try-fallbacks: flip-inline;
 	}
@@ -580,12 +587,19 @@ body:has(#lumen-search:popover-open) .lumen-search-toggle {
 	}
 }
 
-/* Phones: full width with a 1rem margin, still just below the magnifier. */
+/* Phones: as wide as the header, just below it. */
 @media (max-width: 600px) {
 	.lumen-search-popover {
-		left: 1rem;
-		right: 1rem;
+		left: var(--gutter);
+		right: var(--gutter);
 		width: auto;
+	}
+
+	@supports (anchor-name: --a) {
+		.lumen-search-popover {
+			left: anchor(--lumen-header left);
+			right: anchor(--lumen-header right);
+		}
 	}
 }
 
@@ -1683,49 +1697,60 @@ textarea {
 	resize: vertical;
 }
 
-/* Search form: input and button joined into one outlined capsule. */
+/* Search form: one accent-outlined capsule, like the breadcrumbs. The
+   field is borderless inside it; the button is a red capsule that fills
+   the right end edge to edge (white text), inverting on hover. */
 .lumen-search-form {
 	display: flex;
+	height: 2.25rem; /* 36px */
 	margin: 0;
+	overflow: hidden;
+	background: var(--card);
+	border: 1px solid var(--accent);
 	border-radius: var(--round);
 }
 
 .lumen-search-form .lumen-search-input {
 	flex: 1;
 	min-width: 0;
-	padding-inline: 1.1rem;
-	border-radius: var(--round) 0 0 var(--round);
+	height: 100%;
+	padding: 0 0.9rem;
+	font-size: 1rem; /* 16px: phones don't zoom in on focus */
+	background: none;
+	border: 0;
+	border-radius: 0;
 }
 
 .lumen-search-submit {
 	flex: none;
-	margin-left: -1px;
-	padding: 0 1.2rem;
+	height: 100%;
+	margin: 0;
+	padding: 0 1rem;
 	font: inherit;
-	font-size: var(--text-sm);
+	font-size: var(--text-xs);
 	font-weight: 600;
+	line-height: 1;
 	white-space: nowrap;
-	color: var(--fg);
-	background: var(--card);
-	border: 1px solid var(--line);
-	border-radius: 0 var(--round) var(--round) 0;
+	color: var(--card);
+	background: var(--accent);
+	border: 0;
+	border-radius: var(--round);
 	cursor: pointer;
+	transition: color var(--speed), background-color var(--speed);
 }
 
-.lumen-search-submit:hover {
-	color: var(--accent);
-}
-
-/* The capsule shows focus as a whole: both halves' borders darken. */
-.lumen-search-form:focus-within .lumen-search-input,
-.lumen-search-form:focus-within .lumen-search-submit {
-	border-color: var(--fg);
-}
-
-
+.lumen-search-submit:hover,
 .lumen-search-submit:focus-visible {
 	outline: none;
 	color: var(--accent);
+	background: var(--card);
+}
+
+/* Search fields: hide WebKit's own clear (×) and decoration. */
+.lumen-search-input::-webkit-search-decoration,
+.lumen-search-input::-webkit-search-cancel-button {
+	-webkit-appearance: none;
+	appearance: none;
 }
 
 .comment-form {

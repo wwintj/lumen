@@ -3,7 +3,7 @@ Contributors: wwintj
 Requires at least: 6.3
 Tested up to: 7.1
 Requires PHP: 8.2
-Version: 1.3.11
+Version: 1.3.12
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Tags: blog, one-column, custom-menu, custom-logo, featured-images, threaded-comments, translation-ready, accessibility-ready
@@ -31,6 +31,10 @@ Lumen 零 JavaScript、不連外部字型服務：只有一個 CSS 檔和兩個�
 3. （選用）新增頁面，範本選「Archives (all posts by year)」，作為文章歸檔頁。
 
 == Changelog ==
+
+= 1.3.12 =
+* 搜尋彈窗去掉外框，只留搜尋膠囊；手機上與頁首同寬、位於頁首下方。
+* 搜尋框改為紅色外框的單一膠囊（36px 高），SEARCH 按鈕紅底白字貼齊右端，懸停反轉；搜尋頁與 404 頁同樣套用。
 
 = 1.3.11 =
 * 麵包屑放大為 13px（比卡片上的分類膠囊大一級），外框改為強調色，紅色目前項目貼齊外框、不留空隙；文章數膠囊同步為 13px、24px 高。

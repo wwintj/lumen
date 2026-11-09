@@ -48,6 +48,15 @@ msgstr "取消"
 msgid "Write your comment…"
 msgstr "写下你的评论…"
 
+msgid "Name"
+msgstr "名称"
+
+msgid "Email"
+msgstr "电子邮箱"
+
+msgid "Website"
+msgstr "网站"
+
 msgid "Search posts…"
 msgstr "搜索文章…"
 

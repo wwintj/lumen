@@ -107,6 +107,18 @@ msgstr ""
 msgid "Write your comment…"
 msgstr ""
 
+#: inc/comments.php
+msgid "Name"
+msgstr ""
+
+#: inc/comments.php
+msgid "Email"
+msgstr ""
+
+#: inc/comments.php
+msgid "Website"
+msgstr ""
+
 #: inc/template-tags.php:77
 msgid "Search posts…"
 msgstr ""

@@ -48,6 +48,15 @@ msgstr "取消"
 msgid "Write your comment…"
 msgstr "寫下你的留言…"
 
+msgid "Name"
+msgstr "名稱"
+
+msgid "Email"
+msgstr "電子郵件"
+
+msgid "Website"
+msgstr "網站"
+
 msgid "Search posts…"
 msgstr "搜尋文章…"
 

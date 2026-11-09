@@ -51,6 +51,30 @@ function lumen_comment_textarea_placeholder( $field ) {
 add_filter( 'comment_form_field_comment', 'lumen_comment_textarea_placeholder' );
 
 /**
+ * Name / email / website: the label moves into the field as a placeholder
+ * (the real <label> stays for screen readers), so the three fields read as
+ * one tidy row of capsules.
+ *
+ * @param array $fields Core field markup, keyed by field name.
+ * @return array
+ */
+function lumen_comment_field_placeholders( $fields ) {
+	$req    = get_option( 'require_name_email' ) ? ' *' : '';
+	$labels = array(
+		'author' => __( 'Name', 'lumen' ) . $req,
+		'email'  => __( 'Email', 'lumen' ) . $req,
+		'url'    => __( 'Website', 'lumen' ),
+	);
+	foreach ( $labels as $key => $label ) {
+		if ( isset( $fields[ $key ] ) && ! str_contains( $fields[ $key ], 'placeholder=' ) ) {
+			$fields[ $key ] = preg_replace( '/<input /', '<input placeholder="' . esc_attr( $label ) . '" ', $fields[ $key ], 1 );
+		}
+	}
+	return $fields;
+}
+add_filter( 'comment_form_default_fields', 'lumen_comment_field_placeholders' );
+
+/**
  * Commenter names render as plain text, never as a link to their website.
  *
  * Attached only around wp_list_comments() in comments.php.

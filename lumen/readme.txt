@@ -3,7 +3,7 @@ Contributors: wwintj
 Requires at least: 6.3
 Tested up to: 7.1
 Requires PHP: 8.2
-Version: 1.3.12
+Version: 1.3.13
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Tags: blog, one-column, custom-menu, custom-logo, featured-images, threaded-comments, translation-ready, accessibility-ready
@@ -31,6 +31,10 @@ Lumen 零 JavaScript、不連外部字型服務：只有一個 CSS 檔和兩個�
 3. （選用）新增頁面，範本選「Archives (all posts by year)」，作為文章歸檔頁。
 
 == Changelog ==
+
+= 1.3.13 =
+* 留言表單改為與搜尋框一致的風格：名稱、電子郵件、網站改為膠囊輸入框（標籤移入框內），留言框縮短並與卡片同圓角，聚焦時外框變紅。
+* 「發佈留言」改為紅底白字膠囊，懸停反轉；桌面上與「記住我」同一列、靠右。
 
 = 1.3.12 =
 * 搜尋彈窗去掉外框，只留搜尋膠囊；手機上與頁首同寬、位於頁首下方。
